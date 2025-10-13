@@ -4,7 +4,6 @@ from pydantic import BaseModel, Field, model_validator
 
 class ValueGeneratorBase(BaseModel):
     once: bool = False
-    generatorType: str
 
 class SeqCountBase(BaseModel):
     T: int = 1
@@ -12,14 +11,17 @@ class SeqCountBase(BaseModel):
 
     @model_validator(mode="after")
     def check_consistency(self):
-        if self.step == 0:
+        step = getattr(self, "step", None)
+        minv = getattr(self, "min", None)
+        maxv = getattr(self, "max", None)
+        if step is None or step == 0:
             raise ValueError("step must not be 0")
 
-        if self.step > 0:
-            if self.min is None:
+        if step > 0:
+            if minv is None:
                 raise ValueError("min is required for increasing sequence (step > 0)")
-        elif self.step < 0:
-            if self.max is None:
+        elif step < 0:
+            if maxv is None:
                 raise ValueError("max is required for decreasing sequence (step < 0)")
 
         return self
@@ -35,8 +37,12 @@ class NormalInt(ValueGeneratorBaseInt):
 
 class UniformInt(ValueGeneratorBaseInt):
     generatorType: Literal["UniformInt"]
-    min: int
-    max: int
+
+    @model_validator(mode="after")
+    def ensure_min_max(self):
+        if self.min is None or self.max is None:
+            raise ValueError("min and max must be provided for UniformInt")
+        return self
 
 class SeqCountInt(SeqCountBase, ValueGeneratorBaseInt):
     generatorType: Literal["SeqCountInt"]
@@ -62,8 +68,12 @@ class NormalFloat(ValueGeneratorBaseFloat):
 
 class UniformFloat(ValueGeneratorBaseFloat):
     generatorType: Literal["UniformFloat"]
-    min: float
-    max: float
+
+    @model_validator(mode="after")
+    def ensure_min_max(self):
+        if self.min is None or self.max is None:
+            raise ValueError("min and max must be provided for UniformFloat")
+        return self
 
 class SeqCountFloat(ValueGeneratorBaseFloat, SeqCountBase):
     generatorType: Literal["SeqCountFloat"]
