@@ -1,0 +1,29 @@
+from typing import List, Literal
+from pydantic import BaseModel
+from ..DAG.guards import Guard
+from ..DAG.actions import Action
+import os
+import yaml
+import json
+
+class Rule(BaseModel):
+    type: Literal["all", "any"]
+    guards: List[Guard]
+    actions: List[Action]
+
+class TestCase(BaseModel):
+    defaultAction: Literal["Finish", "Drop"]
+    rules: List[Rule]
+
+def load_test_case(file_path: str) -> TestCase:
+    ext = os.path.splitext(file_path)[1].lower()
+
+    with open(file_path, "r", encoding="utf-8") as file:
+        if ext == ".yaml":
+            data = yaml.safe_load(file)
+        elif ext == ".json":
+            data = json.load(file)
+        else:
+            raise ValueError(f"Unsupported file type: {ext}")
+
+    return TestCase.model_validate(data)

@@ -1,0 +1,28 @@
+#ifndef NETLOITER_GENERATOR_INT_H
+#define NETLOITER_GENERATOR_INT_H
+
+#include <concepts>
+
+namespace netloiter_generated {
+    template<typename T>
+    concept GeneratorIntConcept = 
+        requires(T gen) {
+            { gen.get() } -> std::same_as<int>;
+        } || 
+        requires {
+            { T::get() } -> std::same_as<int>;
+        };
+
+    template<GeneratorIntConcept G>
+    inline int generate(G& gen) noexcept {
+        return gen.get();
+    }
+
+    template<GeneratorIntConcept G>
+    inline int generate() noexcept {
+        return G::get();
+    }
+
+}
+
+#endif

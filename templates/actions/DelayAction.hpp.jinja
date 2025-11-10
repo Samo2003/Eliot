@@ -1,0 +1,21 @@
+#ifndef {{ action.hpp_define() }}
+#define {{ action.hpp_define() }}
+
+#include "../Packet.hpp"
+#include "../calendar/Calendar.hpp"
+
+namespace netloiter_generated {
+    struct {{ action.cpp_type() }} {
+        explicit {{ action.cpp_type() }}(Calendar& calendar) : _calendar(calendar) {}
+
+        inline void execute(Packet& packet) noexcept {
+            _calendar.schedule(std::move(packet), _delay);
+        }
+
+        private:
+            static constexpr std::chrono::milliseconds _delay{ {{ action.n }} };
+            Calendar& _calendar;
+    };
+}
+
+#endif

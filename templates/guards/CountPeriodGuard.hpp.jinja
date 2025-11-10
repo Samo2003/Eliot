@@ -1,0 +1,28 @@
+#ifndef {{ guard.hpp_define() }}
+#define {{ guard.hpp_define() }}
+
+#include "../Packet.hpp"
+
+namespace netloiter_generated {
+    struct {{ guard.cpp_type() }} {
+        inline bool fullfilled(const Packet& packet) noexcept {
+            if (++_counter >= get_threshold()) {
+                _counter = 0;
+                _state = !_state;
+            }
+            return _state;
+        }
+
+        private:
+            static constexpr int _t = {{ guard.t }};
+            static constexpr int _f = {{ guard.f }};
+
+            size_t _counter = 0;
+            bool _state = true;
+
+            inline int get_threshold() const noexcept { return _state ? _t : _f; }
+    };
+
+}
+
+#endif

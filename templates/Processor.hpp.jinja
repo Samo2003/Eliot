@@ -1,0 +1,53 @@
+#ifndef NETLOITER_PROCESSOR_H
+#define NETLOITER_PROCESSOR_H
+
+#include "Packet.hpp"
+#include "interfaces/Guard.hpp"
+#include "interfaces/Action.hpp"
+{% if require_calendar %}
+#include "calendar/Calendar.hpp"
+{% endif %}
+{% for guard in guards %}
+#include "guards/{{ guard.cpp_type() }}.hpp"
+{% endfor %}
+{% for action in actions %}
+#include "actions/{{ action.cpp_type() }}.hpp"
+{% endfor %}
+
+namespace netloiter_generated {
+    struct Processor {
+        PacketResult process_packet(Packet& packet) noexcept;
+
+        {% if require_calendar %}
+        inline bool calendar_packets_ready() noexcept {
+            _now = std::chrono::steady_clock::now();
+            auto next = _calendar.next_time();
+            return next.has_value() && next.value() <= _now;
+        }
+
+        inline std::vector<Packet> calendar_get_ready() noexcept {
+            return _calendar.get_ready(_now);
+        }
+        
+        {% endif %}
+        private: 
+            {% if require_calendar %}
+            Calendar _calendar;
+            std::chrono::steady_clock::time_point _now;
+            {% endif %}
+    
+{% for guard in guards %}
+            {% if guard.is_state() %}
+            {{ guard.cpp_type() }} {{ guard.cpp_name() }}{{ guard.init() }};
+            {% endif %}
+{% endfor %}
+{% for action in actions %}
+            {% if action.is_state() %}
+            {{ action.cpp_type() }} {{ action.cpp_name() }}{{ action.init() }};
+            {% endif %}
+{% endfor %}
+    };
+
+}
+
+#endif

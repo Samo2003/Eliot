@@ -1,0 +1,24 @@
+#ifndef {{ generator.hpp_define() }}
+#define {{ generator.hpp_define() }}
+
+#include <random>
+
+namespace netloiter_generated {
+    struct {{ generator.cpp_type() }} {
+        static {{ 'constexpr ' if generator.once else '' }}inline float get() noexcept {
+            {% if generator.once %}
+            return {{ generator.value() }};
+            {% else %}
+            return _distribution(_generator);
+            {% endif %}
+        }
+
+        {% if not generator.once %}
+        private:
+            inline static std::mt19937 _generator{std::random_device{}()};
+            inline static std::uniform_real_distribution<float> _distribution{ {{ generator.min}}, {{ generator.max }} };
+        {% endif %}
+    };
+}
+
+#endif

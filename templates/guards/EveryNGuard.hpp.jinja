@@ -1,0 +1,31 @@
+#ifndef {{ guard.hpp_define() }}
+#define {{ guard.hpp_define() }}
+
+#include "../Packet.hpp"
+{% if not guard.not_generator() %}
+#include "../interfaces/GeneratorInt.hpp"
+#include "../generators/{{ guard.N.cpp_type() }}.hpp"
+{% endif %}
+
+namespace netloiter_generated {
+    struct {{ guard.cpp_type() }} {
+        inline bool fullfilled(const Packet& packet) noexcept {
+            {% if guard.not_generator() %}
+            return (++_counter % _N) == 0;
+            {% else %}
+            return (++_counter % generate{{ guard.N.cpp_call() }}));
+            {% endif %}
+        }
+
+        private:
+            size_t _counter = 0;
+            {% if guard.not_generator() %}
+            static constexpr int _N = {{ guard.N }};
+            {% elif guard.N.is_state() %}
+            static {{ guard.N.cpp_type() }} {{ guard.N.cpp_name() }};
+            {% endif %}
+    };
+
+}
+
+#endif

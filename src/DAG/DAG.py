@@ -1,11 +1,9 @@
 from __future__ import annotations
 from pydantic import BaseModel, model_validator
-from typing import Literal
-from guard import Guard
-from action import Action
+from .guards import Guard
+from .actions import Action
 
 class ActionNode(BaseModel):
-    type: Literal["action"]
     final: bool = False
     action: Action
     next: GuardNode | ActionNode | None = None
@@ -19,7 +17,6 @@ class ActionNode(BaseModel):
         return self
 
 class GuardNode(BaseModel):
-    type: Literal["guard"]
     guard: Guard
     if_true: GuardNode | ActionNode
     if_false: GuardNode | ActionNode
@@ -27,7 +24,3 @@ class GuardNode(BaseModel):
 
 class DAG(BaseModel):
     root: GuardNode | ActionNode
-
-# import json
-# print(json.dumps(DAG.model_json_schema(), indent=4))
-

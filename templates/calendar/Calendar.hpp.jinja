@@ -1,0 +1,37 @@
+#ifndef NETLOITER_CALENDAR_H
+#define NETLOITER_CALENDAR_H
+
+#include <queue>
+#include <vector>
+#include <chrono>
+#include <optional>
+#include "../Packet.hpp"
+
+namespace netloiter_generated {
+    struct Calendar {
+        using Delay = std::chrono::milliseconds;
+        using Clock = std::chrono::steady_clock;
+
+        void schedule(Packet&& packet, Delay delay) noexcept;
+
+        std::vector<Packet> get_ready(Clock::time_point now) noexcept;
+
+        std::optional<Clock::time_point> next_time(void) const noexcept;
+
+        private:
+            struct CalendarItem {
+                Clock::time_point time;
+                Packet packet;
+                size_t order;
+                bool operator>(const CalendarItem& other) const noexcept { 
+                    return (time > other.time) || (time == other.time && order > other.order);
+                }
+            };
+
+            size_t _counter = 0;
+
+            std::priority_queue<CalendarItem, std::vector<CalendarItem>, std::greater<CalendarItem>> _queue;
+    };
+}
+
+#endif

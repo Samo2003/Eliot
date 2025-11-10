@@ -1,0 +1,27 @@
+#ifndef NETLOITER_PACKET_H
+#define NETLOITER_PACKET_H
+
+#include {{ api.include() }}
+
+namespace netloiter_generated {
+    enum class PacketResult { Drop, Finish, Calendar };
+
+    struct Packet {
+        explicit inline Packet({{ api.packet_type() }}&& packet) noexcept 
+            : _packet(std::move(packet)) {}
+
+        inline {{ api.packet_type() }}&& move_packet() noexcept { return std::move(_packet); }
+        
+        inline const size_t size() const noexcept { return payload().size(); }
+        
+        int state = 0;
+
+        private:
+            {{ api.packet_type() }} _packet;
+
+            inline const std::vector<uint8_t>& payload() const noexcept { return _packet.{{ api.packet_payload() }}; }
+    };
+
+}
+
+#endif

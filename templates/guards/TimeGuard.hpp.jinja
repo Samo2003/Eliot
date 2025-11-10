@@ -1,0 +1,36 @@
+#ifndef {{ guard.hpp_define() }}
+#define {{ guard.hpp_define() }}
+
+#include "../Packet.hpp"
+#include <chrono>
+
+namespace netloiter_generated {
+    struct {{ guard.cpp_type() }} {
+        using Clock = std::chrono::steady_clock;
+        using Ms = std::chrono::milliseconds;
+
+        inline bool fullfilled(const Packet& packet) noexcept {
+            {% if not guard.instant %}
+            static const Clock::time_point start = Clock::now();
+            {% endif %}
+            auto elapsed = std::chrono::duration_cast<Ms>(Clock::now() - start);
+            {% if guard.duration %}
+            return elapsed >= _after && elapsed < (_after + _duration);
+            {% else %}
+            return elapsed >= _after;
+            {% endif %}
+        }
+
+        private:
+            static constexpr Ms _after{ {{ guard.after }} };
+            {% if guard.duration %}
+            static constexpr Ms _duration{ {{ guard.duration }} };
+            {% endif %}
+            {% if guard.instant %}
+            const Clock::time_point start = Clock::now();
+            {% endif %}
+    };
+
+}
+
+#endif
