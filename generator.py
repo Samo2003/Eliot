@@ -10,18 +10,27 @@ import shutil
 import click
 
 def load_dag(dag: str | None, test_case: str | None) -> DAG:
+    """
+    Loads DAG model directly if provided otherwise loads and translates given test case
+
+    Raises `RuntimeError` if loading fails
+    """
+
     try:
-        if dag is not None:
+        if dag:
+            # Load and validate DAG
             with open(dag, "r") as file:
                 data = json.load(file)
                 return DAG.model_validate(data)
         else:
+            # Load and convert test case into DAG
             test_case_model = load_test_case(cast(str, test_case))
             return translate_to_DAG(test_case_model)
     except Exception as e:
         raise RuntimeError(f"ERROR: loading input file: {e}")
 
 def clear_output_dir(path: str) -> None:
+    """Clears the provided repository if it exists and ensures it is created"""
     if os.path.exists(path):
         shutil.rmtree(path)
     os.makedirs(path, exist_ok=True)
@@ -34,6 +43,8 @@ def clear_output_dir(path: str) -> None:
 @click.option("--dag_schema", is_flag=True, help="Print DAG JSON schema and exit")
 @click.option("--api", default="mock", help="Specify NFQueue api type")
 def main(dag: str | None, test_case: str | None, output: str, templates: str, dag_schema: bool, api: str):
+    """Main entry point for generator"""
+
     if dag_schema:
         print(json.dumps(DAG.model_json_schema(), indent=4))
         sys.exit(0)
@@ -45,10 +56,13 @@ def main(dag: str | None, test_case: str | None, output: str, templates: str, da
 
     try:
         dag_model = load_dag(dag, test_case)
+
+        # Determine which NFQueue API is used
         if api == "mock":
             api_interface = MockApi()
         else:
             raise RuntimeError(f"ERROR: unknown api type: {api}")
+        
         generate(dag_model, templates, output, api_interface)
     except RuntimeError as e:
         print(e)

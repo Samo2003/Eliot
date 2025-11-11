@@ -7,15 +7,22 @@ import yaml
 import json
 
 class Rule(BaseModel):
+    """Represent rule in test case"""
+
     type: Literal["all", "any"]
     guards: List[Guard]
     actions: List[Action]
 
 class TestCase(BaseModel):
+    """Represents test case"""
+
     defaultAction: Literal["Finish", "Drop"]
     rules: List[Rule]
 
 def load_test_case(file_path: str) -> TestCase:
+    """Load test case from `file_path`, support JSON and YAML format"""
+
+    # Get file extension to determina type
     ext = os.path.splitext(file_path)[1].lower()
 
     with open(file_path, "r", encoding="utf-8") as file:

@@ -1,23 +1,58 @@
-from abc import ABC
+from abc import ABC, abstractmethod
 
 class NFQueueApiBase(ABC):
-    def include(self) -> str:
-        raise NotImplementedError
-    
-    def packet_type(self) -> str:
-        raise NotImplementedError
-    
-    def packet_payload(self) -> str:
-        raise NotImplementedError
+    """
+    Abstract base class defining mandatory functions to define 
+    for NFQueue API implementation to use in generator
+    """
 
+    @abstractmethod
+    def include(self) -> str:
+        """Library name to include in source code"""
+        pass
+
+    @abstractmethod
     def type(self) -> str:
-        raise NotImplementedError
+        """Implemented queue type"""
+        pass
     
+    @abstractmethod
     def get_packet(self) -> str:
-        raise NotImplementedError
+        """
+        Method to receive packet from queue
+
+        Example: .get()
+        """
+        pass
     
+    @abstractmethod
     def accept_packet(self, packet_str: str) -> str:
-        raise NotImplementedError
+        """
+        Method to accept packet with move parameter
+
+        Example: .accept({packet_str})
+        """
+        pass
     
+    @abstractmethod
     def drop_packet(self, packet_str: str) -> str:
-        raise NotImplementedError
+        """
+        Method to drop packet with move parameter
+
+        Example: .drop({packet_str})
+        """
+        pass
+
+    @abstractmethod
+    def packet_type(self) -> str:
+        """Implemented packet type"""
+        pass
+    
+    @abstractmethod
+    def packet_payload(self) -> str:
+        """
+        Method to access packet payload
+        
+        Example: get()
+        """
+        pass

@@ -9,6 +9,11 @@ def generate_netloiter(
     api: NFQueueApiBase, 
     require_calendar: bool
 ) -> None:
+    """Generate main netloiter entry point"""
+
+    # Configure file path
     template_name = "netloiter.cpp.jinja"
     output_path = os.path.join(output_dir, "netloiter.cpp")
+
+    # Generate file with given context
     generate_to_file(env, template_name, output_path, { "api": api, "require_calendar": require_calendar})

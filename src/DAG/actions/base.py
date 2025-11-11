@@ -2,21 +2,29 @@ from abc import ABC
 from typing import TypeVar, Generic
 from ..dag_base_model import DAGBaseModel
 
+# Generic type parameter for action identifier
 T = TypeVar("T", bound=str)
 
 class ActionBase(DAGBaseModel, Generic[T], ABC):
+    """Abstract base class for Action nodes"""
+
+    # Disciminator used by Pydantic
     actionType: T
 
-    def cpp_type(self) -> str:
+    def cpp_type_base(self) -> str:
+        """Returns common action base name"""
         return f"{self.actionType}Action"
     
     def is_final(self) -> bool:
+        """Signalizes if action is final"""
         return False
     
     def calendar(self) -> bool:
+        """Signalizes that action needs calendar"""
         return False
     
     def cpp_call(self) -> str:
+        # Fiinal action must reimplment this method
         if self.is_final():
             raise NotImplementedError
         return super().cpp_call()

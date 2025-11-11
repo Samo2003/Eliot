@@ -3,6 +3,7 @@ from typing import List, Literal
 import json
 
 class Step(BaseModel):
+    """Packet step configuration representation"""
     protocol: Literal["udp", "tcp", "icmp", "raw"]
     protocol_id: int = 99
     src: str = "10.10.10.1"
@@ -15,14 +16,16 @@ class Step(BaseModel):
     icmp_code: int = 0
 
 class Sequence(BaseModel):
+    """Packet sequence configuration representation"""
     name: str
     steps: List[Step]
 
-def load_sequences(packets_path: str) -> List[Sequence]:
+def load_sequences(sequences_path: str) -> List[Sequence]:
+    """Loads sequences from `sequences_path`"""
     try:
-        with open(packets_path, "r") as file:
+        with open(sequences_path, "r") as file:
             data = json.load(file)
-        sequences = [Sequence(**seq) for seq in data]
+        sequences = [Sequence.model_validate(seq) for seq in data]
     except:
         raise RuntimeError("Unable to load packets config")
     

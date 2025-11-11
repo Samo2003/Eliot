@@ -4,13 +4,20 @@ from ..generators import ValueGeneratorInt, ValueGeneratorFloat
 from .base import ActionBase
 
 class BitNoise(ActionBase[Literal["BitNoise"]]):
+    """Inserts bitnoise into the packet"""
+
+    # Part of bits to invert <0,1>
     x: float | ValueGeneratorFloat | None = None
+
+    # Number of bits to invert
     n: int | ValueGeneratorInt | None = None
+
+    # Stratedy to choose bits to invert
     strategy: Literal["left", "right", "random"]
-    layer: str | None = None
 
     @model_validator(mode="after")
     def check_x_or_n(self):
+        """Only n or x can be provided"""
         if (self.x is None and self.n is None) or (self.x is not None and self.n is not None):
             raise ValueError("x or n must be provided")
         if self.x is not None and isinstance(self.x, float) and not (0 <= self.x <= 1):

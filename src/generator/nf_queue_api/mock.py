@@ -1,14 +1,10 @@
 from .base import NFQueueApiBase
 
 class MockApi(NFQueueApiBase):
+    """NFQueue Mock API definition"""
+
     def include(self) -> str:
         return "<nf_queue_mock.hpp>"
-    
-    def packet_type(self) -> str:
-        return "nf_queue_mock::NFQueuePacket"
-    
-    def packet_payload(self) -> str:
-        return "get_payload()"
 
     def type(self) -> str:
         return "nf_queue_mock::NFQueue"
@@ -21,4 +17,10 @@ class MockApi(NFQueueApiBase):
     
     def drop_packet(self, packet_str: str) -> str:
         return f".drop_packet({packet_str})"
+    
+    def packet_type(self) -> str:
+        return "nf_queue_mock::NFQueuePacket"
+    
+    def packet_payload(self) -> str:
+        return "get_payload()"
     

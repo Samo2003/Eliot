@@ -5,12 +5,22 @@ from .generators import *
 from .utils import collect_nodes
 
 def generate(dag: DAG, template_dir: str, output_dir: str, api: NFQueueApiBase) -> None:
+    """Main generator function handeling generating"""
+
+    # Collect nodes from DAG that need to be generated
     guard_nodes, action_nodes, generator_nodes = collect_nodes(dag.root)
 
+    # Only generate calendar if at least one action node requires it
     require_calendar = any([action.calendar() for action in action_nodes])
 
-    env = Environment(loader=FileSystemLoader(template_dir), trim_blocks=True, lstrip_blocks=True)
+    # Initialize jinja environment
+    env = Environment(
+        loader=FileSystemLoader(template_dir),  # Initialize template loader
+        trim_blocks=True,                       # Strip new lines after generated line
+        lstrip_blocks=True                      # Strip white spaces from the beggining of the line
+    )
 
+    # Generate neccessary files
     guards.generate_guards(env, output_dir, guard_nodes)
     actions.generate_actions(env, output_dir, action_nodes)
     generators.generate_generators(env, output_dir, generator_nodes)
