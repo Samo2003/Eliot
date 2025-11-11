@@ -6,7 +6,7 @@
 namespace netloiter_generated {
     struct {{ guard.cpp_type() }} {
         static inline bool fullfilled(const Packet& packet) noexcept {
-            return packet.size() {{ guard.get_op() }} {{ guard.size }};
+            return packet.payload().size() {{ guard.get_op() }} {{ guard.size }};
         }
     };
 

@@ -2,6 +2,7 @@
 #define NETLOITER_PACKET_H
 
 #include {{ api.include() }}
+#include <vector>
 
 namespace netloiter_generated {
     enum class PacketResult { Drop, Finish, Calendar };
@@ -12,14 +13,12 @@ namespace netloiter_generated {
 
         inline {{ api.packet_type() }}&& move_packet() noexcept { return std::move(_packet); }
         
-        inline const size_t size() const noexcept { return payload().size(); }
+        inline const std::vector<uint8_t>& payload() const noexcept { return _packet.{{ api.packet_payload() }}; }
         
         int state = 0;
 
         private:
             {{ api.packet_type() }} _packet;
-
-            inline const std::vector<uint8_t>& payload() const noexcept { return _packet.{{ api.packet_payload() }}; }
     };
 
 }

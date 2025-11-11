@@ -39,7 +39,7 @@ def main(dag: str | None, test_case: str | None, output: str, templates: str, da
         sys.exit(0)
     
     if (dag and test_case) or (not dag and not test_case):
-        raise click.UsageError("ERROR: more than 1 or no input file provided")
+        raise click.UsageError("more than 1 or no input file provided")
     
     clear_output_dir(output)
 

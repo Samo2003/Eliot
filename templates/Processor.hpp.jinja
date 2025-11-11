@@ -25,8 +25,8 @@ namespace netloiter_generated {
             return next.has_value() && next.value() <= _now;
         }
 
-        inline std::vector<Packet> calendar_get_ready() noexcept {
-            return _calendar.get_ready(_now);
+        inline void calendar_process_ready(auto&& process_fn) noexcept {
+            _calendar.process_ready(_now, process_fn);
         }
         
         {% endif %}

@@ -14,7 +14,14 @@ namespace netloiter_generated {
 
         void schedule(Packet&& packet, Delay delay) noexcept;
 
-        std::vector<Packet> get_ready(Clock::time_point now) noexcept;
+        template<typename Fn>
+        inline void process_ready(Clock::time_point now, Fn&& process_fn) noexcept {
+            while (!_queue.empty() && _queue.top().time <= now) {
+                {# const_cast to remove const returned from top() to be able to move the packet #}
+                process_fn(std::move(const_cast<CalendarItem&>(_queue.top()).packet));
+                _queue.pop();
+            }
+        }
 
         std::optional<Clock::time_point> next_time(void) const noexcept;
 

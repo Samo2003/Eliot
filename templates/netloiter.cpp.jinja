@@ -28,16 +28,14 @@ int main() {
             }
             {% if require_calendar %}
             if (processor.calendar_packets_ready()) {
-                auto ready = processor.calendar_get_ready();
-                for (auto& packet : ready) {
+                processor.calendar_process_ready([&](Packet&& packet) {
                     result = processor.process_packet(packet);
-
                     if (result == PacketResult::Drop) {
                         q{{ api.drop_packet("packet.move_packet()") }};
                     } else if (result == PacketResult::Finish) {
                         q{{ api.accept_packet("packet.move_packet()") }};
                     }
-                }
+                });
             }
             {% endif %}
         }
