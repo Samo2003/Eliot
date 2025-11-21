@@ -14,7 +14,7 @@ int main() {
         {{ api.type() }} q;
         Processor processor = Processor();
         PacketResult result;
-        std::cout << "Running...\n";
+        std::cout << "Eliot running...\n";
         while (!stop_flag) {
             if (auto maybe_packet = q{{ api.get_packet() }}) {
                 Packet packet{std::move(*maybe_packet)};
@@ -27,7 +27,7 @@ int main() {
                 }
             }
             {% if require_calendar %}
-            if (processor.calendar_packets_ready()) {
+            {# if (processor.calendar_packets_ready()) {
                 processor.calendar_process_ready([&](Packet&& packet) {
                     result = processor.process_packet(packet);
                     if (result == PacketResult::Drop) {
@@ -36,6 +36,14 @@ int main() {
                         q{{ api.accept_packet("packet.move_packet()") }};
                     }
                 });
+            } #}
+            if (auto packet = processor.calendar_get_ready()) {
+                result = processor.process_packet(*packet);
+                if (result == PacketResult::Drop) {
+                    q{{ api.drop_packet("packet->move_packet()") }};
+                } else if (result == PacketResult::Finish) {
+                    q{{ api.accept_packet("packet->move_packet()") }};
+                }
             }
             {% endif %}
         }

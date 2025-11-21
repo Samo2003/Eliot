@@ -1,0 +1,14 @@
+file(GLOB_RECURSE ELIOT_GENERATED_SOURCES
+    CONFIGURE_DEPENDS
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp"
+)
+
+add_library(eliot_generated INTERFACE)
+
+target_include_directories(eliot_generated INTERFACE
+    ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+target_sources(eliot_generated INTERFACE
+    ${ELIOT_GENERATED_SOURCES}
+)

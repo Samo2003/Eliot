@@ -10,7 +10,7 @@
 namespace nf_queue_mock {
     class NFQueue {
         public: 
-            NFQueue() : _core(Config("../tests/test_config.json")) {}
+            NFQueue() : _core(Config("tests/test_config.json")) {}
 
             std::optional<NFQueuePacket> get_packet() noexcept;
 

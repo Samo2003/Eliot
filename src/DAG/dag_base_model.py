@@ -5,7 +5,6 @@ from pydantic import BaseModel
 class DAGBaseModel(BaseModel, ABC):
     """Abstract base class for all DAG nodes"""
 
-    @final
     def __hash__(self) -> int:
         """Allows DAG nodes to be used in sets"""
         return hash(self.cpp_type())
@@ -18,7 +17,7 @@ class DAGBaseModel(BaseModel, ABC):
     @final  
     def hpp_define(self) -> str:
         """Returns C++ header define"""
-        return f"NETLOITER_{self.cpp_type().upper()}_H"
+        return f"ELIOT_{self.cpp_type().upper()}_H"
     
     @final
     def cpp_name(self) -> str:

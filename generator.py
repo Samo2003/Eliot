@@ -8,6 +8,10 @@ from src.generator import generate
 import os
 import shutil
 import click
+import subprocess
+
+BUILD_DIR = "build"
+BINARY_NAME = "eliot"
 
 def load_dag(dag: str | None, test_case: str | None) -> DAG:
     """
@@ -35,6 +39,22 @@ def clear_output_dir(path: str) -> None:
         shutil.rmtree(path)
     os.makedirs(path, exist_ok=True)
 
+def run_build(keep_build: bool) -> None:
+    """Compiles binary file and moves it to current working directory"""
+    os.makedirs(BUILD_DIR, exist_ok=True)
+    binary_path = os.path.join(BUILD_DIR, BINARY_NAME)
+    subprocess.run(["cmake", ".."], cwd=BUILD_DIR, check=True)
+    subprocess.run(["make", "-j"], cwd=BUILD_DIR, check=True)
+    if not os.path.exists(binary_path):
+        raise RuntimeError(f"ERROR: build failed no binary file found")
+    
+    current_dir = os.getcwd()
+    binary = os.path.join(current_dir, BINARY_NAME)
+    shutil.copy2(binary_path, binary)
+
+    if not keep_build:
+        shutil.rmtree(BUILD_DIR)
+    
 @click.command()
 @click.option("--dag", "-d", type=click.Path(exists=True), help="Path to DAG JSON file")
 @click.option("--test_case", "-t", type=click.Path(exists=True), help="Path to test case in JSON or YAML file")
@@ -42,7 +62,8 @@ def clear_output_dir(path: str) -> None:
 @click.option("--templates", default="./templates", help="Path to templates directory")
 @click.option("--dag_schema", is_flag=True, help="Print DAG JSON schema and exit")
 @click.option("--api", default="mock", help="Specify NFQueue api type")
-def main(dag: str | None, test_case: str | None, output: str, templates: str, dag_schema: bool, api: str):
+@click.option("--keep_build", "-k", is_flag=True, help="If set CMake build directry is not deleted")
+def main(dag: str | None, test_case: str | None, output: str, templates: str, dag_schema: bool, api: str, keep_build: bool):
     """Main entry point for generator"""
 
     if dag_schema:
@@ -64,6 +85,8 @@ def main(dag: str | None, test_case: str | None, output: str, templates: str, da
             raise RuntimeError(f"ERROR: unknown api type: {api}")
         
         generate(dag_model, templates, output, api_interface)
+
+        run_build(keep_build)
     except RuntimeError as e:
         print(e)
         sys.exit(1)

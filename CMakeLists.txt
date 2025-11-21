@@ -10,15 +10,11 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 add_subdirectory(mock)
+add_subdirectory(generated)
 
-add_executable(eliot
-    ${CMAKE_SOURCE_DIR}/generated/eliot.cpp
-    ${CMAKE_SOURCE_DIR}/generated/Processor.cpp
-    ${CMAKE_SOURCE_DIR}/generated/calendar/Calendar.cpp
+add_executable(eliot)
+
+target_link_libraries(eliot PRIVATE
+    eliot_generated
+    nf_queue_mock
 )
-
-target_include_directories(eliot PRIVATE
-    ${CMAKE_SOURCE_DIR}/generated
-)
-
-target_link_libraries(eliot PRIVATE nf_queue_mock)

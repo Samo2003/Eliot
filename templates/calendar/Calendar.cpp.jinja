@@ -6,9 +6,17 @@ namespace eliot_generated {
         _queue.emplace(CalendarItem{ time, std::move(packet), _counter++ });
     }
 
-    std::optional<Calendar::Clock::time_point> Calendar::next_time() const noexcept {
+    std::optional<Packet> Calendar::get_ready() noexcept {
         if (_queue.empty())
             return std::nullopt;
-        return _queue.top().time;
+
+        if (_queue.top().time <= Clock::now()) {
+            {# const_cast to remove const returned from top() to be able to move the packet #}
+            Packet packet = std::move(const_cast<CalendarItem&>(_queue.top()).packet);
+            _queue.pop();
+            return packet;
+        }
+
+        return std::nullopt;
     }
 }

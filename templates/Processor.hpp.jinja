@@ -1,5 +1,5 @@
-#ifndef NETLOITER_PROCESSOR_H
-#define NETLOITER_PROCESSOR_H
+#ifndef ELIOT_PROCESSOR_H
+#define ELIOT_PROCESSOR_H
 
 #include "Packet.hpp"
 #include "interfaces/Guard.hpp"
@@ -19,21 +19,14 @@ namespace eliot_generated {
         PacketResult process_packet(Packet& packet) noexcept;
 
         {% if require_calendar %}
-        inline bool calendar_packets_ready() noexcept {
-            _now = std::chrono::steady_clock::now();
-            auto next = _calendar.next_time();
-            return next.has_value() && next.value() <= _now;
+        inline std::optional<Packet> calendar_get_ready() noexcept {
+            return _calendar.get_ready();
         }
 
-        inline void calendar_process_ready(auto&& process_fn) noexcept {
-            _calendar.process_ready(_now, process_fn);
-        }
-        
         {% endif %}
         private: 
             {% if require_calendar %}
             Calendar _calendar;
-            std::chrono::steady_clock::time_point _now;
             {% endif %}
     
 {% for guard in guards %}

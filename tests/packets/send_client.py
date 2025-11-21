@@ -18,6 +18,8 @@ def build_packet(step: Step) -> bytes:
 
     payload = os.urandom(step.payload_size)
 
+    header: Packet
+
     if step.protocol == "udp":
         header = UDP(sport=step.sport, dport=step.dport)
     elif step.protocol == "tcp":
@@ -30,7 +32,7 @@ def build_packet(step: Step) -> bytes:
         return bytes(datagram)
 
     # Combines packet headers together with payload
-    datagram = cast(Packet, IP(src=step.src, dst=step.dst) / header / payload)
+    datagram = IP(src=step.src, dst=step.dst / header / payload)
     return bytes(datagram)
 
 def send_step(step: Step, name: str, sock: socket.socket) -> None:

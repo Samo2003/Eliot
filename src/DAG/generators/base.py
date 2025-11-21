@@ -6,7 +6,7 @@ from ..dag_base_model import DAGBaseModel
 T = TypeVar("T", bound=str)
 
 # Generic type parameter for generator type
-N = TypeVar("N", int, float)
+N = TypeVar("N", bound=float)
 
 class ValueGeneratorBase(DAGBaseModel, Generic[T, N], ABC):
     """Abstract base class for value generators"""

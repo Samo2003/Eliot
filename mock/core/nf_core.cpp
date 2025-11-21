@@ -54,7 +54,7 @@ namespace nf_queue_mock {
             return std::nullopt; 
         NFQueuePacket packet = std::move(_queue.front());
         _queue.pop();
-        return packet;
+        return std::move(packet);
     }
 
     void NFCore::accept_packets() noexcept {

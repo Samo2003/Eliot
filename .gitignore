@@ -1,5 +1,6 @@
 __pycache__/
 /src/venv
+.mypy_cache/
 
 # CMake build
 /build/
@@ -18,3 +19,6 @@ __pycache__/
 
 # Editor files
 .DS_Store
+
+# Executable
+eliot

@@ -3,3 +3,4 @@ scapy
 pyyaml
 jinja2
 click
+mypy
