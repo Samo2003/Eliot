@@ -15,4 +15,4 @@ class Count(GuardBase[Literal["Count"]]):
         return True
     
     def cpp_type(self) -> str:
-        return f"{super().cpp_type_base()}_{self.after}{'_' + str(self.duration) if self.duration else '' }"
+        return f"{self.cpp_type_base()}_{self.after}{'_' + str(self.duration) if self.duration else '' }"

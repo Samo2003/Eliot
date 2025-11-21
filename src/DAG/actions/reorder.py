@@ -12,7 +12,7 @@ class Reorder(ActionBase[Literal["Reorder"]]):
     strategy: Literal["random", "reverse"] = "random"
 
     def cpp_type(self) -> str:
-        return f"{super().cpp_type()}_{self.n}_{self.strategy}"
+        return f"{self.cpp_type_base()}_{self.n}_{self.strategy}"
 
     def is_state(self) -> bool:
         return True

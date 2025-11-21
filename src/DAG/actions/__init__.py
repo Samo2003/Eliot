@@ -6,7 +6,6 @@ from .drop import Drop
 from .finish import Finish
 from .reorder import Reorder
 from .replicate import Replicate
-from .socket_tcp import SocketTCP
 from .throttle import Throttle
 
 Action = Annotated[
@@ -17,8 +16,7 @@ Action = Annotated[
         Reorder,
         Replicate,
         Throttle,
-        BitNoise,
-        SocketTCP
+        BitNoise
     ],
     Field(discriminator="actionType")
 ]

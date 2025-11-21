@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import TypeVar, Generic
+from typing import TypeVar, Generic, final
 from ..dag_base_model import DAGBaseModel
 
 # Generic type parameter for action identifier
@@ -11,6 +11,7 @@ class ActionBase(DAGBaseModel, Generic[T], ABC):
     # Disciminator used by Pydantic
     actionType: T
 
+    @final
     def cpp_type_base(self) -> str:
         """Returns common action base name"""
         return f"{self.actionType}Action"
@@ -24,7 +25,7 @@ class ActionBase(DAGBaseModel, Generic[T], ABC):
         return False
     
     def cpp_call(self) -> str:
-        # Fiinal action must reimplment this method
+        # Final actions must reimplment this method
         if self.is_final():
             raise NotImplementedError
         return super().cpp_call()

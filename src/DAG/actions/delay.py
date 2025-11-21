@@ -9,7 +9,7 @@ class Delay(ActionBase[Literal["Delay"]]):
     n: int | ValueGeneratorInt
 
     def cpp_type(self) -> str:
-        return f"{super().cpp_type()}_{self.n}"
+        return f"{self.cpp_type_base()}_{self.n}"
 
     def calendar(self) -> bool:
         return True

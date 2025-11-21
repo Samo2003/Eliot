@@ -3,7 +3,7 @@
 
 #include "../Packet.hpp"
 
-namespace netloiter_generated {
+namespace eliot_generated {
     struct {{ guard.cpp_type() }} {
         inline bool fullfilled(const Packet& packet) noexcept {
             if (++_counter >= get_threshold()) {

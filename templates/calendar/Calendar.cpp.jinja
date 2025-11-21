@@ -1,6 +1,6 @@
 #include "Calendar.hpp"
 
-namespace netloiter_generated {
+namespace eliot_generated {
     void Calendar::schedule(Packet&& packet, Delay delay) noexcept {
         Clock::time_point time = Clock::now() + delay;
         _queue.emplace(CalendarItem{ time, std::move(packet), _counter++ });

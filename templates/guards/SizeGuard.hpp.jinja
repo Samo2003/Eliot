@@ -3,7 +3,7 @@
 
 #include "../Packet.hpp"
 
-namespace netloiter_generated {
+namespace eliot_generated {
     struct {{ guard.cpp_type() }} {
         static inline bool fullfilled(const Packet& packet) noexcept {
             return packet.payload().size() {{ guard.get_op() }} {{ guard.size }};

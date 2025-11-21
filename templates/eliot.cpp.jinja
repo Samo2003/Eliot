@@ -3,7 +3,7 @@
 #include <iostream>
 #include <atomic>
 
-using namespace netloiter_generated;
+using namespace eliot_generated;
 
 static std::atomic<bool> stop_flag{false};
 void handle_sigint(int) { stop_flag = true; }

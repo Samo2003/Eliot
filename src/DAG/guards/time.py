@@ -11,11 +11,11 @@ class Time(GuardBase[Literal["Time"]]):
     #Time for which the guard is fullfiled if missing guard stays fullfiled
     duration: int | ValueGeneratorInt | None = None
 
-    # If `True` time is counted from starting Netloiter else from first packet checked by guard
+    # If `True` time is counted from starting eliot else from first packet checked by guard
     instant: bool = False
 
     def cpp_type(self) -> str:
-        return f"{super().cpp_type_base()}_{self.after}_{self.duration}"
+        return f"{self.cpp_type_base()}_{self.after}_{self.duration}"
     
     def is_state(self) -> bool:
         return True

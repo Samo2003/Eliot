@@ -24,7 +24,7 @@ class UniformBase(ValueGeneratorBase[T, N], ABC):
     @final
     def cpp_type(self) -> str:
         min_val, max_val = self.get_min_max()
-        return f"{super().cpp_type_base()}_{self.N_to_int_str(min_val)}_{self.N_to_int_str(max_val)}_{self.once}"
+        return f"{self.cpp_type_base()}_{self.N_to_int_str(min_val)}_{self.N_to_int_str(max_val)}_{self.once}"
 
 class UniformFloat(UniformBase[Literal["UniformFloat"], float]):
     """Uniform Float value ganerator"""

@@ -12,7 +12,7 @@ class TimePeriod(GuardBase[Literal["TimePeriod"]]):
     # Time for which the guard is false
     f: int | ValueGeneratorInt | None = None
 
-    # If `True` time is counted from starting Netloiter else from first packet checked by guard
+    # If `True` time is counted from starting eliot else from first packet checked by guard
     instant: bool = False
 
     @model_validator(mode="after")
@@ -23,7 +23,7 @@ class TimePeriod(GuardBase[Literal["TimePeriod"]]):
         return self
     
     def cpp_type(self) -> str:
-        return f"{super().cpp_type_base()}_{self.t}_{self.f}"
+        return f"{self.cpp_type_base()}_{self.t}_{self.f}"
     
     def is_state(self) -> bool:
         return True

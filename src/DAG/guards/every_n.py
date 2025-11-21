@@ -8,7 +8,7 @@ class EveryN(GuardBase[Literal["EveryN"]]):
     N: int | ValueGeneratorInt
 
     def cpp_type(self) -> str:
-        return f"{super().cpp_type_base()}_{self.N}"
+        return f"{self.cpp_type_base()}_{self.N}"
     
     def is_state(self) -> bool:
         return True
