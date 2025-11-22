@@ -16,7 +16,7 @@ namespace nf_queue_mock {
 
             void accept_packet(NFQueuePacket&& packet) noexcept;
 
-            inline void const drop_packet(NFQueuePacket&& packet) noexcept {}
+            inline void drop_packet(NFQueuePacket&& packet) noexcept {}
 
         private:
             NFCore _core;

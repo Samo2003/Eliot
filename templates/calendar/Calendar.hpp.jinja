@@ -25,8 +25,16 @@ namespace eliot_generated {
                 Clock::time_point time;
                 Packet* packet;
                 size_t order;
+                uint64_t t = 0;
+
+                explicit CalendarItem(Clock::time_point time, Packet* packet, size_t order) 
+                    : time(time), packet(packet), order(order) 
+                {
+                    t = std::chrono::duration_cast<std::chrono::milliseconds>(time.time_since_epoch()).count();
+                }
+
                 bool operator>(const CalendarItem& other) const noexcept { 
-                    return (time > other.time) || (time == other.time && order > other.order);
+                    return (t > other.t) || (t == other.t && order > other.order);
                 }
             };
 

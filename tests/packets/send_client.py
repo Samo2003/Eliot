@@ -5,7 +5,7 @@ from config import load_config, DEFAULT_CONFIG, DEFAULT_PACKETS, BUFFER_SIZE
 from packet_sequences import Step, load_sequences
 import os
 from scapy.layers.inet import TCP, UDP, ICMP, IP
-from scapy.packet import Packet
+from scapy.packet import Packet, Raw
 
 def build_packet(step: Step) -> bytes:
     """
@@ -16,7 +16,7 @@ def build_packet(step: Step) -> bytes:
     Packet is returned in raw bytes form
     """
 
-    payload = os.urandom(step.payload_size)
+    payload = Raw(os.urandom(step.payload_size))
 
     header: Packet
 

@@ -1,5 +1,4 @@
 #include "Calendar.hpp"
-#include <iostream>
 
 namespace eliot_generated {
     void Calendar::schedule(Packet* packet, Delay delay) noexcept {
@@ -21,7 +20,6 @@ namespace eliot_generated {
     }
 
     Calendar::~Calendar() {
-        std::cout << "Destructor\n";
         while (!_queue.empty()) {
             auto item = _queue.top();
             _queue.pop();
