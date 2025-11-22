@@ -8,8 +8,8 @@ namespace eliot_generated {
     struct {{ action.cpp_type() }} {
         explicit {{ action.cpp_type() }}(Calendar& calendar) : _calendar(calendar) {}
 
-        inline void execute(Packet& packet) noexcept {
-            _calendar.schedule(std::move(packet), _delay);
+        inline void execute(Packet* packet) noexcept {
+            _calendar.schedule(packet, _delay);
         }
 
         private:

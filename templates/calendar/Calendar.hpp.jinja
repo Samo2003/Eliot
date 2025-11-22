@@ -12,14 +12,18 @@ namespace eliot_generated {
         using Delay = std::chrono::milliseconds;
         using Clock = std::chrono::steady_clock;
 
-        void schedule(Packet&& packet, Delay delay) noexcept;
+        void schedule(Packet* packet, Delay delay) noexcept;
 
-        std::optional<Packet> get_ready() noexcept;
+        Packet* get_ready() noexcept;
+
+        inline bool empty() const noexcept { return _queue.empty(); }
+
+        ~Calendar();
 
         private:
             struct CalendarItem {
                 Clock::time_point time;
-                Packet packet;
+                Packet* packet;
                 size_t order;
                 bool operator>(const CalendarItem& other) const noexcept { 
                     return (time > other.time) || (time == other.time && order > other.order);

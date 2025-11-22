@@ -16,19 +16,13 @@
 
 namespace eliot_generated {
     struct Processor {
-        PacketResult process_packet(Packet& packet) noexcept;
+        PacketResult process_packet(Packet* packet) noexcept;
 
         {% if require_calendar %}
-        inline std::optional<Packet> calendar_get_ready() noexcept {
-            return _calendar.get_ready();
-        }
-
+        Calendar calendar;
         {% endif %}
+
         private: 
-            {% if require_calendar %}
-            Calendar _calendar;
-            {% endif %}
-    
 {% for guard in guards %}
             {% if guard.is_state() %}
             {{ guard.cpp_type() }} {{ guard.cpp_name() }}{{ guard.init() }};

@@ -9,7 +9,7 @@
 
 namespace eliot_generated {
     struct {{ guard.cpp_type() }} {
-        inline bool fullfilled(const Packet& packet) noexcept {
+        inline bool fullfilled(const Packet* packet) noexcept {
             {% if guard.not_generator() %}
             return (++_counter % _N) == 0;
             {% else %}

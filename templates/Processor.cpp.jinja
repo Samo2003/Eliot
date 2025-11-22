@@ -1,19 +1,19 @@
 #include "Processor.hpp"
 
 namespace eliot_generated {
-    PacketResult Processor::process_packet(Packet& packet) noexcept {
+    PacketResult Processor::process_packet(Packet* packet) noexcept {
         while (true) {
-            switch (packet.state) {
+            switch (packet->state) {
 {% for node in cases %}
                 case {{ node.id }}:
                     {% if node.type == "GuardCase" %}
-                    packet.state = {{ '!' if node.guard.invert else '' }}evaluate_guard{{ node.guard.cpp_call() }}packet) ? {{ node.if_true.id }} : {{ node.if_false.id }};
+                    packet->state = {{ '!' if node.guard.invert else '' }}evaluate_guard{{ node.guard.cpp_call() }}packet) ? {{ node.if_true.id }} : {{ node.if_false.id }};
                     continue;
                     {% else %}
                     {% if node.action.is_final() %}
                     {{ node.action.cpp_call() }};
                     {% else %}
-                    packet.state = {{ node.next.id }};
+                    packet->state = {{ node.next.id }};
                     execute_action{{ node.action.cpp_call() }}packet);
                     {% if node.action.calendar() %}
                     return PacketResult::Calendar;

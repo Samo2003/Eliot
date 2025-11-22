@@ -1,22 +1,31 @@
 #include "Calendar.hpp"
+#include <iostream>
 
 namespace eliot_generated {
-    void Calendar::schedule(Packet&& packet, Delay delay) noexcept {
+    void Calendar::schedule(Packet* packet, Delay delay) noexcept {
         Clock::time_point time = Clock::now() + delay;
-        _queue.emplace(CalendarItem{ time, std::move(packet), _counter++ });
+        _queue.emplace(CalendarItem{ time, packet, _counter++ });
     }
 
-    std::optional<Packet> Calendar::get_ready() noexcept {
+    Packet* Calendar::get_ready() noexcept {
         if (_queue.empty())
-            return std::nullopt;
+            return nullptr;
 
         if (_queue.top().time <= Clock::now()) {
-            {# const_cast to remove const returned from top() to be able to move the packet #}
-            Packet packet = std::move(const_cast<CalendarItem&>(_queue.top()).packet);
+            auto packet = _queue.top().packet;
             _queue.pop();
             return packet;
         }
 
-        return std::nullopt;
+        return nullptr;
+    }
+
+    Calendar::~Calendar() {
+        std::cout << "Destructor\n";
+        while (!_queue.empty()) {
+            auto item = _queue.top();
+            _queue.pop();
+            delete item.packet;
+        }
     }
 }

@@ -7,20 +7,20 @@
 namespace eliot_generated {
     template<typename T>
     concept ActionConcept = 
-        requires(T action, Packet& packet) {
+        requires(T action, Packet* packet) {
             { action.execute(packet) };
         } || 
-        requires(Packet& packet) {
+        requires(Packet* packet) {
             { T::execute(packet) };
         };
 
     template<ActionConcept A>
-    inline void execute_action(A& action, Packet& packet) noexcept {
+    inline void execute_action(A& action, Packet* packet) noexcept {
         action.execute(packet);
     }
 
     template<ActionConcept A>
-    inline void execute_action(Packet& packet) noexcept {
+    inline void execute_action(Packet* packet) noexcept {
         A::execute(packet);
     }
 }

@@ -15,8 +15,8 @@ namespace eliot_generated {
             _buffer.reserve(_n);
         }
 
-        inline void execute(Packet& packet) noexcept {
-            _buffer.push_back(std::move(packet));
+        inline void execute(Packet* packet) noexcept {
+            _buffer.push_back(packet);
 
             if (_buffer.size() == _n) {
                 {% if action.strategy == "random" %}
@@ -25,17 +25,23 @@ namespace eliot_generated {
                 std::reverse(_buffer.begin(), _buffer.end());
                 {% endif %}
 
-                for (Packet& packet : _buffer) {
-                    _calendar.schedule(std::move(packet), _delay);
+                for (Packet* packet : _buffer) {
+                    _calendar.schedule(packet, _delay);
                 }
 
                 _buffer.clear();
             }
         }
 
+        ~{{ action.cpp_type() }}() {
+            for (Packet *packet : _buffer) {
+                delete packet;
+            }
+        }
+
         private:
             Calendar& _calendar;
-            std::vector<Packet> _buffer;
+            std::vector<Packet*> _buffer;
             static constexpr int _n = {{ action.n }};
             static constexpr std::chrono::milliseconds _delay{0};
             {% if action.strategy == "random" %}

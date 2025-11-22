@@ -5,7 +5,7 @@
 
 namespace eliot_generated {
     struct {{ guard.cpp_type() }} {
-        inline bool fullfilled(const Packet& packet) noexcept {
+        inline bool fullfilled(const Packet* packet) noexcept {
             if (++_counter >= get_threshold()) {
                 _counter = 0;
                 _state = !_state;

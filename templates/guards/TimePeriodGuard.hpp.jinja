@@ -9,7 +9,7 @@ namespace eliot_generated {
         using Clock = std::chrono::steady_clock;
         using Ms = std::chrono::milliseconds;
 
-        inline bool fullfilled(const Packet& packet) noexcept {
+        inline bool fullfilled(const Packet* packet) noexcept {
             {% if not guard.instant %}
             static Clock::time_point last = Clock::now();
             {% endif %}
