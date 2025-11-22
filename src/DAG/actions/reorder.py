@@ -21,4 +21,4 @@ class Reorder(ActionBase[Literal["Reorder"]]):
         return True
     
     def init(self) -> str:
-        return f" = {self.cpp_type()}(_calendar)"
+        return f" = {self.cpp_type()}(calendar)"

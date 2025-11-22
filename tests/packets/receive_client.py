@@ -3,7 +3,7 @@ import click
 from collections import defaultdict
 from typing import Dict
 from scapy.layers.inet import IP, TCP, UDP, ICMP
-from config import load_config, DEFAULT_CONFIG
+from config import BUFFER_SIZE, load_config, DEFAULT_CONFIG
 
 class Stats():
     """Statistics tracker for received packets"""
@@ -58,6 +58,7 @@ def main(config: str, verbose: bool) -> None:
     stats = Stats()
 
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, BUFFER_SIZE)
         sock.bind((config_model.server_ip, config_model.server_port))
 
         # Enables CRTL+C termination

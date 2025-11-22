@@ -5,6 +5,7 @@
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
+#include <cstdint>
 
 namespace nf_queue_mock {
     class Config {

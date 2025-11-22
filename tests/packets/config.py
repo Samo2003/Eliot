@@ -3,6 +3,7 @@ import json
 
 DEFAULT_CONFIG = "../test_config.json"
 DEFAULT_PACKETS = "packets.json"
+BUFFER_SIZE = 4 * 1024 * 1024
 
 class Config(BaseModel):
     """Testing configuration representation"""

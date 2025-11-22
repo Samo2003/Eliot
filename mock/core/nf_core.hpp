@@ -5,6 +5,7 @@
 #include <fcntl.h>
 #include <netinet/in.h>
 #include <optional>
+#include <queue>
 
 #include "../config/config.hpp"
 #include "socket.hpp"

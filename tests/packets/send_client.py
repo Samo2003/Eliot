@@ -1,7 +1,7 @@
 import socket
 import click
 from typing import cast
-from config import load_config, DEFAULT_CONFIG, DEFAULT_PACKETS
+from config import load_config, DEFAULT_CONFIG, DEFAULT_PACKETS, BUFFER_SIZE
 from packet_sequences import Step, load_sequences
 import os
 from scapy.layers.inet import TCP, UDP, ICMP, IP
@@ -32,7 +32,7 @@ def build_packet(step: Step) -> bytes:
         return bytes(datagram)
 
     # Combines packet headers together with payload
-    datagram = IP(src=step.src, dst=step.dst / header / payload)
+    datagram = cast(Packet, IP(src=step.src, dst=step.dst) / header / payload)
     return bytes(datagram)
 
 def send_step(step: Step, name: str, sock: socket.socket) -> None:
@@ -72,6 +72,7 @@ def main(config: str, packets: str) -> None:
     
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
         try:
+            sock.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, BUFFER_SIZE)
             sock.bind((config_model.client_ip, config_model.client_port))
             sock.connect((config_model.listen_ip, config_model.listen_port))
 

@@ -7,8 +7,10 @@ namespace nf_queue_mock {
             throw std::runtime_error("Failed to create receive socket");
         }
 
+        int bufsize = 4 * 1024 * 1024;
         int one = 1;
-        if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one)) < 0) {
+        if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one)) < 0 ||
+            setsockopt(fd, SOL_SOCKET, SO_RCVBUF, &bufsize, sizeof(bufsize)) < 0) {
             ::close(fd);
             throw std::runtime_error("Failed to set SO_REUSEADDR");
         }
@@ -38,6 +40,11 @@ namespace nf_queue_mock {
         int fd = ::socket(AF_INET, SOCK_DGRAM, 0);
         if (fd < 0) {
             throw std::runtime_error("Failed to create send socket");
+        }
+        int bufsize = 4 * 1024 * 1024;
+        if (setsockopt(fd, SOL_SOCKET, SO_SNDBUF, &bufsize, sizeof(bufsize)) < 0) {
+            ::close(fd);
+            throw std::runtime_error("Failed to set SO_SNDBUF");
         }
         return Socket(fd);
     }

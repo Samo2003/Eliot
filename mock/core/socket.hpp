@@ -1,6 +1,8 @@
-#pragma once
+#ifndef NF_QUEUE_SOCKET_H
+#define NF_QUEUE_SOCKET_H
 
 #include <unistd.h>
+#include <utility>
 
 namespace nf_queue_mock {
     class Socket {
@@ -27,3 +29,5 @@ namespace nf_queue_mock {
             int _fd;
     };
 }
+
+#endif
