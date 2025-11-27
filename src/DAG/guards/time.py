@@ -19,3 +19,6 @@ class Time(GuardBase[Literal["Time"]]):
     
     def is_state(self) -> bool:
         return True
+    
+    def time(self) -> bool:
+        return True

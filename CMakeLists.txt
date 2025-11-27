@@ -21,16 +21,18 @@ endif()
 
 add_subdirectory(generated)
 
-add_executable(eliot)
+if(PROFILING)
+    target_link_libraries(eliot_generated PUBLIC nf_queue_profiling)
+else()
+    target_link_libraries(eliot_generated PUBLIC nf_queue_mock)
+endif()
+
+add_executable(eliot generated/eliot.cpp)
+
+target_link_libraries(eliot PUBLIC eliot_generated)
 
 if(PROFILING)
-    target_link_libraries(eliot PRIVATE
-        eliot_generated
-        nf_queue_profiling
-    )
+    target_link_libraries(eliot PUBLIC nf_queue_profiling)
 else()
-    target_link_libraries(eliot PRIVATE
-        eliot_generated
-        nf_queue_mock
-    )
+    target_link_libraries(eliot PUBLIC nf_queue_mock)
 endif()

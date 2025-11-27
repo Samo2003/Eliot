@@ -7,7 +7,8 @@ def generate_eliot(
     env: Environment, 
     output_dir: str, 
     api: NFQueueApiBase, 
-    require_calendar: bool
+    require_calendar: bool,
+    require_time: bool
 ) -> None:
     """Generate main eliot entry point"""
 
@@ -16,4 +17,4 @@ def generate_eliot(
     output_path = os.path.join(output_dir, "eliot.cpp")
 
     # Generate file with given context
-    generate_to_file(env, template_name, output_path, { "api": api, "require_calendar": require_calendar})
+    generate_to_file(env, template_name, output_path, { "api": api, "require_calendar": require_calendar, "require_time": require_time })

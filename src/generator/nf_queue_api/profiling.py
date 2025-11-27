@@ -22,3 +22,6 @@ class ProfilingApi(NFQueueApiBase):
     
     def packet_payload(self) -> str:
         return "get_payload()"
+    
+    def returns_optional(self) -> bool:
+        return False

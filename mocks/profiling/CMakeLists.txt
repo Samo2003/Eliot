@@ -11,6 +11,4 @@ add_library(nf_queue_profiling STATIC
 target_include_directories(nf_queue_profiling
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR} 
-        ${CMAKE_CURRENT_SOURCE_DIR}/core 
-        ${CMAKE_CURRENT_SOURCE_DIR}/config
 )

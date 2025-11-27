@@ -2,20 +2,17 @@
 #define {{ guard.hpp_define() }}
 
 #include "../Packet.hpp"
-#include <chrono>
+#include "../Time.hpp"
 
 namespace eliot_generated {
     struct {{ guard.cpp_type() }} {
-        using Clock = std::chrono::steady_clock;
-        using Ms = std::chrono::milliseconds;
-
         inline bool fullfilled(const Packet* packet) noexcept {
             {% if not guard.instant %}
-            static Clock::time_point last = Clock::now();
+            static uint64_t last = read_clock_ms();
             {% endif %}
-            Clock::time_point now = Clock::now();
-            auto elapsed = std::chrono::duration_cast<Ms>(now - last);
-            if (elapsed >= get_threshold()) {
+            uint64_t now = get_global_time();
+            uint64_t elapsed = now - last;
+            if (elapsed >= _get_threshold()) {
                 _state = !_state;
                 last = now;
             }
@@ -23,14 +20,14 @@ namespace eliot_generated {
         }
 
         private:
-            static constexpr Ms _t{ {{ guard.t }} };
-            static constexpr Ms _f{ {{ guard.f }} };
+            static constexpr uint64_t _t = {{ guard.t }};
+            static constexpr uint64_t _f = {{ guard.f }};
             bool _state = true;
             {% if guard.instant %}
-            Clock::time_point last = Clock::now();
+            uint64_t last = read_clock_ms();
             {% endif %}
 
-            inline Ms get_threshold() const noexcept { return _state ? _t : _f; }
+            inline uint64_t _get_threshold() const noexcept { return _state ? _t : _f; }
     };
 
 }

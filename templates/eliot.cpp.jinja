@@ -5,8 +5,8 @@
 
 using namespace eliot_generated;
 
-static std::atomic<bool> stop_flag{false};
-void handle_sigint(int) { stop_flag = true; }
+static volatile sig_atomic_t stop_flag = 0;
+void handle_sigint(int) { stop_flag = 1; }
 
 int main() {
     std::signal(SIGINT, handle_sigint);
@@ -19,7 +19,11 @@ int main() {
         {% endif %}
         std::cout << "Eliot running...\n";
         while (!stop_flag) {
-            if (auto maybe_packet = q{{ api.get_packet() }}) {
+            {% if require_time %}
+            time_updated = false;
+            {% endif %}
+
+            if (auto{{ '' if api.returns_optional() else '*' }} maybe_packet = q{{ api.get_packet() }}) {
                 auto packet = new Packet(std::move(*maybe_packet));
                 result = processor.process_packet(packet);
 

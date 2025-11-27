@@ -27,3 +27,6 @@ class TimePeriod(GuardBase[Literal["TimePeriod"]]):
     
     def is_state(self) -> bool:
         return True
+    
+    def time(self) -> bool:
+        return True

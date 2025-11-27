@@ -2,10 +2,10 @@
 #define {{ action.hpp_define() }}
 
 #include <vector>
-{% if action.strategy == "random" %}
-#include <random>
-{% endif %}
 #include <algorithm>
+{% if action.strategy == "random" %}
+#include "../generators/xoroshiro128plus.hpp"
+{% endif %}
 #include "../Packet.hpp"
 #include "../calendar/Calendar.hpp"
 
@@ -20,13 +20,16 @@ namespace eliot_generated {
 
             if (_buffer.size() == _n) {
                 {% if action.strategy == "random" %}
-                std::shuffle(_buffer.begin(), _buffer.end(), _generator);
+                for (size_t i = _buffer.size() - 1; i > 0; --i) {
+                    size_t j = _rng.next_range(i + 1);
+                    std::swap(_buffer[i], _buffer[j]);
+                }
                 {% else %}
                 std::reverse(_buffer.begin(), _buffer.end());
                 {% endif %}
 
                 for (Packet* packet : _buffer) {
-                    _calendar.schedule(packet, _delay);
+                    _calendar.schedule(packet, 0);
                 }
 
                 _buffer.clear();
@@ -34,18 +37,16 @@ namespace eliot_generated {
         }
 
         ~{{ action.cpp_type() }}() {
-            for (Packet *packet : _buffer) {
+            for (Packet *packet : _buffer)
                 delete packet;
-            }
         }
 
         private:
             Calendar& _calendar;
             std::vector<Packet*> _buffer;
             static constexpr int _n = {{ action.n }};
-            static constexpr std::chrono::milliseconds _delay{0};
             {% if action.strategy == "random" %}
-            std::mt19937 _generator{ std::random_device{}() };
+            inline static xoroshiro128plus _rng{ {{ action.seed() }}, {{ action.seed() }} };
             {% endif %}
     };
 }

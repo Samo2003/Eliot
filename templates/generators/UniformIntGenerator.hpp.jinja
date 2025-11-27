@@ -1,7 +1,7 @@
 #ifndef {{ generator.hpp_define() }}
 #define {{ generator.hpp_define() }}
 
-#include <random>
+#include "xoroshiro128plus.hpp"
 
 namespace eliot_generated {
     struct {{ generator.cpp_type() }} {
@@ -9,14 +9,18 @@ namespace eliot_generated {
             {% if generator.once %}
             return {{ generator.value() }};
             {% else %}
-            return _distribution(_generator);
+            return _generate();
             {% endif %}
         }
 
         {% if not generator.once %}
         private:
-            inline static std::mt19937 _generator{std::random_device{}()};
-            inline static std::uniform_int_distribution<int> _distribution{ {{ generator.min}}, {{ generator.max }} };
+            inline static xoroshiro128plus _rng{ {{ generator.seed() }}, {{ generator.seed() }} };
+            inline static int _generate() noexcept {
+                uint64_t range = uint64_t({{ generator.max }} - {{ generator.min }} + 1);
+                uint64_t value = _rng.next_range(range);
+                return static_cast<int>(value + {{ generator.min }});
+            }
         {% endif %}
     };
 }

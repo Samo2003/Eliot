@@ -13,7 +13,7 @@ def generate_calendar(env: Environment, output_dir: str, require_calendar: bool)
     calendar_dir = os.path.join(output_dir, "calendar")
     
     # Generate all neccesary calendar files
-    names = ["Calendar.cpp", "Calendar.hpp"]
+    names = ["Calendar.cpp", "Calendar.hpp", "Bucket.hpp"]
     for name in names:
         # Configure file paths
         template_name = f"calendar/{name}.jinja"

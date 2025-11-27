@@ -9,11 +9,10 @@ namespace eliot_generated {
         explicit {{ action.cpp_type() }}(Calendar& calendar) : _calendar(calendar) {}
 
         inline void execute(Packet* packet) noexcept {
-            _calendar.schedule(packet, _delay);
+            _calendar.schedule(packet, {{ action.n }});
         }
 
         private:
-            static constexpr std::chrono::milliseconds _delay{ {{ action.n }} };
             Calendar& _calendar;
     };
 }

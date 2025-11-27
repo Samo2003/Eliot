@@ -25,7 +25,7 @@ class ActionBase(DAGBaseModel, Generic[T], ABC):
         return False
     
     def cpp_call(self) -> str:
-        # Final actions must reimplment this method
+        # Final actions must reimplement this method
         if self.is_final():
             raise NotImplementedError
         return super().cpp_call()

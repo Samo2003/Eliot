@@ -1,29 +1,111 @@
 #include "Calendar.hpp"
 
 namespace eliot_generated {
-    void Calendar::schedule(Packet* packet, Delay delay) noexcept {
-        Clock::time_point time = Clock::now() + delay;
-        _queue.emplace(CalendarItem{ time, packet, _counter++ });
+    void Calendar::schedule(Packet* packet, uint64_t delay) noexcept {
+        if (!packet)
+            return;
+
+        // Clamp delay to L2 max (~4.6h)
+        if (delay >= _L2_SPAN)
+            delay = _L2_SPAN - 1;
+        
+        // Time when packet processing should continue
+        uint64_t due_tick = _current_tick_from_clock() + delay;
+
+        // Create new item
+        Item* item = new Item{ due_tick, packet, nullptr };
+
+        // Number of ticks from now till due tick
+        uint64_t diff = (due_tick > _current_tick) ? (due_tick - _current_tick) : 0;
+        if (diff < _L0_SPAN) {
+            // Insert into L0
+            uint32_t slot = static_cast<uint32_t>(due_tick & _MASK);
+            _wheel0[slot].push(item);
+        } else if (diff < _L1_SPAN) {
+            // L1 tick resolution
+            uint32_t slot = static_cast<uint32_t>((due_tick / _L0_SPAN) & _MASK);
+            // Insert into L1
+            _wheel1[slot].push(item);
+        } else {
+            // L2 tick resolution
+            uint32_t slot = static_cast<uint32_t>((due_tick / _L1_SPAN) & _MASK);
+            // Insert into L2
+            _wheel2[slot].push(item);
+        }
+
+        _size++;
+    }
+
+    void Calendar::_cascade_from_L1() noexcept {
+        // L1 slot index
+        uint32_t slot = static_cast<uint32_t>((_current_tick / _L0_SPAN) & _MASK);
+        Bucket& bucket = _wheel1[slot];
+
+        Item* item;
+        while ((item = bucket.pop())) {
+            // L0 tick resolution
+            slot = static_cast<uint32_t>(item->tick & _MASK);
+
+            // Insert into corresponding L0 slot
+            _wheel0[slot].push(item);
+        }
+    }
+
+    void Calendar::_cascade_from_L2() noexcept {
+        // L2 slot index
+        uint32_t slot = static_cast<uint32_t>((_current_tick / _L1_SPAN) & _MASK);
+        Bucket& bucket = _wheel2[slot];
+
+        Item* item;
+        while ((item = bucket.pop())) {
+            // L1 tick resolution
+            slot = static_cast<uint32_t>(item->tick / _L0_SPAN) & _MASK;
+
+            // Insert into corresponding L1 slot
+            _wheel1[slot].push(item);
+        }
     }
 
     Packet* Calendar::get_ready() noexcept {
-        if (_queue.empty())
+        if (_size == 0)
             return nullptr;
 
-        if (_queue.top().time <= Clock::now()) {
-            auto packet = _queue.top().packet;
-            _queue.pop();
-            return packet;
+        // Current tick based on clock
+        uint64_t now_tick = _current_tick_from_clock();
+        if (now_tick < _current_tick) 
+            return nullptr;
+
+        // Clock tick and clanedar tick diference max 1 L1 wheel size
+        uint64_t max_steps = (now_tick - _current_tick) + 1;
+        if (max_steps > _L0_SPAN) 
+            max_steps = _L0_SPAN;
+
+        for (uint64_t i = 0; i < max_steps; i++) {
+            // Current L0 slot corresponding to calendar tick
+            uint32_t slot = static_cast<uint32_t>(_current_tick & _MASK);
+            Bucket& bucket = _wheel0[slot];
+
+            // Check current bucket for packet
+            if (Item* item = bucket.pop()) {
+                Packet* packet = item->packet;
+                delete item;
+                _size--;
+                return packet;
+            }
+
+            // Advance calendar tick
+            _current_tick++;
+
+            // L0 made whole wheel cascading from L1 slot
+            if (slot == _MASK) {
+                _cascade_from_L1();
+                uint64_t coarse_tick = (_current_tick / _L0_SPAN) & _MASK;
+                if (coarse_tick == 0)
+                    _cascade_from_L2();
+            }
         }
 
+        // No packets ready to process yet
         return nullptr;
-    }
-
-    Calendar::~Calendar() {
-        while (!_queue.empty()) {
-            auto item = _queue.top();
-            _queue.pop();
-            delete item.packet;
-        }
     }
 }

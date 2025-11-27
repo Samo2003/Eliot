@@ -56,3 +56,11 @@ class NFQueueApiBase(ABC):
         Example: get()
         """
         pass
+
+    def returns_optional(self) -> bool:
+        """
+        Defines if get_packet return optional packet or reference
+        
+        Used for profiling
+        """
+        return True

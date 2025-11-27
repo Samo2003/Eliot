@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+import random
 from typing import final
 from pydantic import BaseModel
 
@@ -37,3 +38,12 @@ class DAGBaseModel(BaseModel, ABC):
     def init(self) -> str:
         """Initialization if required"""
         return ""
+    
+    def time(self) -> bool:
+        """Signalizes that node needs time module"""
+        return False
+    
+    @final
+    def seed(self) -> int:
+        """Returns seed for generators"""
+        return random.getrandbits(32)

@@ -3,44 +3,45 @@
 
 #include <queue>
 #include <vector>
-#include <chrono>
 #include <optional>
-#include "../Packet.hpp"
+#include <array>
+#include <deque>
+#include "../Time.hpp"
+#include "Bucket.hpp"
 
 namespace eliot_generated {
     struct Calendar {
-        using Delay = std::chrono::milliseconds;
-        using Clock = std::chrono::steady_clock;
-
-        void schedule(Packet* packet, Delay delay) noexcept;
+        void schedule(Packet* packet, uint64_t delay) noexcept;
 
         Packet* get_ready() noexcept;
 
-        inline bool empty() const noexcept { return _queue.empty(); }
-
-        ~Calendar();
+        inline bool empty() const noexcept { return _size == 0; }
 
         private:
-            struct CalendarItem {
-                Clock::time_point time;
-                Packet* packet;
-                size_t order;
-                uint64_t t = 0;
+            static constexpr uint32_t _SLOTS = 256;
+            static constexpr uint64_t _MASK = _SLOTS - 1;
 
-                explicit CalendarItem(Clock::time_point time, Packet* packet, size_t order) 
-                    : time(time), packet(packet), order(order) 
-                {
-                    t = std::chrono::duration_cast<std::chrono::milliseconds>(time.time_since_epoch()).count();
-                }
+            static constexpr uint64_t _L0_SPAN = _SLOTS;
+            static constexpr uint64_t _L1_SPAN = _SLOTS * _SLOTS;
+            static constexpr uint64_t _L2_SPAN = _L1_SPAN * _SLOTS;
 
-                bool operator>(const CalendarItem& other) const noexcept { 
-                    return (t > other.t) || (t == other.t && order > other.order);
-                }
-            };
+            size_t _size = 0;
+            uint64_t _start = read_clock_ms();
+            uint64_t _current_tick = 0;
 
-            size_t _counter = 0;
+            std::array<Bucket, _SLOTS> _wheel0{};
+            std::array<Bucket, _SLOTS> _wheel1{};
+            std::array<Bucket, _SLOTS> _wheel2{};
 
-            std::priority_queue<CalendarItem, std::vector<CalendarItem>, std::greater<CalendarItem>> _queue;
+            void _cascade_from_L1() noexcept;
+            void _cascade_from_L2() noexcept;
+            
+            inline uint64_t _current_tick_from_clock() const noexcept {
+                uint64_t now = get_global_time();
+                if (now < _start)
+                    return _current_tick;
+                return now - _start;
+            }
     };
 }
 

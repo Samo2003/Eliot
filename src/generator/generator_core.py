@@ -13,6 +13,9 @@ def generate(dag: DAG, template_dir: str, output_dir: str, api: NFQueueApiBase) 
     # Only generate calendar if at least one action node requires it
     require_calendar = any([action.calendar() for action in action_nodes])
 
+    # Only generate time if at least one node requires it
+    require_time = require_calendar or any([action.time() for action in action_nodes]) or any([guard.time() for guard in guard_nodes])
+
     # Initialize jinja environment
     env = Environment(
         loader=FileSystemLoader(template_dir),  # Initialize template loader
@@ -29,5 +32,6 @@ def generate(dag: DAG, template_dir: str, output_dir: str, api: NFQueueApiBase) 
     processor.generate_processor_header(env, output_dir, api, guard_nodes, action_nodes, require_calendar)
     processor.generate_processor(env, output_dir, dag)
     calendar.generate_calendar(env, output_dir, require_calendar)
-    eliot.generate_eliot(env, output_dir, api, require_calendar)
+    eliot.generate_eliot(env, output_dir, api, require_calendar, require_time)
+    time.generate_time(env, output_dir, require_time)
     cmake.generate_cmake(template_dir, output_dir)
