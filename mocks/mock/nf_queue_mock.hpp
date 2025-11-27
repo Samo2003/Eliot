@@ -12,7 +12,10 @@ namespace nf_queue_mock {
         public: 
             NFQueue() : _core(Config("tests/test_config.json")) {}
 
-            std::optional<NFQueuePacket> get_packet() noexcept;
+            inline std::optional<NFQueuePacket> get_packet() noexcept {
+                _core.accept_packets();
+                return _core.queue_pop();
+            }
 
             void accept_packet(NFQueuePacket&& packet) noexcept;
 

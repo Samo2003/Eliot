@@ -7,19 +7,18 @@
 namespace nf_queue_profiling {
     class NFQueuePacket {
         private:
-            std::shared_ptr<std::vector<uint8_t>> _payload;
+            std::vector<uint8_t>& _payload;
 
         public:
-            explicit NFQueuePacket(std::shared_ptr<std::vector<uint8_t>> payload) noexcept
-                : _payload(std::move(payload)) {}
+            explicit NFQueuePacket(std::vector<uint8_t>& p) noexcept : _payload(p) {}
 
             
             NFQueuePacket(NFQueuePacket&&) noexcept = default;
-            NFQueuePacket& operator=(NFQueuePacket&&) noexcept = default;
+            NFQueuePacket& operator=(NFQueuePacket&&) noexcept = delete;
             NFQueuePacket(const NFQueuePacket&) = delete;
             NFQueuePacket& operator=(const NFQueuePacket&) = delete;
 
-            inline const std::vector<uint8_t>& get_payload() const noexcept { return *_payload; }
+            inline const std::vector<uint8_t>& get_payload() const noexcept { return _payload; }
     };
 }
 

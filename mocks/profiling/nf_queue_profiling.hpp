@@ -9,20 +9,16 @@
 namespace nf_queue_profiling {
     class NFQueue {
         public: 
-             NFQueue() {
+            NFQueue() {
                 _packets.reserve(_PACKET_COUNT);
 
-                auto template_payload = std::make_shared<std::vector<uint8_t>>(_PAYLOAD_SIZE, 0xAB);
-
                 for (size_t i = 0; i < _PACKET_COUNT; i++) {
-                    _packets.emplace_back(NFQueuePacket(template_payload));
+                    _packets.emplace_back(NFQueuePacket(_template_payload));
                 }
             }
 
             inline NFQueuePacket* get_packet() noexcept {
-                if (_index < _PACKET_COUNT)
-                    return &_packets[_index++];
-                return nullptr;
+                return _index < _PACKET_COUNT ? &_packets[_index++] : nullptr;
             }
 
             inline void accept_packet(NFQueuePacket&& packet) const noexcept {}
@@ -38,6 +34,7 @@ namespace nf_queue_profiling {
             static constexpr size_t _PACKET_COUNT = 100000000;
             static constexpr size_t _PAYLOAD_SIZE = 128;
             std::vector<NFQueuePacket> _packets;
+            std::vector<uint8_t> _template_payload{_PAYLOAD_SIZE, 0xAB};
             size_t _index = 0;
     };
 }

@@ -4,7 +4,7 @@ set -e
 
 MODE="${1:-linux}"   # default = linux
 
-OUTPUT_DIR="profile_output"
+OUTPUT_DIR="profiling_output"
 mkdir -p "$OUTPUT_DIR"
 
 if [[ "$MODE" == "clean" ]]; then
