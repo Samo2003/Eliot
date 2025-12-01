@@ -1,11 +1,12 @@
 from typing import Literal
+from ..generators import ValueGeneratorInt
 from .base import GuardBase
 
 class Size(GuardBase[Literal["Size"]]):
     """Guard that checks packet size"""
 
     # Threshold size
-    size: int
+    size: int | ValueGeneratorInt
 
     # Compare operation
     op: Literal["lt", "le", "eq", "ge", "gt"]
@@ -23,3 +24,7 @@ class Size(GuardBase[Literal["Size"]]):
             "gt": ">"
         }
         return ops[self.op]
+    
+    def not_generator_size(self) -> bool:
+        """Condition used in generating representing if size is a generator"""
+        return isinstance(self.size, int)

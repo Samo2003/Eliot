@@ -27,14 +27,14 @@ class UniformBase(ValueGeneratorBase[T, N], ABC):
         return f"{self.cpp_type_base()}_{self.N_to_int_str(min_val)}_{self.N_to_int_str(max_val)}_{self.once}"
 
 class UniformFloat(UniformBase[Literal["UniformFloat"], float]):
-    """Uniform Float value ganerator"""
+    """Uniform Float value generator"""
 
     def value(self) -> float:
         min_val, max_val = self.get_min_max()
         return random.uniform(min_val, max_val)
 
 class UniformInt(UniformBase[Literal["UniformInt"], int]):
-    """Uniform int value ganerator"""
+    """Uniform int value generator"""
 
     def value(self) -> int:
         min_val, max_val = self.get_min_max()

@@ -8,10 +8,10 @@ class NormalBase(ValueGeneratorBase[T, N], ABC):
     s: float
 
 class NormalFloat(NormalBase[Literal["NormalFloat"], float]):
-    """Normal Float value ganerator"""
+    """Normal Float value generator"""
     pass
 
 class NormalInt(NormalBase[Literal["NormalInt"], int]):
-    """Normal Int value ganerator"""
+    """Normal Int value generator"""
     pass
 

@@ -3,8 +3,9 @@ from .base import GuardBase
 from ..generators import ValueGeneratorInt
 
 class EveryN(GuardBase[Literal["EveryN"]]):
-    """Guard that is fullfilled every nth packet"""
+    """Guard that is fulfilled every nth packet"""
 
+    # Every `N`th packet the guard is fulfilled
     N: int | ValueGeneratorInt
 
     def cpp_type(self) -> str:
@@ -13,6 +14,6 @@ class EveryN(GuardBase[Literal["EveryN"]]):
     def is_state(self) -> bool:
         return True
     
-    def not_generator(self) -> bool:
+    def not_generator_N(self) -> bool:
         """Condition used in generating representing if N is a generator"""
         return isinstance(self.N, int)

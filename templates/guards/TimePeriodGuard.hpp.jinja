@@ -3,31 +3,56 @@
 
 #include "../Packet.hpp"
 #include "../Time.hpp"
+{% if not guard.not_generator_t() or not guard.not_generator_f() %}
+#include "../interfaces/GeneratorInt.hpp"
+{% endif %}
+{% if not guard.not_generator_t() %}
+#include "../generators/{{ guard.t.cpp_type() }}.hpp"
+{% endif %}
+{% if not guard.not_generator_f() %}
+#include "../generators/{{ guard.f.cpp_type() }}.hpp"
+{% endif %}
 
 namespace eliot_generated {
     struct {{ guard.cpp_type() }} {
-        inline bool fullfilled(const Packet* packet) noexcept {
+        inline bool fulfilled(const Packet* packet) noexcept {
             {% if not guard.instant %}
             static uint64_t last = read_clock_ms();
             {% endif %}
             uint64_t now = get_global_time();
             uint64_t elapsed = now - last;
-            if (elapsed >= _get_threshold()) {
-                _state = !_state;
+            if (elapsed >= _threshold) {
                 last = now;
+                _state = !_state;
+                {% if guard.not_generator_t() and guard.not_generator_f() %}
+                _threshold = _state ? {{ guard.t }} : {{ guard.f }};
+                {% elif guard.not_generator_t() %}
+                _threshold =  _state ? {{ guard.t }} : generate{{ guard.f.cpp_call() }}); 
+                {% elif guard.not_generator_f() %}
+                _threshold = _state ? generate{{ guard.t.cpp_call() }}) : {{ guard.f }}; 
+                {% else %}
+                _threshold = _state ? generate{{ guard.t.cpp_call() }}) : generate{{ guard.f.cpp_call() }});
+                {% endif %}
             }
             return _state;
         }
 
         private:
-            static constexpr uint64_t _t = {{ guard.t }};
-            static constexpr uint64_t _f = {{ guard.f }};
             bool _state = true;
+            {% if guard.not_generator_t() %}
+            size_t _threshold = {{ guard.t }};
+            {% else %}
+            size_t _threshold = {{ guard.t.value() }};
+            {% endif %}
             {% if guard.instant %}
             uint64_t last = read_clock_ms();
             {% endif %}
-
-            inline uint64_t _get_threshold() const noexcept { return _state ? _t : _f; }
+            {% if not guard.not_generator_t() and guard.t.is_state() %}
+            static {{ guard.t.cpp_type() }} {{ guard.t.cpp_name() }};
+            {% endif %}
+            {% if not guard.not_generator_f() and guard.f.is_state() %}
+            static {{ guard.f.cpp_type() }} {{ guard.f.cpp_name() }};
+            {% endif %}
     };
 
 }

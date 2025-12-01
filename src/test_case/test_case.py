@@ -22,7 +22,7 @@ class TestCase(BaseModel):
 def load_test_case(file_path: str) -> TestCase:
     """Load test case from `file_path`, support JSON and YAML format"""
 
-    # Get file extension to determina type
+    # Get file extension to determine type
     ext = os.path.splitext(file_path)[1].lower()
 
     with open(file_path, "r", encoding="utf-8") as file:

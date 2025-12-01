@@ -14,14 +14,14 @@ class ValueGeneratorBase(DAGBaseModel, Generic[T, N], ABC):
     # Add hash method from parent class because it was deleted by Generic
     __hash__ = DAGBaseModel.__hash__
 
-    # Disciminator used by Pydantic
+    # Discriminator used by Pydantic
     generatorType: T
 
     # Value range
     min: N | None = None
     max: N | None = None
 
-    # If `True` valua is generated only once and does not change
+    # If `True` value is generated only once and does not change
     once: bool = False
 
     @final
@@ -31,7 +31,7 @@ class ValueGeneratorBase(DAGBaseModel, Generic[T, N], ABC):
     
     @final
     def cpp_type_base(self) -> str:
-        """Returns common generator basee name"""
+        """Returns common generator base name"""
         return f"{self.generatorType}Generator"
     
     @abstractmethod

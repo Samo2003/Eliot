@@ -3,7 +3,7 @@ from ..generators import ValueGeneratorInt
 from .base import ActionBase
 
 class Reorder(ActionBase[Literal["Reorder"]]):
-    """Action that reorders given number of packets based on a certain stratedy"""
+    """Action that reorders given number of packets based on a certain strategy"""
 
     # Packets to reorder
     n: int | ValueGeneratorInt

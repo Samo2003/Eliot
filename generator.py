@@ -63,7 +63,7 @@ def run_build(keep_build: bool, profiling: bool) -> None:
 @click.option("--templates", default="./templates", help="Path to templates directory")
 @click.option("--dag_schema", is_flag=True, help="Print DAG JSON schema and exit")
 @click.option("--api", "-a", default="mock", help="Specify NFQueue api type")
-@click.option("--keep_build", "-k", is_flag=True, help="If set CMake build directry is not deleted")
+@click.option("--keep_build", "-k", is_flag=True, help="If set CMake build directory is not deleted")
 def main(dag: str | None, test_case: str | None, output: str, templates: str, dag_schema: bool, api: str, keep_build: bool):
     """Main entry point for generator"""
 

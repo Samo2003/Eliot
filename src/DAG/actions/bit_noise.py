@@ -12,7 +12,7 @@ class BitNoise(ActionBase[Literal["BitNoise"]]):
     # Number of bits to invert
     n: int | ValueGeneratorInt | None = None
 
-    # Stratedy to choose bits to invert
+    # Strategy to choose bits to invert
     strategy: Literal["left", "right", "random"]
 
     @model_validator(mode="after")

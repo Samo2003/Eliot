@@ -12,7 +12,7 @@ class SeqCountBase(ValueGeneratorBase[T, N], ABC):
     # Step size
     step: N
 
-    # Handeling reached max or min value
+    # Handling reached max or min value
     mode: Literal["repeat", "keep", "reverse"]
 
     @model_validator(mode="after")

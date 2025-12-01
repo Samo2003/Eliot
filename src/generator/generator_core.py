@@ -5,7 +5,7 @@ from .generators import *
 from .utils import collect_nodes
 
 def generate(dag: DAG, template_dir: str, output_dir: str, api: NFQueueApiBase) -> None:
-    """Main generator function handeling generating"""
+    """Main generator function handling generating"""
 
     # Collect nodes from DAG that need to be generated
     guard_nodes, action_nodes, generator_nodes = collect_nodes(dag.root)
@@ -20,10 +20,10 @@ def generate(dag: DAG, template_dir: str, output_dir: str, api: NFQueueApiBase) 
     env = Environment(
         loader=FileSystemLoader(template_dir),  # Initialize template loader
         trim_blocks=True,                       # Strip new lines after generated line
-        lstrip_blocks=True                      # Strip white spaces from the beggining of the line
+        lstrip_blocks=True                      # Strip white spaces from the beginning of the line
     )
 
-    # Generate neccessary files
+    # Generate necessary files
     guards.generate_guards(env, output_dir, guard_nodes)
     actions.generate_actions(env, output_dir, action_nodes)
     generators.generate_generators(env, output_dir, generator_nodes)

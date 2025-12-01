@@ -5,11 +5,11 @@
 
 namespace eliot_generated {
     struct {{ guard.cpp_type() }} {
-        inline bool fullfilled(const Packet* packet) noexcept {
-            {% if guard.duration %}
-            return  ++_counter > {{ guard.after }} && _counter < {{ guard.after + guard.duration }};
-            {% else %}
+        inline bool fulfilled(const Packet* packet) noexcept {
+            {% if guard.duration is none %}
             return ++_counter > {{ guard.after }};
+            {% else %}
+            return  ++_counter > {{ guard.after }} && _counter < {{ guard.after + guard.duration }};
             {% endif %}
         }
 

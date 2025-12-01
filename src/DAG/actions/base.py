@@ -8,7 +8,7 @@ T = TypeVar("T", bound=str)
 class ActionBase(DAGBaseModel, Generic[T], ABC):
     """Abstract base class for Action nodes"""
 
-    # Disciminator used by Pydantic
+    # Discriminator used by Pydantic
     actionType: T
 
     @final

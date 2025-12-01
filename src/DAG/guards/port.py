@@ -2,9 +2,9 @@ from typing import Literal
 from .base import GuardBase
 
 class Port(GuardBase[Literal["Port"]]):
-    """Checks port nubers"""
+    """Checks port numbers"""
 
-    # Surce or destination port
+    # Source or destination port
     port: int | None = None
 
     # Source port

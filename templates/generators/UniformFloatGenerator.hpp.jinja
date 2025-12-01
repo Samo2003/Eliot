@@ -16,10 +16,9 @@ namespace eliot_generated {
         {% if not generator.once %}
         private:
             inline static xoroshiro128plus _rng{ {{ generator.seed() }}, {{ generator.seed() }} };
-            inline static float _
-                uint64_t value = _rng.next();
-                constexpr double inv = 1.0 / double(UINT64_MAX);
-                double f = double(value) * inv;
+            static constexpr double _inv = 1.0 / double(UINT64_MAX);
+            inline static float _generate() noexcept {
+                double f = double(_rng.next()) * _inv;
                 return static_cast<float>( {{ generator.min }} + f * ({{ generator.max }} - {{ generator.min }}) );
             }
         {% endif %}

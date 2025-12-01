@@ -75,7 +75,7 @@ namespace eliot_generated {
         if (now_tick < _current_tick) 
             return nullptr;
 
-        // Clock tick and clanedar tick diference max 1 L1 wheel size
+        // Clock tick and calendar tick difference max 1 L1 wheel size
         uint64_t max_steps = (now_tick - _current_tick) + 1;
         if (max_steps > _L0_SPAN) 
             max_steps = _L0_SPAN;

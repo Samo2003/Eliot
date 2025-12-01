@@ -7,23 +7,19 @@
 namespace eliot_generated {
     struct {{ guard.cpp_type() }} {
 
-        inline bool fullfilled(const Packet* packet) noexcept {
+        inline bool fulfilled(const Packet* packet) noexcept {
             {% if not guard.instant %}
             static const uint64_t start = read_clock_ms();
             {% endif %}
             uint64_t elapsed = get_global_time() - start;
-            {% if guard.duration %}
-            return elapsed >= _after && elapsed < (_after + _duration);
+            {% if guard.duration is none %}
+            return elapsed >= {{ guard.after }};
             {% else %}
-            return elapsed >= _after;
+            return  elapsed >= {{ guard.after }} && elapsed < {{ guard.after + guard.duration }};
             {% endif %}
         }
 
         private:
-            static constexpr uint64_t _after = {{ guard.after }};
-            {% if guard.duration %}
-            static constexpr uint64_t _duration = {{ guard.duration }};
-            {% endif %}
             {% if guard.instant %}
             const uint64_t start = read_clock_ms();
             {% endif %}

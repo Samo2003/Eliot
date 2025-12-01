@@ -3,17 +3,28 @@
 
 #include "../Packet.hpp"
 #include "../calendar/Calendar.hpp"
+{% if not action.not_generator_n() %}
+#include "../interfaces/GeneratorInt.hpp"
+#include "../generators/{{ guard.n.cpp_type() }}.hpp"
+{% endif %}
 
 namespace eliot_generated {
     struct {{ action.cpp_type() }} {
         explicit {{ action.cpp_type() }}(Calendar& calendar) : _calendar(calendar) {}
 
         inline void execute(Packet* packet) noexcept {
+            {% if not action.not_generator_n() %}
             _calendar.schedule(packet, {{ action.n }});
+            {% else %}
+            _calendar.schedule(packet, generate{{ guard.n.cpp_call() }}));
+            {% endif %}
         }
 
         private:
             Calendar& _calendar;
+            {% if not action.not_generator_n() and action.n.is_state() %}
+            static {{ action.t.cpp_type() }} {{ action.t.cpp_name() }};
+            {% endif %}
     };
 }
 

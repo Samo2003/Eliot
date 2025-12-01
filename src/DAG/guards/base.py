@@ -8,7 +8,7 @@ T = TypeVar("T", bound=str)
 class GuardBase(DAGBaseModel, Generic[T], ABC):
     """Abstract base class for all Guard nodes"""
 
-    # Disciminator used by Pydantic
+    # Discriminator used by Pydantic
     guardType: T
 
     # Guard value can be inverted

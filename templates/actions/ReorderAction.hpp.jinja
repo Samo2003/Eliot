@@ -6,6 +6,10 @@
 {% if action.strategy == "random" %}
 #include "../generators/xoroshiro128plus.hpp"
 {% endif %}
+{% if not action.not_generator_n() %}
+#include "../interfaces/GeneratorInt.hpp"
+#include "../generators/{{ action.n.cpp_type() }}.hpp"
+{% endif %}
 #include "../Packet.hpp"
 #include "../calendar/Calendar.hpp"
 

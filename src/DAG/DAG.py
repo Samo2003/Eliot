@@ -20,7 +20,7 @@ class ActionNode(BaseModel):
         if self.final and self.next is not None:
             raise ValueError("Final action node can't have next")
         if not self.final and self.next is None:
-            raise ValueError("Non final action node requieres next node")
+            raise ValueError("Non final action node requires next node")
         return self
 
 class GuardNode(BaseModel):

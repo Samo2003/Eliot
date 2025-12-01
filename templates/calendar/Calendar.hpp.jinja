@@ -38,9 +38,7 @@ namespace eliot_generated {
             
             inline uint64_t _current_tick_from_clock() const noexcept {
                 uint64_t now = get_global_time();
-                if (now < _start)
-                    return _current_tick;
-                return now - _start;
+                return now < _start ? _current_tick : now - _start;
             }
     };
 }

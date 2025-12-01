@@ -61,7 +61,7 @@ def main(config: str, verbose: bool) -> None:
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, BUFFER_SIZE)
         sock.bind((config_model.server_ip, config_model.server_port))
 
-        # Enables CRTL+C termination
+        # Enables CTRL+C termination
         sock.settimeout(1.0)
         
         print(f"[Server] listening on {config_model.server_ip}:{config_model.server_port}")

@@ -26,7 +26,7 @@ class DAGBaseModel(BaseModel, ABC):
         return self.cpp_type().lower()
     
     def cpp_call(self) -> str:
-        """Defines C++ formated call based on state"""
+        """Defines C++ formatted call based on state"""
         if self.is_state():
             return f"({self.cpp_name()}, "
         return f"<{self.cpp_type()}>("

@@ -3,7 +3,7 @@ from .base import GuardBase
 from ..generators import ValueGeneratorFloat
 
 class Prob(GuardBase[Literal["Prob"]]):
-    """Fullfils based on propability"""
+    """Fulfils based on probability"""
 
-    # Propability <0,1>
+    # Probability <0,1>
     x: float | ValueGeneratorFloat

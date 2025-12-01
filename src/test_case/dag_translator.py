@@ -65,7 +65,7 @@ def translate_to_DAG(test_case: TestCase) -> DAG:
     # Creates default ActionNode to add to the bottom of the tree
     default_node = ActionNode(final=True, action=default_action, next=None)
 
-    # No rules given default action is applyed to all packets
+    # No rules given default action is applied to all packets
     if not test_case.rules:
         return DAG(root=default_node)
 
