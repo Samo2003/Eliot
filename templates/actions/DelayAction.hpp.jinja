@@ -13,10 +13,10 @@ namespace eliot_generated {
         explicit {{ action.cpp_type() }}(Calendar& calendar) : _calendar(calendar) {}
 
         inline void execute(Packet* packet) noexcept {
-            {% if not action.not_generator_n() %}
+            {% if action.not_generator_n() %}
             _calendar.schedule(packet, {{ action.n }});
             {% else %}
-            _calendar.schedule(packet, generate{{ guard.n.cpp_call() }}));
+            _calendar.schedule(packet, generate{{ action.n.cpp_call() }}));
             {% endif %}
         }
 

@@ -5,12 +5,13 @@
 #include "../Packet.hpp"
 
 namespace eliot_generated {
-    struct Item {
-        uint64_t tick;
-        Packet* packet;
-        Item* next = nullptr;
+    template<typename T>
+    concept BucketItem = requires(T* item) {
+        { item->packet } -> std::convertible_to<Packet*>;
+        { item->next }   -> std::convertible_to<T*>;
     };
 
+    template<BucketItem Item>
     struct Bucket {
         inline void push(Item* item) noexcept {
             item->next = nullptr;

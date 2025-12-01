@@ -13,7 +13,7 @@ namespace eliot_generated {
         uint64_t due_tick = _current_tick_from_clock() + delay;
 
         // Create new item
-        Item* item = new Item{ due_tick, packet, nullptr };
+        CalendarItem* item = new CalendarItem{ due_tick, packet, nullptr };
 
         // Number of ticks from now till due tick
         uint64_t diff = (due_tick > _current_tick) ? (due_tick - _current_tick) : 0;
@@ -39,9 +39,9 @@ namespace eliot_generated {
     void Calendar::_cascade_from_L1() noexcept {
         // L1 slot index
         uint32_t slot = static_cast<uint32_t>((_current_tick / _L0_SPAN) & _MASK);
-        Bucket& bucket = _wheel1[slot];
+        BucketT& bucket = _wheel1[slot];
 
-        Item* item;
+        CalendarItem* item;
         while ((item = bucket.pop())) {
             // L0 tick resolution
             slot = static_cast<uint32_t>(item->tick & _MASK);
@@ -54,9 +54,9 @@ namespace eliot_generated {
     void Calendar::_cascade_from_L2() noexcept {
         // L2 slot index
         uint32_t slot = static_cast<uint32_t>((_current_tick / _L1_SPAN) & _MASK);
-        Bucket& bucket = _wheel2[slot];
+        BucketT& bucket = _wheel2[slot];
 
-        Item* item;
+        CalendarItem* item;
         while ((item = bucket.pop())) {
             // L1 tick resolution
             slot = static_cast<uint32_t>(item->tick / _L0_SPAN) & _MASK;
@@ -83,10 +83,10 @@ namespace eliot_generated {
         for (uint64_t i = 0; i < max_steps; i++) {
             // Current L0 slot corresponding to calendar tick
             uint32_t slot = static_cast<uint32_t>(_current_tick & _MASK);
-            Bucket& bucket = _wheel0[slot];
+            BucketT& bucket = _wheel0[slot];
 
             // Check current bucket for packet
-            if (Item* item = bucket.pop()) {
+            if (CalendarItem* item = bucket.pop()) {
                 Packet* packet = item->packet;
                 delete item;
                 _size--;

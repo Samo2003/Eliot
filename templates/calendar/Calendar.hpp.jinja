@@ -5,7 +5,6 @@
 #include <vector>
 #include <optional>
 #include <array>
-#include <deque>
 #include "../Time.hpp"
 #include "Bucket.hpp"
 
@@ -28,10 +27,18 @@ namespace eliot_generated {
             size_t _size = 0;
             uint64_t _start = read_clock_ms();
             uint64_t _current_tick = 0;
+        
+            struct CalendarItem {
+                uint64_t tick;
+                Packet* packet;
+                CalendarItem* next = nullptr;
+            };
 
-            std::array<Bucket, _SLOTS> _wheel0{};
-            std::array<Bucket, _SLOTS> _wheel1{};
-            std::array<Bucket, _SLOTS> _wheel2{};
+            using BucketT = Bucket<CalendarItem>;
+
+            std::array<BucketT, _SLOTS> _wheel0{};
+            std::array<BucketT, _SLOTS> _wheel1{};
+            std::array<BucketT, _SLOTS> _wheel2{};
 
             void _cascade_from_L1() noexcept;
             void _cascade_from_L2() noexcept;
