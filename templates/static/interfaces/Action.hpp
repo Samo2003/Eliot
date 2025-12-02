@@ -1,7 +1,7 @@
 #ifndef ELIOT_ACTION_H
 #define ELIOT_ACTION_H
 
-#include "../Packet.hpp"
+#include "../../Packet.hpp"
 #include <concepts>
 
 namespace eliot_generated {

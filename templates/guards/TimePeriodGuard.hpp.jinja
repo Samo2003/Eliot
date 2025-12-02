@@ -2,9 +2,9 @@
 #define {{ guard.hpp_define() }}
 
 #include "../Packet.hpp"
-#include "../Time.hpp"
+#include "../static/Time.hpp"
 {% if not guard.not_generator_t() or not guard.not_generator_f() %}
-#include "../interfaces/GeneratorInt.hpp"
+#include "../static/interfaces/GeneratorInt.hpp"
 {% endif %}
 {% if not guard.not_generator_t() %}
 #include "../generators/{{ guard.t.cpp_type() }}.hpp"

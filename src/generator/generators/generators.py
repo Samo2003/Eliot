@@ -1,7 +1,6 @@
 from jinja2 import Environment
 from typing import Set
 import os
-from src.DAG.generators import ValueGeneratorBase
 from ...DAG import *
 from ..utils import generate_to_file
 
@@ -10,14 +9,6 @@ def generate_generators(env: Environment, output_dir: str, generators: Set[Value
 
     # Configure output directory
     generators_dir = os.path.join(output_dir, "generators")
-
-    # Generate random generator
-    output_name = "xoroshiro128plus.hpp"
-    template_name = f"generators/{output_name}.jinja"
-    output_path = os.path.join(generators_dir, output_name)
-
-    # Generate file with given context
-    generate_to_file(env, template_name, output_path)
 
     for generator in generators:
         # Configure file path

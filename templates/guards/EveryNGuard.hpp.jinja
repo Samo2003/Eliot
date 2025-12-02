@@ -3,7 +3,7 @@
 
 #include "../Packet.hpp"
 {% if not guard.not_generator_N() %}
-#include "../interfaces/GeneratorInt.hpp"
+#include "../static/interfaces/GeneratorInt.hpp"
 #include "../generators/{{ guard.N.cpp_type() }}.hpp"
 {% endif %}
 

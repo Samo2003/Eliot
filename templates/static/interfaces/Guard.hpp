@@ -1,7 +1,7 @@
 #ifndef ELIOT_GUARD_H
 #define ELIOT_GUARD_H
 
-#include "../Packet.hpp"
+#include "../../Packet.hpp"
 #include <concepts>
 
 namespace eliot_generated {

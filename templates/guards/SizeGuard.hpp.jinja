@@ -3,7 +3,7 @@
 
 #include "../Packet.hpp"
 {% if not guard.not_generator_size() %}
-#include "../interfaces/GeneratorInt.hpp"
+#include "../static/interfaces/GeneratorInt.hpp"
 #include "../generators/{{ guard.size.cpp_type() }}.hpp"
 {% endif %}
 

@@ -2,10 +2,10 @@
 #define ELIOT_PROCESSOR_H
 
 #include "Packet.hpp"
-#include "interfaces/Guard.hpp"
-#include "interfaces/Action.hpp"
+#include "static/interfaces/Guard.hpp"
+#include "static/interfaces/Action.hpp"
 {% if require_calendar %}
-#include "calendar/Calendar.hpp"
+#include "static/calendar/Calendar.hpp"
 {% endif %}
 {% for guard in guards %}
 #include "guards/{{ guard.cpp_type() }}.hpp"

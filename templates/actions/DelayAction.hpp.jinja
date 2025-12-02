@@ -2,9 +2,9 @@
 #define {{ action.hpp_define() }}
 
 #include "../Packet.hpp"
-#include "../calendar/Calendar.hpp"
+#include "../static/calendar/Calendar.hpp"
 {% if not action.not_generator_n() %}
-#include "../interfaces/GeneratorInt.hpp"
+#include "../static/interfaces/GeneratorInt.hpp"
 #include "../generators/{{ guard.n.cpp_type() }}.hpp"
 {% endif %}
 
