@@ -19,7 +19,7 @@ else()
     add_subdirectory(mocks/mock)
 endif()
 
-add_subdirectory(generated)
+add_subdirectory(generated/static)
 
 if(PROFILING)
     target_link_libraries(eliot_generated PUBLIC nf_queue_profiling)
