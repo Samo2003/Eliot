@@ -1,6 +1,12 @@
 from typing import Literal
+from pydantic import model_validator
 from ..generators import ValueGeneratorInt
 from .base import ActionBase
+
+# Minimal allowed n value
+MIN_N = 2
+# Maximal allowed n value
+MAX_N = 2048
 
 class Reorder(ActionBase[Literal["Reorder"]]):
     """Action that reorders given number of packets based on a certain strategy"""
@@ -10,6 +16,21 @@ class Reorder(ActionBase[Literal["Reorder"]]):
 
     # Reorder strategy
     strategy: Literal["random", "reverse"] = "random"
+
+    @model_validator(mode="after")
+    def check_n_bounds(self):
+        """Validates possible n values"""
+        if isinstance(self.n, int):
+            if self.n < MIN_N or self.n > MAX_N:
+                raise ValueError(f"n must be from {MIN_N} to {MAX_N}")
+        else:
+            if self.n.min is None:
+                self.n.min = MIN_N
+            if self.n.max is None:
+                self.n.max = MAX_N
+            if self.n.min < MIN_N or self.n.max > MAX_N:
+                raise ValueError(f"n must be from {MIN_N} to {MAX_N}")
+        return self
 
     def cpp_type(self) -> str:
         return f"{self.cpp_type_base()}_{self.n}_{self.strategy}"

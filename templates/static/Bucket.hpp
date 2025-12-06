@@ -2,6 +2,7 @@
 #define ELIOT_BUCKET_H
 
 #include <stdint.h>
+#include <concepts>
 #include "../Packet.hpp"
 
 namespace eliot_generated {
