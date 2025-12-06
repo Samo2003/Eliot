@@ -2,6 +2,7 @@ from typing import Literal
 from pydantic import model_validator
 from ..generators import ValueGeneratorInt
 from .base import GuardBase
+from ..dag_base_model import FACTORS
 
 class TimePeriod(GuardBase[Literal["TimePeriod"]]):
     """Guard that check time-periods"""
@@ -15,11 +16,22 @@ class TimePeriod(GuardBase[Literal["TimePeriod"]]):
     # If `True` time is counted from starting eliot else from first packet checked by guard
     instant: bool = False
 
+    # Time units, also applied for generator
+    unit: Literal["ms", "s", "min", "h"] = "ms"
+
     @model_validator(mode="after")
-    def set_default_f(self):
-        """Default value of `f` is `t`"""
+    def set_default_f_and_convert_time(self):
+        """Default value of `f` is `t`, and converts time based on given units"""
+        if isinstance(self.t, int):
+            self.t *= FACTORS[self.unit]
+        else:
+            if self.t.min is not None:
+                self.t.min *= FACTORS[self.unit]
+            if self.t.max is not None:
+                self.t.max *= FACTORS[self.unit]
         if self.f is None:
             self.f = self.t
+        self.unit = "ms"
         return self
     
     def cpp_type(self) -> str:

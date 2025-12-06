@@ -1,12 +1,43 @@
 from typing import Literal
+from pydantic import model_validator
+from ..generators.seq_count import SeqCountBase
 from ..generators import ValueGeneratorInt
 from .base import ActionBase
+from ..dag_base_model import FACTORS
+
+# Calendar max delay in ms
+MAX_DELAY = 16777215
 
 class Delay(ActionBase[Literal["Delay"]]):
     """Action that delays packet"""
     
     # Time in ms for which the packet is delayed
     n: int | ValueGeneratorInt
+
+    # Time units, also applied for generator
+    unit: Literal["ms", "s", "min", "h"] = "ms"
+
+    @model_validator(mode="after")
+    def convert_and_check_n(self):
+        """Converts n to ms based on provided units and validates its value"""
+        if isinstance(self.n, int):
+            self.n *= FACTORS[self.unit]
+
+            if self.n < 0 or self.n > MAX_DELAY:
+                raise ValueError(f"n must be from 0 to {MAX_DELAY} in ms got: {self.n}")
+        else:
+            if self.n.min is not None:
+                self.n.min *= FACTORS[self.unit]
+                if self.n.max is None:
+                    self.n.max = MAX_DELAY
+                else:
+                    self.n.max *= FACTORS[self.unit]
+                if self.n.min < 0 or self.n.max > MAX_DELAY:
+                    raise ValueError(f"n must be from 0 to {MAX_DELAY} in ms")
+                if isinstance(self.n, SeqCountBase):
+                    self.n.step *= FACTORS[self.unit]
+        self.unit = "ms"
+        return self
 
     def cpp_type(self) -> str:
         return f"{self.cpp_type_base()}_{self.n}"

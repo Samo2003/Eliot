@@ -3,6 +3,9 @@ import random
 from typing import final
 from pydantic import BaseModel
 
+# Unit scale factors fot unit conversion
+FACTORS = { "ms": 1, "s": 1000, "min": 60000, "h": 3600000 }
+
 class DAGBaseModel(BaseModel, ABC):
     """Abstract base class for all DAG nodes"""
 

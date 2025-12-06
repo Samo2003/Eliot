@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import TypeVar, Generic, final
+from pydantic import model_validator
 from ..dag_base_model import DAGBaseModel
 
 # Generic type parameter for generator identifier
@@ -23,6 +24,14 @@ class ValueGeneratorBase(DAGBaseModel, Generic[T, N], ABC):
 
     # If `True` value is generated only once and does not change
     once: bool = False
+
+    @model_validator(mode="after")
+    def check_min(self):
+        if self.min is None:
+            self.min = 0    # type: ignore
+        if self.min < 0:    # type: ignore
+            raise ValueError(f"minimum value has to be 0 or greater")
+        return self
 
     @final
     def __str__(self) -> str:

@@ -4,10 +4,6 @@ namespace eliot_generated {
     void Calendar::schedule(Packet* packet, uint64_t delay) noexcept {
         if (!packet)
             return;
-
-        // Clamp delay to L2 max (~4.6h)
-        if (delay >= _L2_SPAN)
-            delay = _L2_SPAN - 1;
         
         // Time when packet processing should continue
         uint64_t due_tick = _current_tick_from_clock() + delay;
