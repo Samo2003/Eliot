@@ -1,0 +1,35 @@
+#ifndef {{ generator.hpp_define() }}
+#define {{ generator.hpp_define() }}
+
+#include <random>
+#include <cmath>
+#include "../static/xoroshiro128plus.hpp"
+
+namespace eliot_generated {
+    struct {{ generator.cpp_type() }} {
+        static {{ 'constexpr ' if generator.once else '' }}inline int get() noexcept {
+            {% if generator.once %}
+            return {{ generator.value() }};
+            {% else %}
+            float x;
+            while (true) {
+                x = _dist(_rng);
+                {% if generator.max is not none %}
+                if (x >= {{ generator.min }} && x <= {{ generator.max }})
+                {% else %}
+                if (x >= {{ generator.min }})
+                {% endif %}
+                    return static_cast<int>(std::round(x));
+            }
+            {% endif %}
+        }
+
+        {% if not generator.once %}
+        private:
+            inline static xoroshiro128plus _rng{ {{ generator.seed() }}, {{ generator.seed() }} };
+            inline static std::normal_distribution<float> _dist{ {{ generator.m }}f, {{ generator.s }}f };
+        {% endif %}
+    };
+}
+
+#endif

@@ -49,6 +49,6 @@ class ValueGeneratorBase(DAGBaseModel, Generic[T, N], ABC):
         pass
 
     @final
-    def N_to_int_str(self, x: N) -> str:
+    def N_to_int_str(self, x: float | int) -> str:
         """Converts generic type to string representation for C++ type names"""
         return str(int(round(float(x))))

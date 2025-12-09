@@ -3,7 +3,9 @@
 
 #include <stdint.h>
 
-struct xoroshiro128plus {    
+struct xoroshiro128plus {
+    using result_type = uint64_t;
+
     uint64_t s0;
     uint64_t s1;
 
@@ -25,6 +27,13 @@ struct xoroshiro128plus {
 
     inline uint64_t next_range(uint64_t n) noexcept {
         return (uint64_t)(((__uint128_t)next() * n) >> 64);
+    }
+
+    static constexpr result_type min() noexcept { return 0ULL; }
+    static constexpr result_type max() noexcept { return UINT64_MAX; }
+
+    inline result_type operator()() noexcept {
+        return next();
     }
 };
 
