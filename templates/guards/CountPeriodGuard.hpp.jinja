@@ -40,10 +40,10 @@ namespace eliot_generated {
             size_t _threshold = {{ guard.t.value() }};
             {% endif %}
             {% if not guard.not_generator_t() and guard.t.is_state() %}
-            static {{ guard.t.cpp_type() }} {{ guard.t.cpp_name() }};
+            {{ guard.t.cpp_type() }} {{ guard.t.cpp_name() }};
             {% endif %}
             {% if not guard.not_generator_f() and guard.f.is_state() %}
-            static {{ guard.f.cpp_type() }} {{ guard.f.cpp_name() }};
+            {{ guard.f.cpp_type() }} {{ guard.f.cpp_name() }};
             {% endif %}
     };
 

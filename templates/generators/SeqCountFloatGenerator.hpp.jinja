@@ -1,0 +1,62 @@
+#ifndef {{ generator.hpp_define() }}
+#define {{ generator.hpp_define() }}
+
+namespace eliot_generated {
+    struct {{ generator.cpp_type() }} {
+        {{ 'static constexpr ' if generator.once else '' }}inline float get() noexcept {
+            {% if generator.once %}
+            return {{ generator.value() }};
+            {% else %}
+            if (--_wait == 0) {
+                _wait = {{ generator.T }};
+                _advance();
+            }
+            return _value;
+            {% endif %}
+        }
+
+        {% if not generator.once %}
+        private:
+            float _value = {{ generator.value() }};
+            int _T = {{ generator.T }};
+            static constexpr float _step = {{ generator.step }};
+            {% if generator.mode == "reverse" %}
+            int _direction = 1;
+            {% endif %}
+
+            inline void _advance() noexcept {
+                {% if generator.mode == "repeat" %}
+                _value += _step;
+                {% if generator.step < 0 %}
+                if (_value < {{ generator.min }})
+                {% else %}
+                if (_value > {{ generator.max }})
+                {% endif %}
+                    _value = {{ generator.value() }};
+
+                {% elif generator.mode == "keep" %}
+                float next = _value + _step;
+                {% if generator.step < 0 %}
+                if (next >= {{ generator.min }})
+                {% else %}
+                if (next <= {{ generator.max }})
+                {% endif %}
+                    _value = next;
+
+                {% else %}
+                float next = _value + _step * _direction;
+                {% if generator.step < 0 %}
+                if (next < {{ generator.min }} || next > {{ generator.max if generator.max is not none else 0}})
+                {% else %}
+                if (next > {{ generator.max }} || next < {{ generator.min }})
+                {% endif %}
+                    _direction = - _direction;
+                _value += _step * _direction;
+                
+                {% endif %}
+            }
+        {% endif %}
+    };
+}
+
+#endif

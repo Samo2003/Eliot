@@ -39,7 +39,7 @@ def clear_output_dir(path: str) -> None:
         shutil.rmtree(path)
     os.makedirs(path, exist_ok=True)
 
-def run_build(keep_build: bool, profiling: bool) -> None:
+def run_build(clear_build: bool, profiling: bool) -> None:
     """Compiles binary file and moves it to current working directory"""
     os.makedirs(BUILD_DIR, exist_ok=True)
     binary_path = os.path.join(BUILD_DIR, BINARY_NAME)
@@ -53,7 +53,7 @@ def run_build(keep_build: bool, profiling: bool) -> None:
     binary = os.path.join(current_dir, BINARY_NAME)
     shutil.copy2(binary_path, binary)
 
-    if not keep_build:
+    if clear_build:
         shutil.rmtree(BUILD_DIR)
     
 @click.command()
@@ -63,8 +63,8 @@ def run_build(keep_build: bool, profiling: bool) -> None:
 @click.option("--templates", default="./templates", help="Path to templates directory")
 @click.option("--dag_schema", is_flag=True, help="Print DAG JSON schema and exit")
 @click.option("--api", "-a", default="mock", help="Specify NFQueue api type")
-@click.option("--keep_build", "-k", is_flag=True, help="If set CMake build directory is not deleted")
-def main(dag: str | None, test_case: str | None, output: str, templates: str, dag_schema: bool, api: str, keep_build: bool):
+@click.option("--clear_build", "-c", is_flag=True, help="If set CMake build directory is deleted")
+def main(dag: str | None, test_case: str | None, output: str, templates: str, dag_schema: bool, api: str, clear_build: bool):
     """Main entry point for generator"""
 
     if dag_schema:
@@ -92,7 +92,7 @@ def main(dag: str | None, test_case: str | None, output: str, templates: str, da
         
         generate(dag_model, templates, output, api_interface)
 
-        run_build(keep_build, profiling)
+        run_build(clear_build, profiling)
     except RuntimeError as e:
         print(e)
         sys.exit(1)

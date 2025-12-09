@@ -23,7 +23,7 @@ namespace eliot_generated {
         private:
             Calendar& _calendar;
             {% if not action.not_generator_n() and action.n.is_state() %}
-            static {{ action.t.cpp_type() }} {{ action.t.cpp_name() }};
+            {{ action.t.cpp_type() }} {{ action.t.cpp_name() }};
             {% endif %}
     };
 }

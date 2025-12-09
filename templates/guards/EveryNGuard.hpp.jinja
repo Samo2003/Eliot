@@ -26,7 +26,7 @@ namespace eliot_generated {
             size_t _N = {{ guard.N.value() }};
             {% endif %}
             {% if not guard.not_generator_N() and guard.N.is_state() %}
-            static {{ guard.N.cpp_type() }} {{ guard.N.cpp_name() }};
+            {{ guard.N.cpp_type() }} {{ guard.N.cpp_name() }};
             {% endif %}
     };
 

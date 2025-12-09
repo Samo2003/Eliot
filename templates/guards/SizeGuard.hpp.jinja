@@ -19,7 +19,7 @@ namespace eliot_generated {
 
         {% if not guard.not_generator_size() and guard.size.is_state() %}
         private:
-            static {{ guard.size.cpp_type() }} {{ guard.size.cpp_name() }};
+            {{ guard.size.cpp_type() }} {{ guard.size.cpp_name() }};
         {% endif %}
     };
 
