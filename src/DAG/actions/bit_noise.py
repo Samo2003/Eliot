@@ -4,7 +4,7 @@ from ..generators import ValueGeneratorInt, ValueGeneratorFloat
 from .base import ActionBase
 
 class BitNoise(ActionBase[Literal["BitNoise"]]):
-    """Inserts bitnoise into the packet"""
+    """Inserts bit noise into the packet"""
 
     # Part of bits to invert <0,1>
     x: float | ValueGeneratorFloat | None = None

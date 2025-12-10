@@ -22,6 +22,7 @@ class NormalBase(ValueGeneratorBase[T, N], ABC):
             raise ValueError("Unreachable interval in normal generator")
         return self
     
+    @final
     def cpp_type(self) -> str:
         return f"{self.cpp_type_base()}_{self.N_to_int_str(self.m)}_{self.N_to_int_str(self.s)}_{self.once}"
     

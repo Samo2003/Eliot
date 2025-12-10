@@ -18,7 +18,7 @@ namespace eliot_generated {
         {% if not generator.once %}
         private:
             float _value = {{ generator.value() }};
-            int _T = {{ generator.T }};
+            int _wait = {{ generator.T }};
             static constexpr float _step = {{ generator.step }};
             {% if generator.mode == "reverse" %}
             int _direction = 1;

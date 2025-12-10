@@ -19,7 +19,7 @@ namespace eliot_generated {
             static constexpr double _inv = 1.0 / double(UINT64_MAX);
             inline static float _generate() noexcept {
                 double f = double(_rng.next()) * _inv;
-                return static_cast<float>( {{ generator.min }} + f * ({{ generator.max }} - {{ generator.min }}) );
+                return static_cast<float>( {{ generator.min }} + f * {{ generator.max - generator.min }} );
             }
         {% endif %}
     };

@@ -1,4 +1,5 @@
 from typing import Literal
+from ..generators.base import ValueGeneratorBase
 from ..generators import ValueGeneratorInt
 from .base import GuardBase
 
@@ -28,3 +29,6 @@ class Size(GuardBase[Literal["Size"]]):
     def not_generator_size(self) -> bool:
         """Condition used in generating representing if size is a generator"""
         return isinstance(self.size, int)
+    
+    def is_state(self) -> bool:
+        return isinstance(self.size, ValueGeneratorBase) and self.size.is_state()

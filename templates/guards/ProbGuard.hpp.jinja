@@ -1,0 +1,31 @@
+#ifndef {{ guard.hpp_define() }}
+#define {{ guard.hpp_define() }}
+
+#include "../Packet.hpp"
+#include "../static/xoroshiro128plus.hpp"
+{% if not guard.not_generator_x() %}
+#include "../static/interfaces/GeneratorFloat.hpp"
+#include "../generators/{{ guard.x.cpp_type() }}.hpp"
+{% endif %}
+
+namespace eliot_generated {
+    struct {{ guard.cpp_type() }} {
+        {{ 'static ' if guard.not_generator_x() or not guard.x.is_state() else '' }}inline bool fulfilled(const Packet* packet) noexcept {
+            {% if guard.not_generator_x() %}
+            return _prob() < {{ guard.x }};
+            {% else %}
+            return _prob() < generate{{ guard.x.cpp_call() }});
+            {% endif %}
+        }
+
+        private:
+            inline static xoroshiro128plus _rng{ {{ guard.seed() }}, {{ guard.seed() }} };
+            static constexpr double _inv = 1.0 / double(UINT64_MAX);
+            inline static double _prob() noexcept { return  double(_rng.next()) * _inv; }
+            {% if not guard.not_generator_x() and guard.x.is_state() %}
+            {{ guard.x.cpp_type() }} {{ guard.x.cpp_name() }};
+            {% endif %}
+    };
+}
+
+#endif
