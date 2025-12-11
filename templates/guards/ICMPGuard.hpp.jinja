@@ -1,0 +1,30 @@
+#ifndef {{ guard.hpp_define() }}
+#define {{ guard.hpp_define() }}
+
+#include "../Packet.hpp"
+
+namespace eliot_generated {
+    struct {{ guard.cpp_type() }} {
+        static inline bool fulfilled(const Packet *packet) noexcept {
+            const std::vector<uint8_t>& p = packet->payload();
+            size_t size = packet->size();
+
+            int offset = packet->l4_offset();
+            if (offset < 0 || size < offset + 2)
+                return false;
+
+            {% if guard.type is not none %}
+            if (p[offset] != {{ guard.type }})
+                return false;
+            {% endif %}
+            {% if guard.code is not none %}
+            if (p[offset + 1] != {{ guard.code }})
+                return false;
+            {% endif %}
+
+            return true;
+        }
+    };
+}
+
+#endif

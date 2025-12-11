@@ -24,6 +24,59 @@ namespace eliot_generated {
                 _protocol = _get_protocol();
             return _protocol;
         }
+
+        inline const int l4_offset() const noexcept { 
+            if (_l4_offset != -1)
+                return _l4_offset;
+            
+            int v = version();
+            if (v == 4) {
+                if (size() < 20)
+                    return -1;
+
+                int header_len = ((payload()[0]) & 0x0F) * 4;
+                if (header_len < 20 || (size_t)header_len > size())
+                    return -1;
+
+                _l4_offset = header_len;
+                return _l4_offset;
+            } else if (v == 6) {
+                const std::vector<uint8_t>& p = payload();
+                uint8_t next = p[6];
+                size_t offset = 40;
+
+                while (true) {
+                    switch (next) {
+                        case 0:     // Hop-by-Hop option
+                        case 43:    // Routing
+                        case 44:    // Fragment
+                        case 50:    // ESP
+                        case 51:    // AH
+                        case 60:    // Destination options
+                            break;
+                        default:
+                            _l4_offset = offset;
+                            return offset;
+                    }
+                    
+                    // Next-header first byte, header len second byte
+                    if (offset + 2 > size())
+                        return -1;
+
+                    uint8_t len = p[offset + 1];
+                    // Len dos not include first octet
+                    size_t header_size = (len + 1) * 8;
+
+                    if (offset + header_size > size())
+                        return -1;
+
+                    next = p[offset];
+                    offset += header_size;
+                }
+            }
+
+            return -1;
+        }
         
         int state = 0;
 
@@ -31,6 +84,7 @@ namespace eliot_generated {
             {{ api.packet_type() }} _packet;
 
             mutable int _protocol = -1;
+            mutable int _l4_offset = -1;
 
             inline const int _get_protocol() const noexcept {
                 int v = version();
