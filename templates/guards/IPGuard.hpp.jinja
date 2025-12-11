@@ -1,0 +1,65 @@
+#ifndef {{ guard.hpp_define() }}
+#define {{ guard.hpp_define() }}
+
+#include "../Packet.hpp"
+
+namespace eliot_generated {
+    struct {{ guard.cpp_type() }} {
+        static inline bool fulfilled(const Packet *packet) noexcept {
+            const std::vector<uint8_t>& p = packet->payload();
+            size_t size = packet->size();
+            {% set src_bytes = guard.convert(guard.src) if guard.src is not none else none %}                
+            {% set dst_bytes = guard.convert(guard.dst) if guard.dst is not none else none %}
+            int version = packet->version();
+            {% if guard.ipv4() %}
+            if (version == 4) {
+                // IPv4 header size
+                if (size < 20)
+                    return false;
+                
+                static constexpr size_t IPv4_ADDR_LEN = 4;
+                {% if src_bytes %}
+                static constexpr uint8_t SRC_IP[] = { {{ src_bytes | map('int') | join(', ') }} };
+                // SRC IP offset
+                if (memcmp(&p[12], SRC_IP, IPv4_ADDR_LEN) != 0)
+                    return false;
+                {% endif %}
+
+                {% if dst_bytes %}
+                static constexpr uint8_t DST_IP[] = { {{ dst_bytes | map('int') | join(', ') }} };
+                // DST IP offset
+                if (memcmp(&p[16], DST_IP, IPv4_ADDR_LEN) != 0)
+                    return false;
+                {% endif %}
+                return true;
+            } 
+            {% else %}
+            if (version == 6) {
+                // IPv6 header size
+                if (size < 40)
+                    return false;
+
+                static constexpr size_t IPv6_ADDR_LEN = 16;
+                {% if src_bytes %}
+                static constexpr uint8_t SRC_IP[] = { {{ src_bytes | map('int') | join(', ') }} };
+                // SRC IP offset
+                if (memcmp(&p[8], SRC_IP, IPv6_ADDR_LEN) != 0)
+                    return false;
+                {% endif %}
+
+                {% if dst_bytes %}
+                static constexpr uint8_t DST_IP[] = { {{ dst_bytes | map('int') | join(', ') }} };
+                // DST IP offset
+                if (memcmp(&p[24], DST_IP, IPv6_ADDR_LEN) != 0)
+                    return false;
+                {% endif %}
+                return true;
+            }
+            {% endif %}
+
+            return false;
+        }
+    };
+}
+
+#endif
