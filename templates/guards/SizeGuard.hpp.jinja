@@ -11,9 +11,9 @@ namespace eliot_generated {
     struct {{ guard.cpp_type() }} {
         static inline bool fulfilled(const Packet* packet) noexcept {
             {% if guard.not_generator_size() %}
-            return packet->payload().size() {{ guard.get_op() }} {{ guard.size }};
+            return packet->size() {{ guard.get_op() }} {{ guard.size }};
             {% else %}
-            return packet->payload().size() {{ guard.get_op() }} generate{{ guard.size.cpp_call() }});
+            return packet->size() {{ guard.get_op() }} generate{{ guard.size.cpp_call() }});
             {% endif %}
         }
 

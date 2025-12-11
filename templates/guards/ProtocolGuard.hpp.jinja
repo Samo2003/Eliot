@@ -1,0 +1,27 @@
+#ifndef {{ guard.hpp_define() }}
+#define {{ guard.hpp_define() }}
+
+#include "../Packet.hpp"
+
+namespace eliot_generated {
+    struct {{ guard.cpp_type() }} {
+        static inline bool fulfilled(const Packet* packet) noexcept {
+            {% if guard.id | length == 1 %}
+            return packet->protocol() == {{ guard.id[0] }};
+            {% else %}
+            int protocol = packet->protocol();
+            switch (protocol) {
+                {% for p in guard.id %}
+                case {{ p }}:
+                {% endfor %}
+                    return true;
+                default:
+                    return false;
+            }
+            {% endif %}
+        }
+    };
+
+}
+
+#endif
