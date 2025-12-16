@@ -11,6 +11,7 @@ from .time import Time
 from .count import Count
 from .time_period import TimePeriod
 from .count_period import CountPeriod
+from .payload import Payload
 
 Guard = Annotated[
     Union[
@@ -24,7 +25,8 @@ Guard = Annotated[
         Time,
         Count,
         TimePeriod,
-        CountPeriod
+        CountPeriod,
+        Payload
     ],
     Field(discriminator="guardType")
 ]

@@ -1,0 +1,59 @@
+#ifndef {{ guard.hpp_define() }}
+#define {{ guard.hpp_define() }}
+
+#include <cstring>
+#include <algorithm>
+#include "../Packet.hpp"
+
+namespace eliot_generated {
+    struct {{ guard.cpp_type() }} {
+        static inline bool fulfilled(const Packet* packet) noexcept {
+            const uint8_t* data = packet->payload().data();
+            const size_t size = packet->size();
+
+            {% if guard.l4 %}
+            // Initial offset
+            static constexpr size_t start = {{ guard.start }};
+            size_t begin = packet->l4_offset() + start;
+            {% else %}
+            static constexpr size_t begin = {{ guard.start }};
+            {% endif %}
+            if (begin >= size)
+                return false;
+            
+            {% if guard.max is not none %}
+            size_t end = std::min(begin + {{ guard.max }}, size);
+            {% else %}
+            size_t end = size;
+            {% endif %}
+
+            const size_t window_length = end - begin;
+            if (window_length < _pattern_len)
+                return false;
+
+            const uint8_t* window = data + begin;
+
+            {% if guard.pattern | length == 1 %}
+            return std::memchr(window, _pattern[0], window_length) != nullptr;
+            {% else %}
+#if defined(__GLIBC__)
+            return std::memmem(window, window_length, _pattern, _pattern_len) != nullptr;
+#else
+            return std::search(window, window + window_length, _pattern, _pattern + _pattern_len) != window + window_length;
+#endif            
+            {% endif %}
+        }
+
+        private:
+            static constexpr uint8_t _pattern[] = {
+                {%- for b in guard.pattern -%}
+                0x{{ "%02X"|format(b) }}{{ ", " if not loop.last }}
+                {%- endfor -%}
+            };
+
+            static constexpr size_t _pattern_len = {{ guard.pattern | length }};
+    };
+
+}
+
+#endif
