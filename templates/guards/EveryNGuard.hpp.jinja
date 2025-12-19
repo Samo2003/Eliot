@@ -24,6 +24,8 @@ namespace eliot_generated {
             size_t _counter = 0;
             {% if not guard.not_generator_N() %}
             size_t _N = {{ guard.N.value() }};
+            {% else %}
+            static constexpr size_t _N = {{ guard.N }};
             {% endif %}
             {% if not guard.not_generator_N() and guard.N.is_state() %}
             {{ guard.N.cpp_type() }} {{ guard.N.cpp_name() }};

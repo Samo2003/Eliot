@@ -41,7 +41,7 @@ namespace nf_queue_echo {
         }
 
         uint16_t given_port = ntohs(sa.sin_port);
-        std::cout << given_port << std::endl;
+        std::cout << "LISTEN_PORT=" << given_port << std::endl;
         std::cout.flush();
 
         return Socket(fd);
@@ -64,7 +64,7 @@ namespace nf_queue_echo {
 
     void NFCore::accept_packets() noexcept {
         while (true) {
-            uint8_t buf[UINT8_MAX + 1];
+            uint8_t buf[UINT16_MAX + 1];
             sockaddr_in from{};
             socklen_t fromlen = sizeof(from);
             ssize_t n = recvfrom(_socket.get(), buf, sizeof(buf), 0, reinterpret_cast<sockaddr*>(&from), &fromlen);

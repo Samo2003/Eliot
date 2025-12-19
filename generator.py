@@ -56,8 +56,9 @@ def run_build(clear_build: bool, api: str, output: str, generated_dir: str) -> N
     elif api == "echo":
         cmake_args.append("-DTESTING=ON")
 
-    subprocess.run(cmake_args, check=True)
-    subprocess.run(["cmake", "--build", build_dir, "-j"], check=True)
+    if not os.path.exists(os.path.join(build_dir, "CMakeCache.txt")):
+        subprocess.run(cmake_args, check=True)
+    subprocess.run(["cmake", "--build", build_dir, "--parallel"], check=True)
 
     binary = os.path.join(build_dir, BINARY_NAME)
     if not os.path.exists(binary):

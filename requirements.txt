@@ -4,3 +4,5 @@ pyyaml
 jinja2
 click
 mypy
+pytest
+pytest-xdist

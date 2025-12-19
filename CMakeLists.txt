@@ -18,6 +18,12 @@ if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${GENERATED_DIR}")
     message(FATAL_ERROR "GENERATED_DIR does not exist: ${GENERATED_DIR}")
 endif()
 
+find_program(CCACHE_PROGRAM ccache)
+if(CCACHE_PROGRAM)
+    set(CMAKE_C_COMPILER_LAUNCHER ${CCACHE_PROGRAM})
+    set(CMAKE_CXX_COMPILER_LAUNCHER ${CCACHE_PROGRAM})
+endif()
+
 if(PROFILING)
     set(NFQUEUE_LIB nf_queue_profiling)
     add_compile_options(-O1 -g -fno-inline -fno-omit-frame-pointer)

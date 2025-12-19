@@ -11,9 +11,6 @@ __pycache__/
 # VSCode setting
 .vscode/
 
-# Test files
-*.yaml
-
 # Test packets config
 /tests/packets/packets.json
 
@@ -22,3 +19,8 @@ __pycache__/
 
 # Executable
 eliot
+
+#tests
+/tests/output
+*.pytest_cache
+/tests_old

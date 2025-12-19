@@ -66,7 +66,7 @@ namespace nf_queue_mock {
 
     void NFCore::accept_packets() noexcept {
         while (true) {
-            uint8_t buf[UINT8_MAX + 1];
+            uint8_t buf[UINT16_MAX + 1];
             sockaddr_in from{};
             socklen_t fromlen = sizeof(from);
             ssize_t n = recvfrom(_receive_socket.get(), buf, sizeof(buf), 0, reinterpret_cast<sockaddr*>(&from), &fromlen);

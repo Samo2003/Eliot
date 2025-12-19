@@ -1,0 +1,20 @@
+name: Basic every n
+
+build:
+  defaultAction: Finish
+  rules:
+    - type: all
+      guards: 
+        - guardType: EveryN
+          N: 
+            generatorType: NormalInt
+            min: 2
+            max: 6
+            m: 3.5
+            s: 1
+      actions:
+        - actionType: Drop
+
+send: 
+  - count: 12
+  

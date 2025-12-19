@@ -1,0 +1,12 @@
+name: Basic finish
+
+build:
+  defaultAction: Drop
+  rules:
+    - type: all
+      guards: []
+      actions:
+        - actionType: Finish
+
+send: []
+  

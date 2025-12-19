@@ -6,6 +6,8 @@ import os
 import yaml
 import json
 
+__test__ = False
+
 class Rule(BaseModel):
     """Represent rule in test case"""
 
