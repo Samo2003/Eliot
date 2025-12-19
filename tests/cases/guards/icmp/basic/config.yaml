@@ -1,0 +1,32 @@
+name: ICMP basic
+
+build:
+  defaultAction: Finish
+  rules:
+    - type: all
+      guards: 
+        - guardType: ICMP
+          type: 8 
+      actions:
+        - actionType: Drop
+
+send: 
+  - protocol: icmp
+    icmp_type: 3
+  - protocol: icmp
+    icmp_type: 6
+  - protocol: icmp
+    icmp_type: 8
+    icmp_code: 0
+  - protocol: icmp
+    icmp_type: 9
+  - protocol: icmp
+    icmp_type: 8
+    icmp_code: 5
+  - protocol: icmp
+    icmp_type: 8
+  - protocol: icmp
+    icmp_type: 1
+  - protocol: icmp
+    icmp_type: 0
+  
