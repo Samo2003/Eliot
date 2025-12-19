@@ -1,0 +1,19 @@
+name: t parameter is generator
+
+build:
+  defaultAction: Finish
+  rules:
+    - type: all
+      guards: 
+        - guardType: CountPeriod
+          t: 
+            generatorType: UniformInt
+            min: 1
+            max: 5
+          f: 3
+      actions:
+        - actionType: Drop
+
+send: 
+  - count: 12
+  

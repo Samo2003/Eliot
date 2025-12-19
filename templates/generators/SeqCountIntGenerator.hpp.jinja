@@ -38,7 +38,7 @@ namespace eliot_generated {
                 int next = _value + _step;
                 {% if generator.step < 0 %}
                 if (next >= {{ generator.min }})
-                {% else %}
+                {% elif generator.max is not none %}
                 if (next <= {{ generator.max }})
                 {% endif %}
                     _value = next;

@@ -15,7 +15,7 @@
 namespace eliot_generated {
     struct {{ guard.cpp_type() }} {
         inline bool fulfilled(const Packet* packet) noexcept {
-            if (++_counter >= _threshold) {
+            if (_counter == _threshold) {
                 _counter = 0;
                 _state = !_state;
                 {% if guard.not_generator_t() and guard.not_generator_f() %}
@@ -28,6 +28,7 @@ namespace eliot_generated {
                 _threshold = _state ? generate{{ guard.t.cpp_call() }}) : generate{{ guard.f.cpp_call() }});
                 {% endif %}
             }
+            _counter++;
             return _state;
         }
 

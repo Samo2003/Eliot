@@ -1,0 +1,15 @@
+name: Basic count period
+
+build:
+  defaultAction: Finish
+  rules:
+    - type: all
+      guards: 
+        - guardType: CountPeriod
+          t: 3
+      actions:
+        - actionType: Drop
+
+send: 
+  - count: 12
+  
