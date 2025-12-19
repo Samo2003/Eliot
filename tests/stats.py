@@ -18,11 +18,6 @@ class PacketExchange:
         return self.received.recv_time - self.sent.send_time
     
 class ExchangeStats():
-    exchanges: List[PacketExchange] = []
-    sent_count: int
-    received_count: int
-    extra: List[ReceivedPacket]
-
     def __init__(self, sent: List[SentPacket], received: List[ReceivedPacket]):
         self.sent_count = len(sent)
         self.received_count = len(received)
@@ -36,7 +31,7 @@ class ExchangeStats():
             if r.seq is not None and r.seq not in recv_by_seq:
                 recv_by_seq[r.seq] = r
 
-
+        self.exchanges: List[PacketExchange] = []
         for s in sent:
             self.exchanges.append(
                 PacketExchange(

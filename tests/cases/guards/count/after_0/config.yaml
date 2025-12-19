@@ -1,0 +1,16 @@
+name: Count after 0
+
+build:
+  defaultAction: Drop
+  rules:
+    - type: all
+      guards: 
+        - guardType: Count
+          after: 0
+          duration: 2
+      actions:
+        - actionType: Finish
+
+send: 
+  - count: 12
+  

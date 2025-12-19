@@ -9,7 +9,7 @@ namespace eliot_generated {
             {% if guard.duration is none %}
             return ++_counter > {{ guard.after }};
             {% else %}
-            return  ++_counter > {{ guard.after }} && _counter < {{ guard.after + guard.duration }};
+            return  ++_counter > {{ guard.after }} && _counter <= {{ guard.after + guard.duration }};
             {% endif %}
         }
 

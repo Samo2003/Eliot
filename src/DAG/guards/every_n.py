@@ -1,4 +1,6 @@
 from typing import Literal
+
+from pydantic import model_validator
 from .base import GuardBase
 from ..generators import ValueGeneratorInt
 
@@ -7,6 +9,12 @@ class EveryN(GuardBase[Literal["EveryN"]]):
 
     # Every `N`th packet the guard is fulfilled
     N: int | ValueGeneratorInt
+
+    @model_validator(mode="after")
+    def validate_n(self):
+        if isinstance(self.N, int) and self.N < 0:
+            raise ValueError("after must not be negative")
+        return self
 
     def cpp_type(self) -> str:
         return f"{self.cpp_type_base()}_{self.N}"

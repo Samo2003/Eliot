@@ -17,6 +17,11 @@ class CountPeriod(GuardBase[Literal["CountPeriod"]]):
         """Default value of `f` is `t`"""
         if self.f is None:
             self.f = self.t
+        if isinstance(self.t, int) and self.t < 0:
+                raise ValueError("t must not be negative")
+            
+        if isinstance(self.f, int) and self.f < 0:
+                raise ValueError("f must not be negative")
         return self
 
     def cpp_type(self) -> str:
