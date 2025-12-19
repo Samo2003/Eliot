@@ -10,29 +10,30 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 option(PROFILING "Enable profiling mode" OFF)
+option(TESTING "Enable testing mode" OFF)
+
+set(GENERATED_DIR "generated" CACHE STRING "Generated sources directory")
+
+if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${GENERATED_DIR}")
+    message(FATAL_ERROR "GENERATED_DIR does not exist: ${GENERATED_DIR}")
+endif()
 
 if(PROFILING)
-    set(CMAKE_CXX_FLAGS "-O1 -g -fno-inline -fno-omit-frame-pointer")
+    set(NFQUEUE_LIB nf_queue_profiling)
+    add_compile_options(-O1 -g -fno-inline -fno-omit-frame-pointer)
     add_subdirectory(mocks/profiling)
+elseif(TESTING)
+    set(NFQUEUE_LIB nf_queue_echo)
+    add_compile_options(-O3)
+    add_subdirectory(mocks/echo)
 else()
-    set(CMAKE_CXX_FLAGS "-O3")
+    set(NFQUEUE_LIB nf_queue_mock)
+    add_compile_options(-O3)
     add_subdirectory(mocks/mock)
 endif()
 
-add_subdirectory(generated/static)
+add_subdirectory(${GENERATED_DIR}/static)
 
-if(PROFILING)
-    target_link_libraries(eliot_generated PUBLIC nf_queue_profiling)
-else()
-    target_link_libraries(eliot_generated PUBLIC nf_queue_mock)
-endif()
-
-add_executable(eliot generated/eliot.cpp)
-
-target_link_libraries(eliot PUBLIC eliot_generated)
-
-if(PROFILING)
-    target_link_libraries(eliot PUBLIC nf_queue_profiling)
-else()
-    target_link_libraries(eliot PUBLIC nf_queue_mock)
-endif()
+target_link_libraries(eliot_generated PUBLIC ${NFQUEUE_LIB})
+add_executable(eliot ${GENERATED_DIR}/eliot.cpp)
+target_link_libraries(eliot PUBLIC eliot_generated ${NFQUEUE_LIB})

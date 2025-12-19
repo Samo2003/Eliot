@@ -4,11 +4,9 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
-add_library(nf_queue_profiling STATIC 
-    nf_queue_profiling.cpp
-)
+add_library(nf_queue_profiling INTERFACE)
 
 target_include_directories(nf_queue_profiling
-    PUBLIC
-        ${CMAKE_CURRENT_SOURCE_DIR} 
+    INTERFACE
+        ${CMAKE_CURRENT_SOURCE_DIR}
 )
