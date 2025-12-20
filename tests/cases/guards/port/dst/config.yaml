@@ -1,0 +1,23 @@
+name: Dst port guard test
+
+build:
+  defaultAction: Drop
+  rules:
+    - type: all
+      guards: 
+        - guardType: Port
+          dst: 5555
+      actions:
+        - actionType: Finish
+
+send:
+  - sport: 5555
+    dport: 5555
+    protocol: tcp
+  - dport: 5555
+    protocol: udp
+  - sport: 5555
+    protocol: tcp
+  - sport: 21179
+    protocol: udp
+    

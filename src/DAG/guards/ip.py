@@ -25,10 +25,6 @@ class IP(GuardBase[Literal["IP"]]):
         if self.ip is not None:
             if self.src is not None or self.dst is not None:
                 raise ValueError("when ip is provided src and dst cannot be given")
-            
-            # self.src = self.ip
-            # self.dst = self.ip
-            # self.ip = None
 
         for ip in ips:
             try:
@@ -39,7 +35,6 @@ class IP(GuardBase[Literal["IP"]]):
         if self.src is not None and self.dst is not None:
             if ipaddress.ip_address(self.src).version != ipaddress.ip_address(self.dst).version:
                 raise ValueError("src and dst must have the same IP version")
-
 
         return self
     

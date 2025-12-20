@@ -1,0 +1,30 @@
+name: Different ports guard test
+
+build:
+  defaultAction: Drop
+  rules:
+    - type: all
+      guards: 
+        - guardType: Port
+          src: 4444
+          dst: 5555
+      actions:
+        - actionType: Finish
+
+send:
+  - sport: 4444
+    dport: 5555
+    protocol: tcp
+  - sport: 5555
+    dport: 4444
+    protocol: tcp
+  - sport: 4444
+    protocol: tcp
+  - dport: 4444
+    protocol: tcp
+  - dport: 5555
+    protocol: udp
+  - sport: 5555
+    protocol: tcp
+  - sport: 21179
+    protocol: udp

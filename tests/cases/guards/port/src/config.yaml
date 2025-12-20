@@ -1,0 +1,22 @@
+name: Src port guard test
+
+build:
+  defaultAction: Drop
+  rules:
+    - type: all
+      guards: 
+        - guardType: Port
+          src: 5555
+      actions:
+        - actionType: Finish
+
+send:
+  - sport: 5555
+    protocol: tcp
+  - sport: 5555
+    dport: 5555
+    protocol: tcp
+  - dport: 5555
+    protocol: udp
+  - sport: 21179
+    protocol: udp

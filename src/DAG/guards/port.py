@@ -16,21 +16,18 @@ class Port(GuardBase[Literal["Port"]]):
 
     @model_validator(mode="after")
     def validate_ports(self):
-        if self.port is None and self.src is None and self.dst is None:
-            raise ValueError("no port provided")
+        ports = [port for port in [self.port, self.src, self.dst] if port is not None]
 
+        if not ports:
+            raise ValueError("no port provided")
+        
         if self.port is not None:
             if self.src is not None or self.dst is not None:
                 raise ValueError("when port is provided, src and dst cannot be given")
-            self.src = self.port
-            self.dst = self.port
-            self.port = None
 
-        for p in [self.src, self.dst]:
-            if p is not None:
-                if p < 0 or p > 65535:
-                    raise ValueError(f"invalid port number: {p}")
-
+        for port in ports:
+            if port < 0 or port > 65535:
+                    raise ValueError(f"invalid port number: {port}")
         return self
     
     def cpp_type(self) -> str:

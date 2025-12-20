@@ -13,6 +13,11 @@ namespace eliot_generated {
             if (offset < 0 || size < offset + 4)
                 return false;
 
+            {% if guard.port is not none %}
+            uint16_t src_port = (uint16_t(p[offset]) << 8) | p[offset + 1];
+            uint16_t dst_port = (uint16_t(p[offset + 2]) << 8) | p[offset + 3];
+            return src_port == {{ guard.port }} || dst_port == {{ guard.port }};
+            {% else %}
             {% if guard.src is not none %}
             uint16_t src_port = (uint16_t(p[offset]) << 8) | p[offset + 1];
             if (src_port != {{ guard.src }})
@@ -25,6 +30,7 @@ namespace eliot_generated {
             {% endif %}
 
             return true;
+            {% endif %}
         }
     };
 }
