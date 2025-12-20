@@ -26,9 +26,9 @@ class IP(GuardBase[Literal["IP"]]):
             if self.src is not None or self.dst is not None:
                 raise ValueError("when ip is provided src and dst cannot be given")
             
-            self.src = self.ip
-            self.dst = self.ip
-            self.ip = None
+            # self.src = self.ip
+            # self.dst = self.ip
+            # self.ip = None
 
         for ip in ips:
             try:
@@ -60,6 +60,8 @@ class IP(GuardBase[Literal["IP"]]):
     
     def ipv4(self) -> bool:
         """Determines if guard is checking IPv4 or IPv6 packets"""
+        if self.ip is not None:
+            return ipaddress.ip_address(self.ip).version == 4
         if self.src is not None:
             return ipaddress.ip_address(self.src).version == 4
         if self.dst is not None:

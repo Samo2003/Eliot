@@ -111,7 +111,7 @@ class CaseRunner:
         exec(assert_file.read_text(), namespace)
 
         if "check" not in namespace:
-            raise RuntimeError("assert.py must define check(sent: List[SentPacket], received: List[ReceivedPacket])")
+            raise RuntimeError("assert.py must define check(stats: ExchangeStats)")
 
         check = cast(AssertFn, namespace["check"])
         check(stats)

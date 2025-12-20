@@ -1,0 +1,25 @@
+name: IP different for src and dst
+
+build:
+  defaultAction: Finish
+  rules:
+    - type: all
+      guards: 
+        - guardType: IP
+          src: 127.0.0.1
+          dst: 10.0.10.1
+      actions:
+        - actionType: Drop
+
+send: 
+  - dst: 10.0.10.1
+    src: 127.0.0.1
+  - dst: 10.0.10.1
+  - dst: 127.0.0.1
+  - src: 127.0.0.1
+  - count: 1
+  - protocol: tcp
+  - src: 10.0.0.1
+  - dst: ::1
+  - src: ::1
+  

@@ -6,6 +6,8 @@ from tests.loader import Step
 import os
 from scapy.layers.inet import TCP, UDP, ICMP, IP
 from scapy.packet import Packet, Raw
+from scapy.layers.inet6 import IPv6
+import ipaddress
 from dataclasses import dataclass
 from typing import Optional
 
@@ -50,11 +52,31 @@ def build_packet(step: Step, seq: int) -> bytes:
         header = ICMP(type=step.icmp_type, code=step.icmp_code)
     else:
         # Only IP header with random payload when raw protocol provided
-        datagram = cast(Packet, IP(src=step.src, dst=step.dst, proto=step.protocol_id) / payload)
+        if ipaddress.ip_address(step.dst).version == 6:
+            if ipaddress.ip_address(step.src).version != 6:
+                step.src = step.dst
+            datagram = cast(Packet, IPv6(src=step.src, dst=step.dst) / payload)
+        elif ipaddress.ip_address(step.src).version == 6:
+            if ipaddress.ip_address(step.dst).version != 6:
+                step.dst = step.src
+            datagram = cast(Packet, IPv6(src=step.src, dst=step.dst) / payload)
+        else:
+            datagram = cast(Packet, IP(src=step.src, dst=step.dst, proto=step.protocol_id) / payload)
+
+        # datagram = cast(Packet, IP(src=step.src, dst=step.dst, proto=step.protocol_id) / payload)
         return bytes(datagram)
 
     # Combines packet headers together with payload
-    datagram = cast(Packet, IP(src=step.src, dst=step.dst) / header / payload)
+    if ipaddress.ip_address(step.dst).version == 6:
+        if ipaddress.ip_address(step.src).version != 6:
+            step.src = step.dst
+        datagram = cast(Packet, IPv6(src=step.src, dst=step.dst) / header /  payload)
+    elif ipaddress.ip_address(step.src).version == 6:
+        if ipaddress.ip_address(step.dst).version != 6:
+            step.dst = step.src
+        datagram = cast(Packet, IPv6(src=step.src, dst=step.dst) / header / payload)
+    else:
+        datagram = cast(Packet, IP(src=step.src, dst=step.dst) / header / payload)
     return bytes(datagram)
 
 def send_packets(steps: List[Step], sock: socket.socket) -> List[SentPacket]:

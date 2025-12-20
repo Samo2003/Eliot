@@ -1,0 +1,31 @@
+name: IPv6 different for src and dst
+
+build:
+  defaultAction: Finish
+  rules:
+    - type: all
+      guards: 
+        - guardType: IP
+          src: ::1
+          dst: ::2
+      actions:
+        - actionType: Drop
+
+send: 
+  - dst: ::1
+  - dst: ::2
+  - src: ::1
+  - src: ::2
+  - dst: ::1
+    src: ::2
+  - dst: ::2
+    src: ::1
+  - dst: ::1
+    src: ::1
+  - dst: ::2
+    src: ::2
+  - dst: 127.0.0.1
+  - src: 127.0.0.1
+  - dst: 127.0.0.1
+    src: 127.0.0.1
+  

@@ -1,0 +1,25 @@
+name: IPv6 check
+
+build:
+  defaultAction: Finish
+  rules:
+    - type: all
+      guards: 
+        - guardType: IP
+          ip: ::1
+      actions:
+        - actionType: Drop
+
+send: 
+  - dst: ::1
+  - src: ::1
+  - dst: ::1
+    src: ::1
+  - dst: 127.0.0.1
+  - src: 127.0.0.1
+  - count: 1
+  - protocol: tcp
+  - src: 10.0.0.1
+  - dst: 127.0.0.1
+    src: 127.0.0.1
+  
