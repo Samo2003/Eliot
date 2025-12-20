@@ -1,5 +1,5 @@
-from typing import Any, Literal
-from pydantic import field_validator, model_validator
+from typing import Literal, cast
+from pydantic import model_validator
 from .base import GuardBase
 import hashlib
 
@@ -7,7 +7,7 @@ class Payload(GuardBase[Literal["Payload"]]):
     """Check packets payload"""
 
     # Pattern to match
-    pattern: bytes
+    pattern: bytes | str
 
     # Pattern encoding
     encoding: Literal["raw", "ascii", "hex"] = "raw"
@@ -27,37 +27,33 @@ class Payload(GuardBase[Literal["Payload"]]):
             raise ValueError("max offset must be non negative")
         if self.start < 0:
             raise ValueError("start offset must be non negative")
-        if len(self.pattern) < 1:
+        if len(self.pattern) < 1 or (self.max is not None and len(self.pattern) > self.max):
             raise ValueError("invalid pattern length")
         return self
     
-    @field_validator("pattern", mode="before")
-    @classmethod
-    def convert_pattern(cls, v: Any, info: Any) -> bytes:
-        if isinstance(v, (bytes, bytearray)):
-            return bytes(v)
-        
-        if not isinstance(v, str):
+    @model_validator(mode="after")
+    def normalize_pattern(self):
+        if isinstance(self.pattern, (bytes, bytearray)):
+            self.pattern = bytes(self.pattern)
+            return self
+
+        if not isinstance(self.pattern, str):
             raise TypeError("pattern must be str or bytes")
         
-        encoding = info.data.get("encoding", "raw")
-        
-        if encoding == "hex":
+        if self.encoding == "hex":
             try:
-                return bytes.fromhex(v)
+                self.pattern = bytes.fromhex(self.pattern)
             except ValueError:
                 raise ValueError("invalid hex pattern")
-
-        if encoding == "ascii":
+        elif self.encoding == "ascii":
             try:
-                return v.encode("ascii")
+                self.pattern = self.pattern.encode("ascii")
             except UnicodeEncodeError:
                 raise ValueError("pattern is not valid ASCII")
+        else:
+            self.pattern = self.pattern.encode("latin1")
 
-        if encoding == "raw":
-            return v.encode("latin1")
-
-        raise ValueError(f"unknown encoding: {encoding}")
+        return self
     
     def cpp_type(self) -> str:
-        return f"{super().cpp_type_base()}_{hashlib.sha1(self.pattern).hexdigest()[:8]}_{self.encoding.upper()}_{self.max}_{self.start}_{self.l4}"
+        return f"{super().cpp_type_base()}_{hashlib.sha1(cast(bytes, self.pattern)).hexdigest()[:8]}_{self.encoding.upper()}_{self.max}_{self.start}_{self.l4}"

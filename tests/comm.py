@@ -39,8 +39,12 @@ def build_packet(step: Step, seq: int) -> bytes:
     """
 
     seq_bytes = struct.pack("!I", seq)
-    payload_len = max(step.payload_size - len(seq_bytes), 0)
-    payload = Raw(os.urandom(payload_len) + seq_bytes)
+    if step.payload:
+        payload_bytes = cast(bytes, step.payload.value) + seq_bytes
+    else:
+        payload_len = max(step.payload_size - len(seq_bytes), 0)
+        payload_bytes = os.urandom(payload_len) + seq_bytes
+    payload = Raw(payload_bytes)
 
     header: Packet
 
@@ -62,8 +66,6 @@ def build_packet(step: Step, seq: int) -> bytes:
             datagram = cast(Packet, IPv6(src=step.src, dst=step.dst) / payload)
         else:
             datagram = cast(Packet, IP(src=step.src, dst=step.dst, proto=step.protocol_id) / payload)
-
-        # datagram = cast(Packet, IP(src=step.src, dst=step.dst, proto=step.protocol_id) / payload)
         return bytes(datagram)
 
     # Combines packet headers together with payload

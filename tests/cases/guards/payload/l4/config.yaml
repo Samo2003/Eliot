@@ -1,0 +1,23 @@
+name: Payload L4 offset
+
+build:
+  defaultAction: Drop
+  rules:
+    - type: all
+      guards:
+        - guardType: Payload
+          pattern: aaaa
+          max: 4
+          l4: true
+      actions:
+        - actionType: Finish
+
+send:
+  - payload: 
+      value: aaaa
+  - payload: 
+      value: aaaa
+    src: ::1
+  - protocol: udp
+    payload: 
+      value: aaaa

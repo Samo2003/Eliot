@@ -1,0 +1,19 @@
+name: Payload raw
+
+build:
+  defaultAction: Drop
+  rules:
+    - type: all
+      guards: 
+        - guardType: Payload
+          pattern: "b\x01\x05"
+      actions:
+        - actionType: Finish
+
+send:
+  - payload:
+      value: "b\x01\x05"
+  - payload:
+      value: "b\x01\x05a"
+  - payload:
+      value: "b\x01\x06\x05"

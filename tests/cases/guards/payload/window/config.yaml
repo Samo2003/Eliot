@@ -1,0 +1,23 @@
+name: Payload windowed match
+
+build:
+  defaultAction: Drop
+  rules:
+    - type: all
+      guards:
+        - guardType: Payload
+          pattern: aaaa
+          start: 22
+          max: 4
+      actions:
+        - actionType: Finish
+
+send:
+  - payload: 
+      value: xxaaaa
+  - payload: 
+      value: xxxaaaaaa
+  - payload: 
+      value: axxaaa
+  - payload: 
+      value: aaxxaaa

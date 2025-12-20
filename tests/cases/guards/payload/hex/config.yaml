@@ -1,0 +1,28 @@
+name: Payload hex
+
+build:
+  defaultAction: Drop
+  rules:
+    - type: all
+      guards: 
+        - guardType: Payload
+          pattern: aaaa
+          encoding: hex
+      actions:
+        - actionType: Finish
+
+send:
+  - payload:
+      value: aaaa
+      encoding: hex
+  - payload:
+      value: AAAA
+      encoding: hex
+  - payload:
+      value: aaaa
+      encoding: ascii
+  - payload:
+      value: aaaa
+  - payload:
+      value: bbbb
+    count: 5
