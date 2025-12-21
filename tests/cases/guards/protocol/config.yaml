@@ -1,0 +1,19 @@
+name: Basic protocol test
+
+build:
+  defaultAction: Drop
+  rules:
+    - type: all
+      guards: 
+        - guardType: Protocol
+          id: 6
+      actions:
+        - actionType: Finish
+
+send:
+  - protocol: tcp
+  - src: ::1
+    protocol: tcp
+  - protocol: udp
+  - protocol: udp
+    src: ::1

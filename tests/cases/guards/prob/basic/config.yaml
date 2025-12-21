@@ -1,4 +1,4 @@
-name: Prob test with 1 Prob
+name: Basic prob guard test
 
 build:
   defaultAction: Drop
