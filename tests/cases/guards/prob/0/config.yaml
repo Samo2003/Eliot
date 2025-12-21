@@ -1,0 +1,14 @@
+name: Prob test with 0 Prob
+
+build:
+  defaultAction: Drop
+  rules:
+    - type: all
+      guards: 
+        - guardType: Prob
+          x: 0
+      actions:
+        - actionType: Finish
+
+send:
+  - count: 1000
