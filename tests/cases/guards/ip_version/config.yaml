@@ -1,0 +1,16 @@
+name: Basic IPVersion test
+
+build:
+  defaultAction: Drop
+  rules:
+    - type: all
+      guards: 
+        - guardType: IPVersion
+          v: 4
+      actions:
+        - actionType: Finish
+
+send:
+  - count: 1
+  - src: ::1
+  - dst: ::1

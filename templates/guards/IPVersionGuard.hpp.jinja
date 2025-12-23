@@ -1,0 +1,15 @@
+#ifndef {{ guard.hpp_define() }}
+#define {{ guard.hpp_define() }}
+
+#include "../Packet.hpp"
+
+namespace eliot_generated {
+    struct {{ guard.cpp_type() }} {
+        static inline bool fulfilled(const Packet* packet) noexcept {
+            return packet->version() == {{ guard.v }};
+        }
+    };
+
+}
+
+#endif
