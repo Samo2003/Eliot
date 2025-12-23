@@ -6,7 +6,7 @@
 namespace eliot_generated {
     struct {{ guard.cpp_type() }} {
         static inline bool fulfilled(const Packet* packet) noexcept {
-            return packet->protocol() == {{ guard.id }};
+            return packet->protocol({{ guard.get_nh() }}) == {{ guard.id }};
         }
     };
 

@@ -8,6 +8,11 @@ namespace eliot_generated {
         static inline bool fulfilled(const Packet *packet) noexcept {
             const std::vector<uint8_t>& p = packet->payload();
             size_t size = packet->size();
+            int ver = packet->version();
+            int prot = packet->protocol();
+            
+            if (!(ver == 4 && prot == ICMPv4) && !(ver == 6 && prot == ICMPv6))
+                return false;
 
             int offset = packet->l4_offset();
             if (offset < 0 || size < offset + 2)
@@ -24,6 +29,10 @@ namespace eliot_generated {
 
             return true;
         }
+
+        private:
+            static constexpr int ICMPv4 = 1;
+            static constexpr int ICMPv6 = 58;
     };
 }
 
