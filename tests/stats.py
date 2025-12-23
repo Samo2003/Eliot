@@ -52,3 +52,6 @@ class ExchangeStats():
 
     def no_losses(self) -> bool:
         return self.sent_count == self.received_count
+    
+    def only_first_n_have_response(self, n: int) -> bool:
+        return all(e.has_response for e in self.exchanges[:n]) and all(not e.has_response for e in self.exchanges[n:])

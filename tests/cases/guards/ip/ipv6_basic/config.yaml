@@ -11,10 +11,6 @@ build:
         - actionType: Drop
 
 send: 
-  - dst: ::1
-  - src: ::1
-  - dst: ::1
-    src: ::1
   - dst: 127.0.0.1
   - src: 127.0.0.1
   - count: 1
@@ -22,4 +18,8 @@ send:
   - src: 10.0.0.1
   - dst: 127.0.0.1
     src: 127.0.0.1
+  - dst: ::1
+  - src: ::1
+  - dst: ::1
+    src: ::1
   

@@ -7,10 +7,5 @@ def check(stats: ExchangeStats) -> None:
 
     expected = stats.sent_count // 3
 
-    assert lost == expected, (
-        f"Unexpected packet loss\n"
-        f"sent={stats.sent_count}\n"
-        f"lost={lost}\n"
-        f"expected={expected}\n"
-    )
+    assert lost == expected
     
