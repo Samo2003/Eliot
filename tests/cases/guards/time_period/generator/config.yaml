@@ -1,0 +1,28 @@
+name: TimePeriod generator test
+
+build:
+  defaultAction: Drop
+  rules:
+    - type: all
+      guards:
+        - guardType: TimePeriod
+          t:
+            generatorType: SeqCountInt
+            min: 100
+            step: 100
+          f: 100
+      actions:
+        - actionType: Finish
+
+send:
+  - count: 1
+  - delay: 150
+  - count: 1
+  - delay: 50
+  - count: 1
+  - delay: 250
+  - count: 1
+  - delay: 100
+  - count: 1
+  - delay: 250
+  - count: 1

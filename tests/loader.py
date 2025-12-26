@@ -45,6 +45,7 @@ class Step(BaseModel):
     dport: int = 54321
     icmp_type: int = 8
     icmp_code: int = 0
+    delay: float | None = None
 
 class Case(BaseModel):
     """Test case representation"""

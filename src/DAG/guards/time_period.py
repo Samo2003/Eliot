@@ -24,13 +24,25 @@ class TimePeriod(GuardBase[Literal["TimePeriod"]]):
         """Default value of `f` is `t`, and converts time based on given units"""
         if isinstance(self.t, int):
             self.t *= FACTORS[self.unit]
+            if self.t <= 0:
+                raise ValueError("t must be greater that zero")
         else:
             if self.t.min is not None:
                 self.t.min *= FACTORS[self.unit]
             if self.t.max is not None:
                 self.t.max *= FACTORS[self.unit]
+        
         if self.f is None:
             self.f = self.t
+        elif isinstance(self.f, int):
+            self.f *= FACTORS[self.unit]
+            if self.f <= 0:
+                raise ValueError("f must be greater that zero")
+        else:
+            if self.f.min is not None:
+                self.f.min *= FACTORS[self.unit]
+            if self.f.max is not None:
+                self.f.max *= FACTORS[self.unit]
         self.unit = "ms"
         return self
     

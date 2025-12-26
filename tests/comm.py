@@ -86,26 +86,28 @@ def send_packets(steps: List[Step], sock: socket.socket) -> List[SentPacket]:
     seq = 0
 
     for step in steps:
+        if step.delay:
+            time.sleep(step.delay / 1000.0)
+        else:
+            for _ in range(step.count):
+                try:
+                    packet = build_packet(step, seq)
+                    now = time.time()
+                    sock.send(packet)
 
-        for _ in range(step.count):
-            try:
-                packet = build_packet(step, seq)
-                now = time.time()
-                sock.send(packet)
-
-                sent_packets.append(
-                    SentPacket(
-                        seq=seq,
-                        protocol=step.protocol,
-                        send_time=now,
-                        raw=packet,
+                    sent_packets.append(
+                        SentPacket(
+                            seq=seq,
+                            protocol=step.protocol,
+                            send_time=now,
+                            raw=packet,
+                        )
                     )
-                )
 
-                seq += 1
+                    seq += 1
 
-            except Exception as e:
-                raise RuntimeError(f"Send failed: {e}")
+                except Exception as e:
+                    raise RuntimeError(f"Send failed: {e}")
 
     return sent_packets
 

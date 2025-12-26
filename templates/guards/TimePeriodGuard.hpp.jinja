@@ -20,9 +20,8 @@ namespace eliot_generated {
             static uint64_t last = read_clock_ms();
             {% endif %}
             uint64_t now = get_global_time();
-            uint64_t elapsed = now - last;
-            if (elapsed >= _threshold) {
-                last = now;
+            while (now - last  >= _threshold) {
+                last += _threshold;
                 _state = !_state;
                 {% if guard.not_generator_t() and guard.not_generator_f() %}
                 _threshold = _state ? {{ guard.t }} : {{ guard.f }};
