@@ -1,0 +1,14 @@
+name: Basic reorder
+
+build:
+  defaultAction: Finish
+  rules:
+    - type: all
+      guards: []
+      actions:
+        - actionType: Reorder
+          n: 100
+
+send:
+  - count: 100
+  

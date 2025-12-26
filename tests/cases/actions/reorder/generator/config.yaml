@@ -1,0 +1,18 @@
+name: Basic reorder
+
+build:
+  defaultAction: Finish
+  rules:
+    - type: all
+      guards: []
+      actions:
+        - actionType: Reorder
+          n: 
+            generatorType: SeqCountInt
+            min: 2
+            step: 1
+          strategy: reverse
+
+send:
+  - count: 10
+  

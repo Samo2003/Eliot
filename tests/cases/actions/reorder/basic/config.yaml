@@ -1,4 +1,4 @@
-name: Unit conversion test
+name: Basic reorder
 
 build:
   defaultAction: Finish
@@ -6,11 +6,9 @@ build:
     - type: all
       guards: []
       actions:
-        - actionType: Delay
-          n: 1
-          unit: s
-
-timeout: 2
+        - actionType: Reorder
+          n: 10
+          strategy: reverse
 
 send:
   - count: 10

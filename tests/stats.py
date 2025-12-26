@@ -20,7 +20,9 @@ class PacketExchange:
 class ExchangeStats():
     def __init__(self, sent: List[SentPacket], received: List[ReceivedPacket]):
         self.sent_count = len(sent)
+        self.sent = sent
         self.received_count = len(received)
+        self.received = received
 
         sent_by_seq: Dict[int, SentPacket] = {
             s.seq: s for s in sent
