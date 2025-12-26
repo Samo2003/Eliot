@@ -1,0 +1,14 @@
+name: Basic delay
+
+build:
+  defaultAction: Finish
+  rules:
+    - type: all
+      guards: []
+      actions:
+        - actionType: Delay
+          n: 100
+
+send:
+  - count: 10
+  

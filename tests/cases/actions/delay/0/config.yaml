@@ -1,0 +1,14 @@
+name: Zero delay
+
+build:
+  defaultAction: Finish
+  rules:
+    - type: all
+      guards: []
+      actions:
+        - actionType: Delay
+          n: 0
+
+send:
+  - count: 10
+  
