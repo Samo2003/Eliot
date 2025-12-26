@@ -1,0 +1,18 @@
+name: Time basic test
+
+build:
+  defaultAction: Drop
+  rules:
+    - type: all
+      guards:
+        - guardType: Time
+          after: 100
+      actions:
+        - actionType: Finish
+
+send:
+  - count: 1
+  - delay: 150
+  - count: 1
+  - delay: 200
+  - count: 1

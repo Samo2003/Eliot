@@ -19,10 +19,10 @@ namespace eliot_generated {
             {% endif %}
         }
 
+        {% if guard.instant %}
         private:
-            {% if guard.instant %}
             const uint64_t start = read_clock_ms();
-            {% endif %}
+        {% endif %}
     };
 
 }

@@ -24,11 +24,13 @@ class Time(GuardBase[Literal["Time"]]):
         self.after *= FACTORS[self.unit]
         if self.duration is not None:
             self.duration *= FACTORS[self.unit]
+        if self.after <= 0 or (self.duration and self.duration <= 0):
+            raise ValueError("after and duration have to be both positive")
         self.unit = "ms"
         return self
 
     def cpp_type(self) -> str:
-        return f"{self.cpp_type_base()}_{self.after}_{self.duration}"
+        return f"{self.cpp_type_base()}_{self.after}_{self.duration}_{self.instant}"
     
     def is_state(self) -> bool:
         return True

@@ -47,7 +47,7 @@ class TimePeriod(GuardBase[Literal["TimePeriod"]]):
         return self
     
     def cpp_type(self) -> str:
-        return f"{self.cpp_type_base()}_{self.t}_{self.f}"
+        return f"{self.cpp_type_base()}_{self.t}_{self.f}_{self.instant}"
     
     def is_state(self) -> bool:
         return True
