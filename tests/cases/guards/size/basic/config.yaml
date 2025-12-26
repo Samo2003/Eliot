@@ -1,0 +1,17 @@
+name: Basic size test
+
+build:
+  defaultAction: Drop
+  rules:
+    - type: all
+      guards: 
+        - guardType: Size
+          size: 40
+          op: gt
+      actions:
+        - actionType: Finish
+
+send:       # All packet sizes are +20 for IPv4 header
+  - payload_size: 21
+  - payload_size: 20
+  - payload_size: 19
