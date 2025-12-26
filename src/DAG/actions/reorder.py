@@ -33,7 +33,7 @@ class Reorder(ActionBase[Literal["Reorder"]]):
         return self
 
     def cpp_type(self) -> str:
-        return f"{self.cpp_type_base()}_{self.n}_{self.strategy}"
+        return f"{self.cpp_type_base()}_{self.n}_{self.strategy}_{id(self)}"
 
     def is_state(self) -> bool:
         return True

@@ -40,7 +40,7 @@ class Delay(ActionBase[Literal["Delay"]]):
         return self
 
     def cpp_type(self) -> str:
-        return f"{self.cpp_type_base()}_{self.n}"
+        return f"{self.cpp_type_base()}_{self.n}_{id(self)}"
 
     def calendar(self) -> bool:
         return True

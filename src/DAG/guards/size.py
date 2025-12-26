@@ -13,7 +13,7 @@ class Size(GuardBase[Literal["Size"]]):
     op: Literal["lt", "le", "eq", "ge", "gt"]
 
     def cpp_type(self) -> str:
-        return f"{self.cpp_type_base()}_{self.size}_{self.op}"
+        return f"{self.cpp_type_base()}_{self.size}_{self.op}{'_' + str(id(self)) if self.is_state() else ''}"
 
     def get_op(self) -> str:
         """Maps operation to C++ operator"""

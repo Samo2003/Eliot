@@ -17,7 +17,7 @@ class EveryN(GuardBase[Literal["EveryN"]]):
         return self
 
     def cpp_type(self) -> str:
-        return f"{self.cpp_type_base()}_{self.N}"
+        return f"{self.cpp_type_base()}_{self.N}_{id(self)}"
     
     def is_state(self) -> bool:
         return True

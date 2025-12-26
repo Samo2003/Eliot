@@ -25,7 +25,7 @@ class CountPeriod(GuardBase[Literal["CountPeriod"]]):
         return self
 
     def cpp_type(self) -> str:
-        return f"{self.cpp_type_base()}_{self.t}_{self.f}"
+        return f"{self.cpp_type_base()}_{self.t}_{self.f}_{id(self)}"
     
     def is_state(self) -> bool:
         return True

@@ -32,7 +32,7 @@ class Prob(GuardBase[Literal["Prob"]]):
     def cpp_type(self) -> str:
         if isinstance(self.x, float):
             return f"{self.cpp_type_base()}_{str(self.x).replace('.', '_')}"
-        return f"{self.cpp_type_base()}_{self.x}"
+        return f"{self.cpp_type_base()}_{self.x}{'_' + str(id(self)) if self.is_state() else ''}"
     
     def is_state(self) -> bool:
         return isinstance(self.x, ValueGeneratorBase) and self.x.is_state()
