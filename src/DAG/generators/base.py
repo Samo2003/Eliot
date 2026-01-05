@@ -31,6 +31,8 @@ class ValueGeneratorBase(DAGBaseModel, Generic[T, N], ABC):
             self.min = 0    # type: ignore
         if self.min < 0:    # type: ignore
             raise ValueError(f"minimum value has to be 0 or greater")
+        if self.max is not None and self.min is not None and self.min > self.max:
+            raise ValueError("Generator cannot produce values")
         return self
 
     @final

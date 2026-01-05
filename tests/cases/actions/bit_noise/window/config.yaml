@@ -1,0 +1,17 @@
+name: Window Bitnoise test
+
+build:
+  defaultAction: Finish
+  rules:
+    - type: all
+      guards: []
+      actions:
+        - actionType: BitNoise
+          n: 10
+          mode: first
+          start: 10
+          end: 13   # Last bit not included
+
+send:
+  - count: 1
+  

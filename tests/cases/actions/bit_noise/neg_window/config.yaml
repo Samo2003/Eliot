@@ -1,0 +1,17 @@
+name: Window with negative offsets Bitnoise test
+
+build:
+  defaultAction: Finish
+  rules:
+    - type: all
+      guards: []
+      actions:
+        - actionType: BitNoise
+          n: 5
+          mode: first
+          end: -32    # Skip seq num in payload
+          start: -37
+
+send:
+  - count: 1
+  

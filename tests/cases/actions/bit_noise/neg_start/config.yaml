@@ -1,0 +1,16 @@
+name: Negative start offset Bitnoise test
+
+build:
+  defaultAction: Finish
+  rules:
+    - type: all
+      guards: []
+      actions:
+        - actionType: BitNoise
+          n: 2
+          mode: first
+          start: -34
+
+send:
+  - count: 1
+  

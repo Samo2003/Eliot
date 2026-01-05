@@ -57,3 +57,12 @@ class ExchangeStats():
     
     def only_first_n_have_response(self, n: int) -> bool:
         return all(e.has_response for e in self.exchanges[:n]) and all(not e.has_response for e in self.exchanges[n:])
+    
+    def bit_diff(self, a: bytes, b: bytes) -> List[int]:
+        out: List[int] = []
+        for i, (x, y) in enumerate(zip(a, b)):
+            d = x ^ y
+            for bit in range(8):
+                if d & (1 << (7 - bit)):
+                    out.append(i * 8 + bit)
+        return out

@@ -1,0 +1,16 @@
+name: Random mode Bitnoise test
+
+build:
+  defaultAction: Finish
+  rules:
+    - type: all
+      guards: []
+      actions:
+        - actionType: BitNoise
+          n: 5
+          mode: random
+          end: -32    # Skip seq num in payload
+
+send:
+  - count: 100
+  

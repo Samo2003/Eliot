@@ -1,0 +1,17 @@
+name: L4 Bitnoise test
+
+build:
+  defaultAction: Finish
+  rules:
+    - type: all
+      guards: []
+      actions:
+        - actionType: BitNoise
+          n: 2
+          mode: first
+          layer: L4
+
+send:
+  - count: 1
+  - src: ::1
+  

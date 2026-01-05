@@ -126,12 +126,16 @@ def receive_packets(sock: socket.socket, timeout: float) -> List[ReceivedPacket]
         recv_time = time.time()
         try:
             ip = IP(data)
+            ip_proto = ip.proto
         except Exception:
-            continue
+            try:
+                ip = IPv6(data)
+                ip_proto = ip.nh
+            except Exception:
+                continue
 
         src = ip.src
         dst = ip.dst
-        ip_proto = ip.proto
         sport = dport = None
 
         if TCP in ip:

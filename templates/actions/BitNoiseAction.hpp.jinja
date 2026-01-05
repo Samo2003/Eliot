@@ -1,0 +1,162 @@
+#ifndef {{ action.hpp_define() }}
+#define {{ action.hpp_define() }}
+
+#include <algorithm>
+#include "../Packet.hpp"
+{% if action.mode == "random" %}
+#include "../static/xoroshiro128plus.hpp"
+{% endif %}
+{% if action.x is not none and not action.not_generator_x() %}
+#include "../static/interfaces/GeneratorFloat.hpp"
+#include "../generators/{{ action.x.cpp_type() }}.hpp"
+{% endif %}
+{% if action.n is not none and not action.not_generator_n() %}
+#include "../static/interfaces/GeneratorInt.hpp"
+#include "../generators/{{ action.n.cpp_type() }}.hpp"
+{% endif %}
+{% if not action.not_generator_start() %}
+#include "../static/interfaces/GeneratorInt.hpp"
+#include "../generators/{{ action.start.cpp_type() }}.hpp"
+{% endif %}
+{% if action.end is not none and not action.not_generator_end() %}
+#include "../static/interfaces/GeneratorInt.hpp"
+#include "../generators/{{ action.end.cpp_type() }}.hpp"
+{% endif %}
+
+namespace eliot_generated {
+    struct {{ action.cpp_type() }} {
+        {{ 'static ' if not action.is_state() else '' }}inline void execute(Packet* packet) noexcept {
+            auto& p = packet->mutable_payload();
+            const size_t size = packet->size();
+            const size_t total_bits = size * 8;
+            if (total_bits == 0)
+                return;
+
+            {% if action.layer == "IP" %}
+            // Determine base window for IP header
+            const int offset = packet->l4_offset();
+            if (offset <= 0)
+                return;
+            constexpr size_t layer_beg_byte = 0;
+            const size_t layer_end_byte = (size_t)offset <= size ? offset : size;
+            {% elif action.layer == "L4" %}
+            // Determine base window for L4 payload
+            const int offset = packet->l4_offset();
+            if (offset < 0 || (size_t)offset >= size)
+                return;
+            
+            const size_t layer_beg_byte = offset;
+            const size_t layer_end_byte = size;
+            {% else %}
+            // Determine base window
+            constexpr size_t layer_beg_byte = 0;
+            const size_t layer_end_byte = size;
+            {% endif %}
+            const size_t layer_beg_bit = layer_beg_byte * 8;
+            const size_t layer_end_bit = layer_end_byte * 8;
+            if (layer_beg_bit >= layer_end_bit)
+                return;
+
+            const uint64_t layer_len = layer_end_bit - layer_beg_bit;
+            // Determine start offset
+            {% if action.not_generator_start() %}
+            constexpr int64_t start_offset = {{ action.start }};
+            {% else %}
+            const int64_t start_offset = generate{{ action.start.cpp_call() }});
+            {% endif %}
+            // Convert negative offset to positive
+            const int64_t beg_rel = start_offset >= 0 ? start_offset : (static_cast<int64_t>(layer_len) + start_offset);
+            // Clamp start offset
+            const uint64_t beg_relative = static_cast<uint64_t>(std::clamp(beg_rel, int64_t{0}, static_cast<int64_t>(layer_len)));
+            {% if action.end is not none %}
+            // Determine end offset
+            {% if action.not_generator_end() %}
+            constexpr int64_t end_offset = {{ action.end }};
+            {% else %}
+            const int64_t end_offset = generate{{ action.end.cpp_call() }});
+            {% endif %}
+            // Convert negative offset to positive
+            const int64_t end_rel = end_offset >= 0 ? end_offset : (static_cast<int64_t>(layer_len) + end_offset);
+            // Clamp end offset
+            const uint64_t end_relative = static_cast<uint64_t>(std::clamp(end_rel, int64_t{0}, static_cast<int64_t>(layer_len)));
+            if (beg_relative >= end_relative)
+                return;
+            {% endif %}
+
+            // Determine half open window interval
+            const uint64_t beg_bit = static_cast<uint64_t>(layer_beg_bit) + beg_relative;
+            const uint64_t end_bit = {{ 'static_cast<uint64_t>(layer_end_bit)' if action.end is none else 'static_cast<uint64_t>(layer_beg_bit) + end_relative' }};
+            const uint64_t range = end_bit - beg_bit;
+
+            {% if action.x is not none %}
+            // Determine part of bits to invert
+            {% if action.not_generator_x() %}
+            constexpr float x = {{ action.x }};
+            {% else %}
+            const float x = generate{{ action.x.cpp_call() }});
+            {% endif %}
+            // Convert part to number of bits
+            uint64_t bits_to_invert = static_cast<uint64_t>(x * (float)range);
+            {% else %}
+            // Determine number of bits to invert
+            {% if action.not_generator_n() %}
+            const int n = {{ action.n }};
+            {% else %}
+            const int n = generate{{ action.n.cpp_call() }});
+            {% endif %}
+            uint64_t bits_to_invert = static_cast<uint64_t>(n);
+            {% endif %}
+
+            if (bits_to_invert == 0)
+                return;
+
+            // Clamp bits to invert to range
+            if (bits_to_invert > range)
+                bits_to_invert = range;
+
+            {% if action.mode == "first" %}
+            // Invert first N bits in window
+            for (uint64_t i = 0; i < bits_to_invert; i++)
+                _invert_bit(p, beg_bit + i);
+            {% elif action.mode == "last" %}
+            // Invert last N bits in window
+            for (uint64_t i = 0; i < bits_to_invert; i++)
+                _invert_bit(p, end_bit - 1 - i);
+            {% else %}
+            // Invert N randomly selected bits (duplicates possible)
+            for (uint64_t i = 0; i < bits_to_invert; i++) {
+                uint64_t index = _rng.next_range(range);
+                _invert_bit(p, beg_bit + index);
+            }
+            {% endif %}           
+        }
+
+        private:
+            // Inverts single bit assuming network byte order
+            static inline void _invert_bit(std::vector<uint8_t>& p, uint64_t bit_index) noexcept {
+                const uint64_t byte_index = bit_index >> 3;
+                const uint8_t bit = bit_index & 0b111;
+                const uint8_t mask = static_cast<uint8_t>(1 << (0b111 - bit));
+                if (byte_index < p.size())
+                    p[byte_index] ^= mask;
+            }
+
+            {% if action.mode == "random" %}
+            inline static xoroshiro128plus _rng{ {{ action.seed() }}, {{ action.seed() }} };
+            {% endif %}
+            {% if action.x is not none and not action.not_generator_x() and action.x.is_state() %}
+            inline static {{ action.x.cpp_type() }} {{ action.x.cpp_name() }};
+            {% endif %}
+            {% if action.n is not none and not action.not_generator_n() and action.n.is_state() %}
+            inline static {{ action.n.cpp_type() }} {{ action.n.cpp_name() }};
+            {% endif %}
+            {% if not action.not_generator_start() and action.start.is_state() %}
+            inline static {{ action.start.cpp_type() }} {{ action.start.cpp_name() }};
+            {% endif %}
+            {% if action.end is not none and not action.not_generator_end() and action.end.is_state() %}
+            inline static {{ action.end.cpp_type() }} {{ action.end.cpp_name() }};
+            {% endif %}
+    };
+}
+
+#endif

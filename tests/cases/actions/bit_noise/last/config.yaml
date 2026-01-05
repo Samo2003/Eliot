@@ -1,0 +1,16 @@
+name: Last Bitnoise test
+
+build:
+  defaultAction: Finish
+  rules:
+    - type: all
+      guards: []
+      actions:
+        - actionType: BitNoise
+          n: 3
+          mode: last
+          end: -32    # Skip seq in payload (last 4 bytes)
+
+send:
+  - count: 1
+  

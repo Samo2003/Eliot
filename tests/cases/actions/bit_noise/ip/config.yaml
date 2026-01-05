@@ -1,0 +1,17 @@
+name: IP Bitnoise test
+
+build:
+  defaultAction: Finish
+  rules:
+    - type: all
+      guards: []
+      actions:
+        - actionType: BitNoise
+          n: 2
+          mode: last
+          layer: IP
+
+send:
+  - count: 1
+  - src: ::1
+  

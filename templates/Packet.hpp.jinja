@@ -15,6 +15,8 @@ namespace eliot_generated {
         
         inline const std::vector<uint8_t>& payload() const noexcept { return _packet.{{ api.packet_payload() }}; }
 
+        inline std::vector<uint8_t>& mutable_payload() noexcept { return const_cast<std::vector<uint8_t>&>(_packet.{{ api.packet_payload() }}); }
+
         inline const size_t size() const noexcept { return payload().size(); }
 
         inline const int version() const noexcept { return size() == 0 ? -1 : (payload()[0]) >> 4; }

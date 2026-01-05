@@ -1,0 +1,15 @@
+name: Basic Bitnoise test
+
+build:
+  defaultAction: Finish
+  rules:
+    - type: all
+      guards: []
+      actions:
+        - actionType: BitNoise
+          n: 5
+          mode: first
+
+send:
+  - count: 1
+  
