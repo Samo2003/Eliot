@@ -1,0 +1,19 @@
+name: Payload negative window
+
+build:
+  defaultAction: Drop
+  rules:
+    - type: all
+      guards:
+        - guardType: Payload
+          pattern: aaaa
+          start: -10  # +4 for seq number in payload
+          end: -6     # +4 for seq number in payload
+      actions:
+        - actionType: Finish
+
+send:
+  - payload:
+      value: xxaaaaXX
+  - payload:
+      value: aaaaXXXX

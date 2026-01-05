@@ -1,4 +1,4 @@
-name: Payload windowed match
+name: Payload negative start
 
 build:
   defaultAction: Drop
@@ -7,17 +7,14 @@ build:
       guards:
         - guardType: Payload
           pattern: aaaa
-          start: 22
-          end: 26
+          start: -8   # +4 for seq number in payload
       actions:
         - actionType: Finish
 
 send:
-  - payload: 
+  - payload:
       value: xxaaaa
-  - payload: 
-      value: xxxaaaaaa
-  - payload: 
-      value: axxaaa
-  - payload: 
-      value: aaxxaaa
+  - payload:
+      value: aaaa
+  - payload:
+      value: aaaaxx

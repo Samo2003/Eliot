@@ -12,23 +12,27 @@ class Payload(GuardBase[Literal["Payload"]]):
     # Pattern encoding
     encoding: Literal["raw", "ascii", "hex"] = "raw"
 
-    # Maximum number of bytes to check
-    max: int | None = None
-
-    # Initial offset
+    # Initial offset (if negative, counted from the end)
     start: int = 0
+
+    # Offset where to stop checking payload (if negative, counted from the end)
+    # Interval is <start, end) 
+    end: int | None = None
 
     # Start checking from L4 layer default is from IP layer
     l4: bool = False 
 
     @model_validator(mode="after")
     def validate_offsets(self):
-        if self.max is not None and self.max < 0:
-            raise ValueError("max offset must be non negative")
-        if self.start < 0:
-            raise ValueError("start offset must be non negative")
-        if len(self.pattern) < 1 or (self.max is not None and len(self.pattern) > self.max):
-            raise ValueError("invalid pattern length")
+        if self.start == self.end:
+            raise ValueError("start and end offsets have to be different")
+        if len(self.pattern) < 1:
+            raise ValueError("invalid pattern")
+        if self.end is not None:
+            if self.start >= 0 and self.end >= 0 and self.end - self.start < len(self.pattern):
+                raise ValueError("invalid pattern length")
+            if self.start < 0 and self.end < 0 and self.end - self.start < len(self.pattern):
+                raise ValueError("invalid pattern length")
         return self
     
     @model_validator(mode="after")
@@ -56,4 +60,4 @@ class Payload(GuardBase[Literal["Payload"]]):
         return self
     
     def cpp_type(self) -> str:
-        return f"{super().cpp_type_base()}_{hashlib.sha1(cast(bytes, self.pattern)).hexdigest()[:8]}_{self.encoding.upper()}_{self.max}_{self.start}_{self.l4}"
+        return f"{super().cpp_type_base()}_{hashlib.sha1(cast(bytes, self.pattern)).hexdigest()[:8]}_{self.encoding.upper()}_{self.end}_{self.start}_{self.l4}".replace('.', '_').replace('-', 'neg')

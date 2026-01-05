@@ -1,4 +1,4 @@
-name: Payload L4 offset
+name: Payload negative end
 
 build:
   defaultAction: Drop
@@ -7,17 +7,14 @@ build:
       guards:
         - guardType: Payload
           pattern: aaaa
-          end: 4
-          l4: true
+          end: -6   # +4 for seq number in payload
       actions:
         - actionType: Finish
 
 send:
-  - payload: 
+  - payload:
+      value: aaaaXX
+  - payload:
       value: aaaa
-  - payload: 
-      value: aaaa
-    src: ::1
-  - protocol: udp
-    payload: 
-      value: aaaa
+  - payload:
+      value: xxaaaa

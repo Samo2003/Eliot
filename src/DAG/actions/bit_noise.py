@@ -47,12 +47,12 @@ class BitNoise(ActionBase[Literal["BitNoise"]]):
             raise ValueError("n must be >= 0")
         if self.end is not None:
             if isinstance(self.start, int) and isinstance(self.end, int):
-                if self.start < 0 and self.end > 0:
-                    raise ValueError("if start is negative end has to be as well")
-                if self.start > 0 and self.end < 0:
-                    raise ValueError("if start is positive end has to be as well")
                 if self.start == self.end:
-                    raise ValueError("start end end offsets have to be different")
+                    raise ValueError("start and end offsets have to be different")
+                if self.start >= 0 and self.end >= 0 and self.end - self.start < 0:
+                    raise ValueError("invalid window length")
+                if self.start < 0 and self.end < 0 and self.end - self.start < 0:
+                    raise ValueError("invalid window length")
         return self
     
     def is_state(self) -> bool:
