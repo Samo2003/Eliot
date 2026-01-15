@@ -9,6 +9,9 @@ namespace eliot_generated {
                     {% if node.type == "GuardCase" %}
                     packet->state = {{ '!' if node.guard.invert else '' }}evaluate_guard{{ node.guard.cpp_call() }}packet) ? {{ node.if_true.id }} : {{ node.if_false.id }};
                     continue;
+                    {% elif node.type == "StateCase" %}
+                    packet->state = get_next_state({{ node.state_node.cpp_name() }});
+                    continue;
                     {% else %}
                     {% if node.action.is_final() %}
                     {{ node.action.cpp_call() }};

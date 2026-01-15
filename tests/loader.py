@@ -1,7 +1,8 @@
 from pathlib import Path
 from pydantic import BaseModel, model_validator
 import yaml
-from typing import List, Literal
+from typing import Any, Dict, List, Literal, cast
+from src.DAG.dag import DAG
 from src.test_case.test_case import TestCase
 
 class Payload(BaseModel):
@@ -52,7 +53,29 @@ class Case(BaseModel):
     name: str
     timeout: int = 1
     send: List[Step]
-    build: TestCase
+    build: TestCase | DAG
+
+    @model_validator(mode="before")
+    @classmethod
+    def resolve_build(cls, data: Any):
+        if not isinstance(data, dict):
+            return data
+        
+        raw = cast(Dict[str, Any], data)
+
+        build = raw.get("build")
+        if not isinstance(build, dict):
+            return raw
+
+        if "rules" in build or "defaultAction" in build:
+            raw["build"] = TestCase.model_validate(build)
+            return raw
+
+        if "root" in build:
+            raw["build"] = DAG.model_validate(build)
+            return raw
+
+        raise ValueError("Unknown build format, expected TestCase or DAG")
 
 def load_case(path: Path):
     with open(path) as f:

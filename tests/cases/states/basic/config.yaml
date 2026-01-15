@@ -1,0 +1,25 @@
+name: Basic StateNode Test
+
+build:
+  root:
+    id: Node
+    initial: init
+    transitions:
+      - state: INIT
+        next: 
+          action: 
+            actionType: ChangeState
+            target: Node
+            state: end
+          next:
+            action: 
+              actionType: Finish
+            final: true
+      - state: end
+        next:
+          action: 
+            actionType: Drop
+          final: true
+
+send:
+  - count: 5

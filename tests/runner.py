@@ -1,11 +1,7 @@
-import os
-import yaml
-import sys
+import os, yaml, sys, socket, subprocess, time
 from pathlib import Path
-import socket
-import subprocess
-import time
 from typing import Any, Callable, Dict, List, Tuple, cast
+from src.test_case.test_case import TestCase
 from tests.comm import ReceivedPacket, SentPacket, receive_packets, send_packets
 from tests.loader import Case, load_case
 from tests.stats import ExchangeStats
@@ -42,21 +38,27 @@ class CaseRunner:
         workspace.mkdir(parents=True, exist_ok=True)
         return workspace
     
-    def _write_test_case(self, case: Case) -> Path:
-        path = self.workspace / "test_case.yaml"
-        with open(path, "w") as f:
-            yaml.safe_dump(case.build.model_dump(), f)
-        return path
+    def _write_test_case(self, case: Case) -> List[str]:
+        if isinstance(case.build, TestCase):
+            path = self.workspace / "test_case.yaml"
+            with open(path, "w", encoding="utf-8") as f:
+                yaml.safe_dump(case.build.model_dump(), f)
+            return ["-t", str(path)]
+        else:
+            path = self.workspace / "dag.json"
+            with open(path, "w", encoding="utf-8") as f:
+                f.write(case.build.model_dump_json(indent=4))
+            return ["-d", str(path)]
     
     def _generate_and_build(self, case: Case) -> str:
-        test_case_path = self._write_test_case(case)
+        build_args = self._write_test_case(case)
         generator_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
         workspace_rel = os.path.relpath(self.workspace, generator_root)
 
         generator_args = [
             sys.executable,
             "generator.py",
-            "-t", str(test_case_path),
+            *build_args,
             "-o", str(workspace_rel),
             "-a", "echo"
         ]

@@ -1,0 +1,30 @@
+#ifndef {{ state.hpp_define() }}
+#define {{ state.hpp_define() }}
+
+namespace eliot_generated {
+    struct {{ state.cpp_type() }} {
+        enum class State {
+{% for s in state.states() %}
+        {{ s }}{% if not loop.last %},{% endif %}
+{% endfor %}
+        };
+
+        inline unsigned get_next_packet_state(void) const noexcept {
+            switch (_state) {
+{% for t in state.transitions %}
+                case State::{{ t.state }}:
+                    return {{ t.get_id() }};
+{% endfor %}
+            }
+        }
+
+        inline void set_state(State s) noexcept {
+            _state = s;
+        }
+
+        private:
+            State _state = State::{{state.initial }};
+    };
+}
+
+#endif

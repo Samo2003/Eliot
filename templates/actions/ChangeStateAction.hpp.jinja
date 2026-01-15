@@ -1,0 +1,20 @@
+#ifndef {{ action.hpp_define() }}
+#define {{ action.hpp_define() }}
+
+#include "../Packet.hpp"
+#include "../states/{{ action.get_state_cpp_type() }}.hpp"
+
+namespace eliot_generated {
+    struct {{ action.cpp_type() }} {
+        explicit {{ action.cpp_type() }}({{ action.get_state_cpp_type() }}& node) : _node(node) {}
+
+        inline void execute(Packet* packet) noexcept {
+            _node.set_state({{ action.get_state_cpp_type() }}::State::{{ action.state }});
+        }
+
+        private:
+            {{ action.get_state_cpp_type() }}& _node;
+    };
+}
+
+#endif

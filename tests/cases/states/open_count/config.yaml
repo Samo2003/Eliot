@@ -1,0 +1,43 @@
+name: 1 packet to open let 3 pass and then close
+
+build:
+  root:
+    id: Node
+    initial: init
+    transitions:
+      - state: INIT
+        next: 
+          action: 
+            actionType: ChangeState
+            target: Node
+            state: open
+          next:
+            action: 
+              actionType: Drop
+            final: true
+      - state: open
+        next:
+          guard:
+            guardType: Count
+            after: 3
+          if_false:
+            action: 
+              actionType: Finish
+            final: true
+          if_true:
+            action: 
+              actionType: ChangeState
+              target: Node
+              state: close
+            next:
+              action: 
+                actionType: Drop
+              final: true
+      - state: close
+        next:
+          action:
+            actionType: Drop
+          final: true
+
+send:
+  - count: 7

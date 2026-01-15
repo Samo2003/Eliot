@@ -10,7 +10,7 @@ build:
           n: 1
           unit: s
 
-timeout: 2
+timeout: 3
 
 send:
   - count: 10

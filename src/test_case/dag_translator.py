@@ -47,7 +47,7 @@ def build_rule_tree(rule: Rule, default_node: ActionNode | GuardNode) -> GuardNo
                 if_false=default_node
             )
         else:
-            # At least one satisfied guard is required to execute acion chain
+            # At least one satisfied guard is required to execute action chain
             next_node = GuardNode(
                 guard=guard, 
                 if_true=actions_chain, 

@@ -1,0 +1,193 @@
+name: 2 FSM for 2 drones differentiated by IP
+
+build:
+  root:
+    guard:
+      guardType: IP
+      dst: 10.10.10.10
+    if_true:
+      id: drone1
+      initial: INIT
+      transitions:
+        - state: INIT
+          next:
+            guard:
+              guardType: Payload
+              pattern: UP
+              encoding: ascii
+              l4: true
+            if_true:
+              action:
+                actionType: ChangeState
+                target: drone1
+                state: UP
+              next:
+                action:
+                  actionType: Finish
+                final: true
+            if_false:
+              action:
+                actionType: Finish
+              final: true
+
+        - state: UP
+          next:
+            guard:
+              guardType: Payload
+              pattern: DOWN
+              encoding: ascii
+              l4: true
+            if_true:
+              guard:
+                guardType: EveryN
+                N: 3
+              if_true:
+                action:
+                  actionType: ChangeState
+                  target: drone1
+                  state: DOWN
+                next:
+                  action:
+                    actionType: Finish
+                  final: true
+              if_false:
+                action:
+                  actionType: Drop
+                final: true
+            if_false:
+              action:
+                actionType: Finish
+              final: true
+          
+        - state: DOWN
+          next:
+            guard:
+              guardType: Payload
+              pattern: DOWN
+              encoding: ascii
+              l4: true
+            if_true:
+              action:
+                actionType: ChangeState
+                target: drone1
+                state: UP
+              next:
+                action:
+                  actionType: Finish
+                final: true
+            if_false:
+              action:
+                actionType: Finish
+              final: true
+    if_false:
+      guard:
+        guardType: IP
+        dst: 10.10.10.20
+      if_true:
+        id: drone2
+        initial: INIT
+        transitions:
+          - state: INIT
+            next:
+              guard:
+                guardType: Payload
+                pattern: UP
+                encoding: ascii
+                l4: true
+              if_true:
+                action:
+                  actionType: ChangeState
+                  target: drone2
+                  state: UP
+                next:
+                  action:
+                    actionType: Finish
+                  final: true
+              if_false:
+                action:
+                  actionType: Finish
+                final: true
+
+          - state: UP
+            next:
+              guard:
+                guardType: Payload
+                pattern: DOWN
+                encoding: ascii
+                l4: true
+              if_true:
+                guard:
+                  guardType: EveryN
+                  N: 3
+                if_true:
+                  action:
+                    actionType: ChangeState
+                    target: drone2
+                    state: DOWN
+                  next:
+                    action:
+                      actionType: Finish
+                    final: true
+                if_false:
+                  action:
+                    actionType: Drop
+                  final: true
+              if_false:
+                action:
+                  actionType: Finish
+                final: true
+            
+          - state: DOWN
+            next:
+              guard:
+                guardType: Payload
+                pattern: DOWN
+                encoding: ascii
+                l4: true
+              if_true:
+                action:
+                  actionType: ChangeState
+                  target: drone2
+                  state: UP
+                next:
+                  action:
+                    actionType: Finish
+                  final: true
+              if_false:
+                action:
+                  actionType: Finish
+                final: true
+      if_false:
+        action:
+          actionType: Finish
+        final: true
+
+send:
+  - dst: 10.10.10.10      # drone 1 state -> UP
+    payload: 
+      value: UP
+      encoding: ascii
+  - dst: 10.10.10.10      # drone 1 state -> DOWN
+    payload: 
+      value: DOWN
+      encoding: ascii
+    count: 3
+  - dst: 10.10.10.20      # drone 2 state -> UP
+    payload: 
+      value: UP
+      encoding: ascii
+  - count: 1              # Random packet should be accepted
+  - dst: 10.10.10.10      # drone 1 state -> UP
+    payload: 
+      value: UP
+      encoding: ascii
+  - dst: 10.10.10.10      # drone 1 state -> UP still
+    payload: 
+      value: DOWN
+      encoding: ascii
+  - count: 1              # Random packet should be accepted
+  - dst: 10.10.10.20      # drone 2 state -> DOWN
+    payload: 
+      value: DOWN
+      encoding: ascii
+    count: 3
