@@ -1,8 +1,8 @@
 #include "Processor.hpp"
 
 namespace eliot_generated {
-    PacketResult Processor::process_packet(Packet* packet) noexcept {
-        while (true) {
+    void Processor::process_packet(Packet* packet) noexcept {
+        while (packet->result == PacketResult::Processing) {
             switch (packet->state) {
 {% for node in cases %}
                 case {{ node.id }}:
@@ -13,21 +13,15 @@ namespace eliot_generated {
                     packet->state = get_next_state({{ node.state_node.cpp_name() }});
                     continue;
                     {% else %}
-                    {% if node.action.is_final() %}
-                    {{ node.action.cpp_call() }};
-                    {% else %}
+                    {% if not node.action.is_final() %}
                     packet->state = {{ node.next.id }};
+                    {% endif %}
                     execute_action{{ node.action.cpp_call() }}packet);
-                    {% if node.action.calendar() %}
-                    return PacketResult::Calendar;
-                    {% else %}
                     continue;
-                    {% endif %}
-                    {% endif %}
                     {% endif %}
 {% endfor %}
                 default:
-                    return PacketResult::Finish;
+                    packet->result = PacketResult::Finish;
             }
         }
     }

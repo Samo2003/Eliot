@@ -20,7 +20,7 @@
 
 namespace eliot_generated {
     struct Processor {
-        PacketResult process_packet(Packet* packet) noexcept;
+        void process_packet(Packet* packet) noexcept;
 
         {% if require_calendar %}
         Calendar calendar;

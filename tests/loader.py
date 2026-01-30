@@ -47,11 +47,12 @@ class Step(BaseModel):
     icmp_type: int = 8
     icmp_code: int = 0
     delay: float | None = None
+    interval: float = 0
 
 class Case(BaseModel):
     """Test case representation"""
     name: str
-    timeout: int = 1
+    timeout: float = 1
     send: List[Step]
     build: TestCase | DAG
 

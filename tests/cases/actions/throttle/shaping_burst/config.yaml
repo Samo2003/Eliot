@@ -1,0 +1,17 @@
+name: Throttle shaping burst
+
+build:
+  defaultAction: Finish
+  rules:
+    - type: all
+      guards: []
+      actions:
+        - actionType: Throttle
+          rate: 1000
+          burst: 600
+
+timeout: 3
+
+send:
+  - count: 20
+    payload_size: 100

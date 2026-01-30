@@ -1,0 +1,62 @@
+#ifndef {{ action.hpp_define() }}
+#define {{ action.hpp_define() }}
+
+#include "../Packet.hpp"
+#include "../static/Time.hpp"
+{% if action.mode == "shaping"%}
+#include "../static/calendar/Calendar.hpp"
+{% endif %}
+
+namespace eliot_generated {
+    struct {{ action.cpp_type() }} {
+        {% if action.mode == "shaping"%}
+        explicit {{ action.cpp_type() }}(Calendar& calendar) : _calendar(calendar) {}
+
+        {% endif %}
+        inline void execute(Packet* packet) noexcept {
+            const uint64_t now = get_global_time();
+            {% if action.mode == "shaping"%}
+
+            if (now > _last) {
+                _tokens += (now - _last) * _RATE;
+                if (_tokens > _MAX_SIZE)
+                    _tokens = _MAX_SIZE;
+                _last = now;
+            }
+
+            const double packet_size = static_cast<double>(packet->size());
+            if (packet_size <= _tokens) {
+                _tokens -= packet_size;
+                return;
+            }
+            const double missing = packet_size - _tokens;
+            const uint64_t delay = static_cast<uint64_t>(std::ceil(missing / _RATE));
+            _tokens = 0.0;
+            _last += delay;
+            _calendar.schedule(packet, _last - now);
+            {% else %}
+
+            if (now < _next_allowed_time) {
+                packet->result = PacketResult::Drop;
+                return;
+            }
+
+            const uint64_t delay = static_cast<uint64_t>(std::ceil(packet->size() / _RATE));
+            _next_allowed_time = now + delay;
+            {% endif %}
+        }
+
+        private:
+            static constexpr double _RATE = {{ action.rate }} / 1000.0;     // Convert to B/ms
+            {% if action.mode == "shaping"%}
+            Calendar& _calendar;
+            static constexpr double _MAX_SIZE = {{ action.burst }};
+            double _tokens = _MAX_SIZE;
+            uint64_t _last = get_global_time();
+            {% else %}
+            uint64_t _next_allowed_time = get_global_time();
+            {% endif %}
+    };
+}
+
+#endif

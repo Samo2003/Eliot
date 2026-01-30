@@ -25,12 +25,12 @@ int main() {
 
             if (auto{{ '' if api.returns_optional() else '*' }} maybe_packet = q{{ api.get_packet() }}) {
                 auto packet = new Packet(std::move(*maybe_packet));
-                result = processor.process_packet(packet);
+                processor.process_packet(packet);
 
-                if (result == PacketResult::Drop) {
+                if (packet->result == PacketResult::Drop) {
                     q{{ api.drop_packet("packet->move_packet()") }};
                     delete packet;
-                } else if (result == PacketResult::Finish) {
+                } else if (packet->result == PacketResult::Finish) {
                     q{{ api.accept_packet("packet->move_packet()") }};
                     delete packet;
                 }
@@ -43,11 +43,11 @@ int main() {
             {% if require_calendar %}
             if (!calendar_empty) {
                 if (auto packet = processor.calendar.get_ready()) {
-                    result = processor.process_packet(packet);
-                    if (result == PacketResult::Drop) {
+                    processor.process_packet(packet);
+                    if (packet->result == PacketResult::Drop) {
                         q{{ api.drop_packet("packet->move_packet()") }};
                         delete packet;
-                    } else if (result == PacketResult::Finish) {
+                    } else if (packet->result == PacketResult::Finish) {
                         q{{ api.accept_packet("packet->move_packet()") }};
                         delete packet;
                     }

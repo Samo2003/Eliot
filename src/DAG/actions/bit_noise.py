@@ -64,6 +64,8 @@ class BitNoise(ActionBase[Literal["BitNoise"]]):
     
     def cpp_type(self) -> str:
         type_name = f"{super().cpp_type_base()}_{self.x}_{self.n}_{self.start}_{self.end}_{self.mode.upper()}_{self.layer.upper()}"
+        if self.is_state():
+            type_name += f"{id(self)}"
         return type_name.replace('-', "neg").replace('.', '_')
     
     def not_generator_x(self) -> bool:

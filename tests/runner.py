@@ -57,7 +57,7 @@ class CaseRunner:
 
         generator_args = [
             sys.executable,
-            "generator.py",
+            "eliot.py",
             *build_args,
             "-o", str(workspace_rel),
             "-a", "echo"

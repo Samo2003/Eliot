@@ -23,9 +23,3 @@ class ActionBase(DAGBaseModel, Generic[T], ABC):
     def calendar(self) -> bool:
         """Signalizes that action needs calendar"""
         return False
-    
-    def cpp_call(self) -> str:
-        # Final actions must reimplement this method
-        if self.is_final():
-            raise NotImplementedError
-        return super().cpp_call()

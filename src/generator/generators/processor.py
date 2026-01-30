@@ -26,7 +26,7 @@ def generate_processor_header(
         { 
             "api": api, 
             "guards": guards, 
-            "actions": [action for action in actions if not action.is_final()],         # Only add non final actions
+            "actions": actions,
             "states": state_nodes,
             "require_calendar": require_calendar 
         }

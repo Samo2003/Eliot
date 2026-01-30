@@ -1,0 +1,14 @@
+#ifndef {{ action.hpp_define() }}
+#define {{ action.hpp_define() }}
+
+#include "../Packet.hpp"
+
+namespace eliot_generated {
+    struct {{ action.cpp_type() }} {
+        static inline void execute(Packet* packet) noexcept {
+            packet->result = PacketResult::Drop;
+        }
+    };
+}
+
+#endif

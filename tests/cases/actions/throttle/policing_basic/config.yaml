@@ -1,0 +1,16 @@
+name: Throttle policing basic
+
+build:
+  defaultAction: Finish
+  rules:
+    - type: all
+      guards: []
+      actions:
+        - actionType: Throttle
+          mode: policing
+          rate: 1000
+
+send:
+  - count: 20
+    payload_size: 100
+    interval: 60

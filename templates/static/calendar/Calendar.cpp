@@ -4,6 +4,9 @@ namespace eliot_generated {
     void Calendar::schedule(Packet* packet, uint64_t delay) noexcept {
         if (!packet)
             return;
+
+        // Change packet state
+        packet->result = PacketResult::Calendar;
         
         // Time when packet processing should continue
         uint64_t due_tick = _current_tick_from_clock() + delay;
@@ -86,6 +89,8 @@ namespace eliot_generated {
                 Packet* packet = item->packet;
                 delete item;
                 _size--;
+                // Change packet state back to processing
+                packet->result = PacketResult::Processing;
                 return packet;
             }
 

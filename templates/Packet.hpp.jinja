@@ -5,7 +5,7 @@
 #include <vector>
 
 namespace eliot_generated {
-    enum class PacketResult { Drop, Finish, Calendar };
+    enum class PacketResult { Drop, Finish, Calendar, Processing };
 
     struct Packet {
         explicit inline Packet({{ api.packet_type() }}&& packet) noexcept 
@@ -32,6 +32,8 @@ namespace eliot_generated {
         }
         
         unsigned state = 0;
+
+        PacketResult result = PacketResult::Processing;
 
         private:
             {{ api.packet_type() }} _packet;

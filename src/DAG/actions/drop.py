@@ -7,9 +7,5 @@ class Drop(ActionBase[Literal["Drop"]]):
     def is_final(self) -> bool:
         return True
     
-    def cpp_call(self) -> str:
-        return "return PacketResult::Drop"
-    
     def cpp_type(self) -> str:
-        """Defined only to silence Pylance warning"""
-        return ""
+        return super().cpp_type_base()

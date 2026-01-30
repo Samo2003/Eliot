@@ -56,9 +56,11 @@ class Transition(BaseModel):
         return self
 
     def attach_id(self, id: int) -> None:
+        """Assign branch ID assigned during generating"""
         self.id = id
 
     def get_id(self) -> int:
+        """Retrieve and validate branch ID was assigned"""
         if self.id is None:
             raise RuntimeError(f"Transition ID not attached to transition with state: {self.state}")
         return self.id
@@ -76,12 +78,13 @@ class StateNode(DAGBaseModel):
     transitions: List[Transition]
 
     @model_validator(mode="after")
-    def validate_node(self):
+    def validate_node(self) -> StateNode:
         used: Set[str] = set()
         for transition in self.transitions:
             if transition.state in used:
                 raise ValueError(f"State {transition.state} used multiple times in node {self.id}")
             used.add(transition.state)
+        self.id = self.id.upper()
         self.initial = self.initial.upper()
         if self.initial not in used:
             raise ValueError(f"No transition for initial state fount in node {self.id}")
@@ -89,6 +92,7 @@ class StateNode(DAGBaseModel):
         return self
     
     def states(self) -> List[str]:
+        """Retrieve list of defined states in `Transition` nodes"""
         states: List[str] = []
         for transition in self.transitions:
             states.append(transition.state)
@@ -101,16 +105,23 @@ class StateNode(DAGBaseModel):
         return f"{self.id.upper()}StateNode"
     
     def attach_transition_ids(self, case: Any) -> None:
+        """Add branch ID to `Transition` nodes for generating"""
         # Any used to fix circular imports case has type `StateCase` from src.DAG.generator.utils
+
+        # Create state name to Transition map
         state_transition_map: Dict[str, int] = {}
         for state, c in case["transitions"]:
             state_transition_map[state] = c["id"]
 
+        # Attach branch IDs to Transition nodes
         for transition in self.transitions:
             transition.attach_id(state_transition_map[transition.state])
 
+# Define DAGNode Union type
 DAGNode = ActionNode | GuardNode | StateNode
 
 class DAG(BaseModel):
     """DAG root container containing Action node, Guard node or State node"""
+
+    # DAG root node
     root: DAGNode

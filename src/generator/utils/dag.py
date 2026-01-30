@@ -165,13 +165,13 @@ def process_state_nodes(state_nodes: Set[StateNode], action_nodes: List[ChangeSt
         node.attach_transition_ids(find_case(node.id))
     
     # Verify action references to StateNodes
-    for node in action_nodes:
-        if node.target not in state_node_map:
-            raise ValueError(f"Undefined reference to state node in ChangeState action: {node.target}")
+    for action in action_nodes:
+        if action.target not in state_node_map:
+            raise ValueError(f"Undefined reference to state node in ChangeState action: {action.target}")
 
-        target_node = state_node_map[node.target]
-        if node.state not in target_node.states():
-            raise ValueError(f"Cannot set undefined state {node.state} to StateNode with id: {target_node.id}")
+        target_node = state_node_map[action.target]
+        if action.state not in target_node.states():
+            raise ValueError(f"Cannot set undefined state {action.state} to StateNode with id: {target_node.id}")
 
         # Attach `StateNode` to action node for generating
-        node.attach_state_node_type(target_node.cpp_type())
+        action.attach_state_node_type(target_node.cpp_type())

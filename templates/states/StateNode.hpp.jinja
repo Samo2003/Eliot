@@ -4,9 +4,7 @@
 namespace eliot_generated {
     struct {{ state.cpp_type() }} {
         enum class State {
-{% for s in state.states() %}
-        {{ s }}{% if not loop.last %},{% endif %}
-{% endfor %}
+            {{ state.states() | join(",\n\t\t\t") }}
         };
 
         inline unsigned get_next_packet_state(void) const noexcept {

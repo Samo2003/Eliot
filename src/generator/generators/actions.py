@@ -10,11 +10,7 @@ def generate_actions(env: Environment, output_dir: str, actions: Set[Action]) ->
     # Configure output directory
     actions_dir = os.path.join(output_dir, "actions")
 
-    for action in actions:
-        # Skip generation for final nodes because they directly return packet result
-        if action.is_final():
-            continue
-        
+    for action in actions:        
         # Configure file paths
         template_name = f"actions/{action.actionType}Action.hpp.jinja"
         output_name = f"{action.cpp_type()}.hpp"

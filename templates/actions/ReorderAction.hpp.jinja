@@ -18,6 +18,7 @@ namespace eliot_generated {
 
         inline void execute(Packet* packet) noexcept {
             _buffer[_buffer_index++] = packet;
+            packet->result = PacketResult::Calendar;
 
             if (_buffer_index < _size)
                 return;

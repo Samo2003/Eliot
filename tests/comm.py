@@ -89,7 +89,7 @@ def send_packets(steps: List[Step], sock: socket.socket) -> List[SentPacket]:
         if step.delay:
             time.sleep(step.delay / 1000.0)
         else:
-            for _ in range(step.count):
+            for i in range(step.count):
                 try:
                     packet = build_packet(step, seq)
                     now = time.time()
@@ -108,6 +108,9 @@ def send_packets(steps: List[Step], sock: socket.socket) -> List[SentPacket]:
 
                 except Exception as e:
                     raise RuntimeError(f"Send failed: {e}")
+                
+                if i < step.count - 1 and step.interval > 0:
+                    time.sleep(step.interval / 1000.0)
 
     return sent_packets
 

@@ -17,6 +17,7 @@ class ChangeState(ActionBase[Literal["ChangeState"]]):
 
     @model_validator(mode="after")
     def upper_state(self):
+        self.target = self.target.upper()
         self.state = self.state.upper()
         return self
 
@@ -27,9 +28,11 @@ class ChangeState(ActionBase[Literal["ChangeState"]]):
         return True
 
     def attach_state_node_type(self, state_cpp_type: str) -> None:
+        """Attaches `StateNode` C++ type used for node referencing in generated code"""
         self.state_cpp_type = state_cpp_type
     
     def get_state_cpp_type(self) -> str:
+        """Retrieve and validate `StateNode` C++ type was attached"""
         if self.state_cpp_type is None:
             raise RuntimeError(f"StateNode with id: {self.target} not attached to action node")
         return self.state_cpp_type
