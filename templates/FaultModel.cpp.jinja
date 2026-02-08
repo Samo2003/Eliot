@@ -1,7 +1,7 @@
-#include "Processor.hpp"
+#include "FaultModel.hpp"
 
 namespace eliot_generated {
-    void Processor::process_packet(Packet* packet) noexcept {
+    void FaultModel::evaluate(Packet* packet) noexcept {
         while (packet->result == PacketResult::Processing) {
             switch (packet->state) {
 {% for node in cases %}

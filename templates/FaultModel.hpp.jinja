@@ -1,5 +1,5 @@
-#ifndef ELIOT_PROCESSOR_H
-#define ELIOT_PROCESSOR_H
+#ifndef ELIOT_FAULT_MODEL_H
+#define ELIOT_FAULT_MODEL_H
 
 #include "Packet.hpp"
 #include "static/interfaces/State.hpp"
@@ -19,8 +19,8 @@
 {% endfor %}
 
 namespace eliot_generated {
-    struct Processor {
-        void process_packet(Packet* packet) noexcept;
+    struct FaultModel {
+        void evaluate(Packet* packet) noexcept;
 
         {% if require_calendar %}
         Calendar calendar;

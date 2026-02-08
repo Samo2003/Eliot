@@ -5,7 +5,7 @@ from ...DAG import *
 import os
 from ..utils import generate_to_file, Case
 
-def generate_processor_header(
+def generate_fault_model_header(
     env: Environment, 
     output_dir: str, 
     api: NFQueueApiBase, 
@@ -14,11 +14,11 @@ def generate_processor_header(
     state_nodes: Set[StateNode],
     require_calendar: bool
 ) -> None:
-    """Generates processor header"""
+    """Generates fault model header"""
 
     # COnfigure file paths
-    template_name = "Processor.hpp.jinja"
-    output_path = os.path.join(output_dir, "Processor.hpp")
+    template_name = "FaultModel.hpp.jinja"
+    output_path = os.path.join(output_dir, "FaultModel.hpp")
 
     # Generate file with given context
     generate_to_file(
@@ -32,12 +32,12 @@ def generate_processor_header(
         }
     )
 
-def generate_processor(env: Environment, output_dir: str, cases: List[Case]) -> None:
-    """Generates processor"""
+def generate_fault_model(env: Environment, output_dir: str, cases: List[Case]) -> None:
+    """Generates fault model"""
 
     # Configure file paths
-    template_name = "Processor.cpp.jinja"
-    output_path = os.path.join(output_dir, "Processor.cpp")
+    template_name = "FaultModel.cpp.jinja"
+    output_path = os.path.join(output_dir, "FaultModel.cpp")
 
     # Generate file with given context
     generate_to_file(env, template_name, output_path, { "cases": cases })
