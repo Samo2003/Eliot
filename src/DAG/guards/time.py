@@ -33,7 +33,7 @@ class Time(GuardBase[Literal["Time"]]):
         return f"{self.cpp_type_base()}_{self.after}_{self.duration}_{self.instant}_{id(self)}"
     
     def is_state(self) -> bool:
-        return True
+        return self.instant
     
     def time(self) -> bool:
         return True
