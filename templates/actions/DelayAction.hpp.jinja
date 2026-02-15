@@ -17,7 +17,7 @@
 #include "../static/calendar/Calendar.hpp"
 {% if not action.not_generator_n() %}
 #include "../static/interfaces/GeneratorInt.hpp"
-#include "../generators/{{ condition.n.cpp_type() }}.hpp"
+#include "../generators/{{ action.n.cpp_type() }}.hpp"
 {% endif %}
 
 namespace eliot_generated {

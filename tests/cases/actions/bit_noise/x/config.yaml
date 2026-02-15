@@ -1,4 +1,4 @@
-name: X Bitnoise test
+name: X exponential Bitnoise test
 
 build:
   defaultAction: Finish
@@ -7,9 +7,13 @@ build:
       conditions: []
       actions:
         - actionType: BitNoise
-          x: 0.25
+          x: 
+            generatorType: ExponentialFloat
+            max: 0.8
+            mean: 0.2
+            seed: 123456
           mode: first
 
 send:
-  - count: 1
+  - count: 100
   

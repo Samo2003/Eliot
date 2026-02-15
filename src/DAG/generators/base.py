@@ -71,3 +71,12 @@ class ValueGeneratorBase(DAGBaseModel, Generic[T, N], ABC):
         if self.seed is not None:
             return self.seed
         return super().seed_value()
+    
+    @final
+    def clamp(self, x: float) -> float:
+        """Clamps given value based on min and max"""
+        if self.min is not None and x < self.min:
+            x = self.min
+        if self.max is not None and x > self.max:
+            x = self.max
+        return x

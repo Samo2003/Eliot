@@ -1,4 +1,4 @@
-name: Generator every n
+name: Exponential generator every n
 
 build:
   defaultAction: Finish
@@ -7,14 +7,14 @@ build:
       conditions: 
         - conditionType: EveryN
           N: 
-            generatorType: NormalInt
+            generatorType: ExponentialInt
             min: 2
             max: 6
-            m: 3.5
-            s: 1
+            mean: 4
+            seed: 123456
       actions:
         - actionType: Drop
 
 send: 
-  - count: 12
+  - count: 2000
   

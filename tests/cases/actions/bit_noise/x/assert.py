@@ -1,10 +1,15 @@
+from typing import List
 from tests.stats import ExchangeStats
 
 def check(stats: ExchangeStats) -> None:
     assert stats.no_losses()
-    e = stats.exchanges[0]
-    assert e.received is not None
-    diff = stats.bit_diff(e.sent.raw, e.received.raw)
-    expected = int(0.25 * len(e.sent.raw) * 8)
-    assert len(diff) == expected
+
+    ratios: List[float] = []
+    for e in stats.exchanges:
+        assert e.received is not None
+        diff = stats.bit_diff(e.sent.raw, e.received.raw)
+        ratios.append(len(diff) / (len(e.sent.raw) * 8))
+
+    avg = sum(ratios) / len(ratios)
+    assert 0.15 <= avg <= 0.25
     

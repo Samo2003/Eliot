@@ -41,7 +41,7 @@ class BitNoise(ActionBase[Literal["BitNoise"]]):
                 self.x.max = 1
             elif not (0 <= self.x.max <= 1):
                 raise ValueError("x must be between 0 and 1")
-            if self.x.min < self.x.max:
+            if self.x.min > self.x.max:
                 raise ValueError("Generator cannot produce values")
         if self.n is not None and isinstance(self.n, int) and self.n < 0:
             raise ValueError("n must be >= 0")

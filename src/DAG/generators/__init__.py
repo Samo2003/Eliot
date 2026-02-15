@@ -1,13 +1,14 @@
 from pydantic import Field
 from typing import Annotated, Union
 from .base import ValueGeneratorBase
-from . import normal, seq_count, uniform
+from . import normal, seq_count, uniform, exponential
 
 ValueGeneratorInt = Annotated[
     Union[
         normal.NormalInt, 
         seq_count.SeqCountInt,
-        uniform.UniformInt
+        uniform.UniformInt,
+        exponential.ExponentialInt
     ],
     Field(discriminator="generatorType")
 ]
@@ -16,7 +17,8 @@ ValueGeneratorFloat = Annotated[
     Union[
         normal.NormalFloat, 
         seq_count.SeqCountFloat,
-        uniform.UniformFloat
+        uniform.UniformFloat,
+        exponential.ExponentialFloat
     ],
     Field(discriminator="generatorType")
 ]

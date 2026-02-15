@@ -25,15 +25,6 @@ class NormalBase(ValueGeneratorBase[T, N], ABC):
     @final
     def cpp_type(self) -> str:
         return f"{self.cpp_type_base()}_{self.N_to_str(self.m)}_{self.N_to_str(self.s)}_{self.once}"
-    
-    @final
-    def clamp(self, x: float) -> float:
-        """Clamps given value based on min and max"""
-        if self.min is not None and x < self.min:
-            x = self.min
-        if self.max is not None and x > self.max:
-            x = self.max
-        return x
 
 class NormalFloat(NormalBase[Literal["NormalFloat"], float]):
     """Normal Float value generator"""

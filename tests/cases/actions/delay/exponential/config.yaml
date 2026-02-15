@@ -1,0 +1,17 @@
+name: Exponential generator delay
+
+build:
+  defaultAction: Finish
+  rules:
+    - type: all
+      conditions: []
+      actions:
+        - actionType: Delay
+          n: 
+            generatorType: ExponentialInt
+            mean: 100
+            seed: 123456
+
+send:
+  - count: 1000
+  
