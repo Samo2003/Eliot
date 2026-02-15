@@ -56,7 +56,7 @@ namespace eliot_generated {
         private:
 
             ///> Pseudo-random number generator.
-            inline static xoroshiro128plus _rng{ {{ generator.seed() }}, {{ generator.seed() }} };
+            inline static xoroshiro128plus _rng{ {{ generator.seed_value() }} };
 
             ///> Normalization constant for converting random integers to [0, 1].
             static constexpr double _inv = 1.0 / double(UINT64_MAX);

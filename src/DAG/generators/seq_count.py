@@ -26,7 +26,8 @@ class SeqCountBase(ValueGeneratorBase[T, N], ABC):
             raise ValueError("max is required for decreasing sequence (step < 0)")
         if self.T <= 0:
             raise ValueError("T must be >= 1")
-
+        if self.seed is not None:
+            raise ValueError(f"Seed value has no effect in {self.generatorType}")
         return self
     
     @final

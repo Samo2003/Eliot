@@ -61,7 +61,7 @@ namespace eliot_generated {
         private:
 
             ///> Pseudo-random number generator.
-            inline static xoroshiro128plus _rng{ {{ generator.seed() }}, {{ generator.seed() }} };
+            inline static xoroshiro128plus _rng{ {{ generator.seed_value() }} };
 
             ///> Normal distribution used for value sampling.
             inline static std::normal_distribution<float> _dist{ {{ generator.m }}f, {{ generator.s }}f };

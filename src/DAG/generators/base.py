@@ -25,6 +25,9 @@ class ValueGeneratorBase(DAGBaseModel, Generic[T, N], ABC):
     # If `True` value is generated only once and does not change
     once: bool = False
 
+    # Set generator seed to ensure determinism
+    seed: int | None = None
+
     @model_validator(mode="after")
     def check_min(self):
         if self.min is None:
@@ -33,6 +36,8 @@ class ValueGeneratorBase(DAGBaseModel, Generic[T, N], ABC):
             raise ValueError(f"minimum value has to be 0 or greater")
         if self.max is not None and self.min is not None and self.min > self.max:
             raise ValueError("Generator cannot produce values")
+        if self.seed is not None and self.seed < 0:
+            raise ValueError("Seed value has to be a positive integer")
         return self
 
     @final
@@ -60,3 +65,9 @@ class ValueGeneratorBase(DAGBaseModel, Generic[T, N], ABC):
         if self.is_state():
             return f"({self.cpp_name()}"
         return super().cpp_call()
+    
+    @final
+    def seed_value(self) -> int:
+        if self.seed is not None:
+            return self.seed
+        return super().seed_value()

@@ -125,7 +125,7 @@ namespace eliot_generated {
             {% if action.strategy == "random" %}
 
             ///> Pseudo-random number generator used for packet shuffling.
-            inline static xoroshiro128plus _rng{ {{ action.seed() }}, {{ action.seed() }} };
+            inline static xoroshiro128plus _rng{ {{ action.seed_value() }} };
             {% endif %}
     };
 }

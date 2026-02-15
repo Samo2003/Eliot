@@ -190,7 +190,7 @@ namespace eliot_generated {
 
             {% if action.mode == "random" %}
             ///> Pseudo-random number generator used for random bit selection.
-            inline static xoroshiro128plus _rng{ {{ action.seed() }}, {{ action.seed() }} };
+            inline static xoroshiro128plus _rng{ {{ action.seed_value() }} };
             {% endif %}
             {% if action.x is not none and not action.not_generator_x() and action.x.is_state() %}
             ///> Generator providing dynamic values for parameter x.

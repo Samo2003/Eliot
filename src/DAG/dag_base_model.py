@@ -46,7 +46,6 @@ class DAGBaseModel(BaseModel, ABC):
         """Signalizes that node needs time module"""
         return False
     
-    @final
-    def seed(self) -> int:
+    def seed_value(self) -> int:
         """Returns seed for generators"""
         return random.getrandbits(32)

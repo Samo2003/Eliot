@@ -56,7 +56,7 @@ namespace eliot_generated {
         private:
 
             ///> Pseudo-random number generator.
-            inline static xoroshiro128plus _rng{ {{ generator.seed() }}, {{ generator.seed() }} };
+            inline static xoroshiro128plus _rng{ {{ generator.seed_value() }} };
 
             /**
              * @brief Generates a uniformly distributed integer value.
