@@ -29,7 +29,10 @@ namespace eliot_generated {
 
         inline const size_t size() const noexcept { return payload().size(); }
 
-        inline const int version() const noexcept { return size() == 0 ? -1 : (payload()[0]) >> 4; }
+        inline const int version() const noexcept { 
+            const std::vector<uint8_t>& p = payload();
+            return p.size() == 0 ? -1 : (p[0]) >> 4; 
+        }
 
         inline const int protocol(bool nh_only = false) const noexcept {
             _ensure_l4_parsed();
@@ -65,22 +68,23 @@ namespace eliot_generated {
 
             inline void _parse_l4() const noexcept {
                 const std::vector<uint8_t>& p = payload();
-                int v = version();
+                const size_t sz = p.size();
+                const int v = version();
 
                 if (v == 4) {
                     // IPv4 header size
-                    if (size() < 20)
+                    if (sz < 20)
                         return;
 
                     int header_len = (p[0] & 0x0F) * 4;
-                    if (header_len < 20 || (size_t)header_len > size())
+                    if (header_len < 20 || (size_t)header_len > sz)
                         return;
 
                     _l4_offset = header_len;
                     // Protocol field
                     _l4_protocol = p[9];
                 } else if (v == 6) {
-                    if (size() < 40)
+                    if (sz < 40)
                         return;
 
                     uint8_t next = p[6];
@@ -103,14 +107,14 @@ namespace eliot_generated {
                         }
                         
                         // Next-header first byte, header len second byte
-                        if (offset + 2 > size())
+                        if (offset + 2 > sz)
                             return;
 
                         uint8_t len = p[offset + 1];
                         // Len does not include first octet
                         size_t header_size = (len + 1) * 8;
 
-                        if (offset + header_size > size())
+                        if (offset + header_size > sz)
                             return;
 
                         next = p[offset];

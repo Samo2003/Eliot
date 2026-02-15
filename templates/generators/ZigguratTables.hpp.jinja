@@ -1,0 +1,48 @@
+/**
+ * @file ZigguratTables.hpp
+ * @brief Precomputed lookup tables for the Ziggurat normal distribution generator.
+ *
+ * The tables define 128 rectangular layers used by the Ziggurat algorithm
+ * for fast sampling of standard normal random variables.
+ *
+ * This file was automatically generated.
+ */
+
+#ifndef ZIGGURAT_TABLES_H
+#define ZIGGURAT_TABLES_H
+
+#include <cstdint>
+
+namespace eliot_generated {
+    ///> Integer thresholds for fast acceptance test.
+    static inline constexpr uint32_t kn[128] = {
+{% for row in kn|batch(8) %}
+    {%- for v in row %}
+        {{ v }}u,
+    {%- endfor %}
+    
+{% endfor %}
+    };
+
+    ///> Layer widths (scaling factors).
+    inline static constexpr float wn[128] = {
+{% for row in wn|batch(8) %}
+    {%- for v in row %}
+        {{ "%.12e"|format(v) }}f,
+    {%- endfor %}
+    
+{% endfor %}
+    };
+
+    ///> Function values at layer boundaries.
+    inline static constexpr float fn[128] = {
+{% for row in fn|batch(8) %}
+    {%- for v in row %}
+        {{ "%.12e"|format(v) }}f,
+    {%- endfor %}
+    
+{% endfor %}
+    };
+}
+
+#endif

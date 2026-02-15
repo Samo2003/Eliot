@@ -58,9 +58,6 @@ namespace eliot_generated {
             ///> Pseudo-random number generator.
             inline static xoroshiro128plus _rng{ {{ generator.seed_value() }} };
 
-            ///> Normalization constant for converting random integers to [0, 1].
-            static constexpr double _inv = 1.0 / double(UINT64_MAX);
-
             /**
              * @brief Generates a uniformly distributed value.
              *
@@ -69,8 +66,9 @@ namespace eliot_generated {
              * @return Uniformly distributed floating-point value.
              */
             inline static float _generate() noexcept {
-                double f = double(_rng.next()) * _inv;
-                return static_cast<float>( {{ generator.min }} + f * {{ generator.max - generator.min }} );
+                uint32_t r = static_cast<uint32_t>(_rng.next() >> 40);
+                float f = std::bit_cast<float>(0x3F800000u | r) - 1.0f;
+                return {{ generator.min }} + f * {{ generator.max - generator.min }};
             }
         {% endif %}
     };
