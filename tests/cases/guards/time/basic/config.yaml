@@ -4,8 +4,8 @@ build:
   defaultAction: Drop
   rules:
     - type: all
-      guards:
-        - guardType: Time
+      conditions:
+        - conditionType: Time
           after: 100
       actions:
         - actionType: Finish

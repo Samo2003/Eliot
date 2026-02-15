@@ -1,16 +1,16 @@
 from typing import List, cast
-from ..DAG.dag import DAG, ActionNode, GuardNode
+from ..DAG.dag import DAG, ActionNode, DecisionNode
 from .test_case import TestCase, Rule
 from ..DAG.actions import Action, Drop, Finish
 
-def build_action_chain(actions: List[Action], default_node: ActionNode | GuardNode) -> ActionNode:
+def build_action_chain(actions: List[Action], default_node: ActionNode | DecisionNode) -> ActionNode:
     """Creates a list of Action nodes in DAG"""
 
     if not actions:
         raise ValueError("Rule must contain at least one action")
 
     # Default node is at the end of action chain
-    next_node: ActionNode | GuardNode = default_node
+    next_node: ActionNode | DecisionNode = default_node
 
     # Iterates in reversed to build list from bottom
     for i, action in enumerate(reversed(actions)):
@@ -27,29 +27,29 @@ def build_action_chain(actions: List[Action], default_node: ActionNode | GuardNo
     # so next node is always action node
     return cast(ActionNode, next_node)
 
-def build_rule_tree(rule: Rule, default_node: ActionNode | GuardNode) -> GuardNode | ActionNode:
+def build_rule_tree(rule: Rule, default_node: ActionNode | DecisionNode) -> DecisionNode | ActionNode:
     """Builds tree from given rule"""
 
     actions_chain = build_action_chain(rule.actions, default_node)
 
-    # Reverse guards to create tree from bottom
-    guards = list(reversed(rule.guards))
+    # Reverse conditions to create tree from bottom
+    conditions = list(reversed(rule.conditions))
 
-    # Action chain follows after last guard
-    next_node: GuardNode | ActionNode = actions_chain
+    # Action chain follows after last condition
+    next_node: DecisionNode | ActionNode = actions_chain
 
-    for i, guard in enumerate(guards):
+    for i, condition in enumerate(conditions):
         if rule.type == "all":
-            # All guards have to be true to execute action chain
-            next_node = GuardNode(
-                guard=guard, 
+            # All decision nodes have to be true to execute action chain
+            next_node = DecisionNode(
+                condition=condition, 
                 if_true=next_node, 
                 if_false=default_node
             )
         else:
-            # At least one satisfied guard is required to execute action chain
-            next_node = GuardNode(
-                guard=guard, 
+            # At least one satisfied decision node is required to execute action chain
+            next_node = DecisionNode(
+                condition=condition, 
                 if_true=actions_chain, 
                 if_false=next_node if i > 0 else default_node
             )
@@ -70,9 +70,9 @@ def translate_to_DAG(test_case: TestCase) -> DAG:
         return DAG(root=default_node)
 
     # Save next node
-    next_default: GuardNode | ActionNode = default_node
+    next_default: DecisionNode | ActionNode = default_node
 
-    # Iterate over all rules in reverser order to build tree from bottom
+    # Iterate over all rules in reverse order to build tree from bottom
     for rule in reversed(test_case.rules):
         next_default = build_rule_tree(rule, next_default)
 

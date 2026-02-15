@@ -3,32 +3,32 @@ from itertools import count
 from src.DAG.actions.change_state import ChangeState
 from src.DAG.generators import ValueGeneratorBase
 from src.DAG.actions import Action
-from src.DAG.guards import Guard
-from src.DAG import DAGNode, StateNode, DAG, GuardNode, ActionNode
+from src.DAG.conditions import Condition
+from src.DAG import DAGNode, StateNode, DAG, DecisionNode, ActionNode
 from typing import Dict, Tuple, Set, TypedDict, Literal, Optional, Iterator, List
 
-def get_generators(node: Guard | Action) -> Set[ValueGeneratorBase[str, float | int]]:
+def get_generators(node: Condition | Action) -> Set[ValueGeneratorBase[str, float | int]]:
     """Iterates over node instance internal dictionary values and collect all generators"""
     return { v for v in node.__dict__.values() if isinstance(v, ValueGeneratorBase) }
 
-def collect_nodes(node: DAGNode) -> Tuple[Set[Guard], Set[Action], Set[StateNode], Set[ValueGeneratorBase[str, float | int]]]:
-    """Collect Guards, Actions and generators from DAG starting from root node"""
+def collect_nodes(node: DAGNode) -> Tuple[Set[Condition], Set[Action], Set[StateNode], Set[ValueGeneratorBase[str, float | int]]]:
+    """Collect Conditions, Actions and generators from DAG starting from root node"""
 
-    guards: Set[Guard] = set()
+    conditions: Set[Condition] = set()
     actions: Set[Action] = set()
     states: Set[StateNode] = set()
     generators: Set[ValueGeneratorBase[str, float | int]] = set()
 
-    if isinstance(node, GuardNode):
-        guards.add(node.guard)
-        generators |= get_generators(node.guard)
+    if isinstance(node, DecisionNode):
+        conditions.add(node.condition)
+        generators |= get_generators(node.condition)
 
         # Collect nodes from subtrees
-        guards_true, actions_true, states_true, generators_true = collect_nodes(node.if_true)
-        guards_false, actions_false, states_false, generators_false = collect_nodes(node.if_false)
+        conditions_true, actions_true, states_true, generators_true = collect_nodes(node.if_true)
+        conditions_false, actions_false, states_false, generators_false = collect_nodes(node.if_false)
 
         # Join results
-        guards |= guards_true | guards_false
+        conditions |= conditions_true | conditions_false
         actions |= actions_true | actions_false
         states |= states_true | states_false
         generators |= generators_true | generators_false
@@ -38,10 +38,10 @@ def collect_nodes(node: DAGNode) -> Tuple[Set[Guard], Set[Action], Set[StateNode
         generators |= get_generators(node.action)
         if node.next is not None:
             # Collect nodes from subtree
-            guards_next, actions_next, states_next, generators_next = collect_nodes(node.next)
+            conditions_next, actions_next, states_next, generators_next = collect_nodes(node.next)
 
             # Join results
-            guards |= guards_next
+            conditions |= conditions_next
             actions |= actions_next
             states |= states_next
             generators |= generators_next
@@ -50,21 +50,21 @@ def collect_nodes(node: DAGNode) -> Tuple[Set[Guard], Set[Action], Set[StateNode
         states.add(node)
         # Collect nodes from subtrees
         for t in node.transitions:
-            guards_transition, actions_transition, states_transition, generators_transition = collect_nodes(t.next)
+            conditions_transition, actions_transition, states_transition, generators_transition = collect_nodes(t.next)
 
             # Join results
-            guards |= guards_transition
+            conditions |= conditions_transition
             actions |= actions_transition
             states |= states_transition
             generators |= generators_transition
 
-    return guards, actions, states, generators
+    return conditions, actions, states, generators
 
-class GuardCase(TypedDict):
-    """Class representing Guard context for generating"""
+class DecisionCase(TypedDict):
+    """Class representing Decision context for generating"""
     id: int
-    type: Literal["GuardCase"]
-    guard: Guard
+    type: Literal["DecisionCase"]
+    condition: Condition
     if_true: Case
     if_false: Case
 
@@ -83,7 +83,7 @@ class StateCase(TypedDict):
     state_node: StateNode
     transitions: List[Tuple[str, Case]]
 
-Case = GuardCase | ActionCase | StateCase
+Case = DecisionCase | ActionCase | StateCase
 
 def build_cases(node: DAGNode, counter: Iterator[int]) -> Case:
     """Traverse DAG and convert nodes to `Case`"""
@@ -91,11 +91,11 @@ def build_cases(node: DAGNode, counter: Iterator[int]) -> Case:
     # Determine unique node id used in switch
     node_id = next(counter)
 
-    if isinstance(node, GuardNode):
+    if isinstance(node, DecisionNode):
         return {
             "id": node_id,
-            "type": "GuardCase",
-            "guard": node.guard,
+            "type": "DecisionCase",
+            "condition": node.condition,
 
             # Process subtree nodes
             "if_true": build_cases(node.if_true, counter),
@@ -126,7 +126,7 @@ def flatten_cases(root: Case) -> List[Case]:
     # Recursive inorder traversing flattening function
     def flatten(node: Case) -> None:
         result.append(node)
-        if node["type"] == "GuardCase":
+        if node["type"] == "DecisionCase":
             flatten(node["if_true"])
             flatten(node["if_false"])
         elif node["type"] == "StateCase":
@@ -145,7 +145,7 @@ def get_cases(dag: DAG) -> List[Case]:
     root = build_cases(dag.root, count(0))
     return flatten_cases(root)
 
-def process_state_nodes(state_nodes: Set[StateNode], action_nodes: List[ChangeState], cases: List[Case]) -> None:
+def process_state_nodes(state_nodes: Set[StateNode], actions: List[ChangeState], cases: List[Case]) -> None:
     def find_case(id: str) -> StateCase:
         for case in cases:
             if case["type"] != "StateCase":
@@ -165,7 +165,7 @@ def process_state_nodes(state_nodes: Set[StateNode], action_nodes: List[ChangeSt
         node.attach_transition_ids(find_case(node.id))
     
     # Verify action references to StateNodes
-    for action in action_nodes:
+    for action in actions:
         if action.target not in state_node_map:
             raise ValueError(f"Undefined reference to state node in ChangeState action: {action.target}")
 

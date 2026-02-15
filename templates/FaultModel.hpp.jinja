@@ -3,7 +3,7 @@
 
 #include "Packet.hpp"
 #include "static/interfaces/State.hpp"
-#include "static/interfaces/Guard.hpp"
+#include "static/interfaces/Condition.hpp"
 #include "static/interfaces/Action.hpp"
 {% if require_calendar %}
 #include "static/calendar/Calendar.hpp"
@@ -11,8 +11,8 @@
 {% for state in states %}
 #include "states/{{ state.cpp_type() }}.hpp"
 {% endfor %}
-{% for guard in guards %}
-#include "guards/{{ guard.cpp_type() }}.hpp"
+{% for condition in conditions %}
+#include "conditions/{{ condition.cpp_type() }}.hpp"
 {% endfor %}
 {% for action in actions %}
 #include "actions/{{ action.cpp_type() }}.hpp"
@@ -30,9 +30,9 @@ namespace eliot_generated {
 {% for state in states %}
             {{ state.cpp_type() }} {{ state.cpp_name() }};
 {% endfor %}
-{% for guard in guards %}
-            {% if guard.is_state() %}
-            {{ guard.cpp_type() }} {{ guard.cpp_name() }}{{ guard.init() }};
+{% for condition in conditions %}
+            {% if condition.is_state() %}
+            {{ condition.cpp_type() }} {{ condition.cpp_name() }}{{ condition.init() }};
             {% endif %}
 {% endfor %}
 {% for action in actions %}

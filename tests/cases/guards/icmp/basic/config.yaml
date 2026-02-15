@@ -4,8 +4,8 @@ build:
   defaultAction: Finish
   rules:
     - type: all
-      guards: 
-        - guardType: ICMP
+      conditions: 
+        - conditionType: ICMP
           type: 8 
       actions:
         - actionType: Drop

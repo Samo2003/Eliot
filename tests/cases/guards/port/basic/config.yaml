@@ -1,11 +1,11 @@
-name: Basic port guard test
+name: Basic port condition test
 
 build:
   defaultAction: Drop
   rules:
     - type: all
-      guards: 
-        - guardType: Port
+      conditions: 
+        - conditionType: Port
           port: 5555
       actions:
         - actionType: Finish

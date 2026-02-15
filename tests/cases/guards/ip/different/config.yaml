@@ -4,8 +4,8 @@ build:
   defaultAction: Finish
   rules:
     - type: all
-      guards: 
-        - guardType: IP
+      conditions: 
+        - conditionType: IP
           src: 127.0.0.1
           dst: 10.0.10.1
       actions:

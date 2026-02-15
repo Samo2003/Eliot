@@ -1,11 +1,11 @@
-name: Different ports guard test
+name: Different ports condition test
 
 build:
   defaultAction: Drop
   rules:
     - type: all
-      guards: 
-        - guardType: Port
+      conditions: 
+        - conditionType: Port
           src: 4444
           dst: 5555
       actions:

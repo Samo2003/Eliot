@@ -4,8 +4,8 @@ build:
   defaultAction: Drop
   rules:
     - type: all
-      guards:
-        - guardType: Payload
+      conditions:
+        - conditionType: Payload
           pattern: aaaa
           end: -6   # +4 for seq number in payload
       actions:

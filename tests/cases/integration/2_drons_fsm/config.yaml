@@ -2,8 +2,8 @@ name: 2 FSM for 2 drones differentiated by IP
 
 build:
   root:
-    guard:
-      guardType: IP
+    condition:
+      conditionType: IP
       dst: 10.10.10.10
     if_true:
       id: drone1
@@ -11,8 +11,8 @@ build:
       transitions:
         - state: INIT
           next:
-            guard:
-              guardType: Payload
+            condition:
+              conditionType: Payload
               pattern: UP
               encoding: ascii
               l4: true
@@ -32,14 +32,14 @@ build:
 
         - state: UP
           next:
-            guard:
-              guardType: Payload
+            condition:
+              conditionType: Payload
               pattern: DOWN
               encoding: ascii
               l4: true
             if_true:
-              guard:
-                guardType: EveryN
+              condition:
+                conditionType: EveryN
                 N: 3
               if_true:
                 action:
@@ -61,8 +61,8 @@ build:
           
         - state: DOWN
           next:
-            guard:
-              guardType: Payload
+            condition:
+              conditionType: Payload
               pattern: DOWN
               encoding: ascii
               l4: true
@@ -80,8 +80,8 @@ build:
                 actionType: Finish
               final: true
     if_false:
-      guard:
-        guardType: IP
+      condition:
+        conditionType: IP
         dst: 10.10.10.20
       if_true:
         id: drone2
@@ -89,8 +89,8 @@ build:
         transitions:
           - state: INIT
             next:
-              guard:
-                guardType: Payload
+              condition:
+                conditionType: Payload
                 pattern: UP
                 encoding: ascii
                 l4: true
@@ -110,14 +110,14 @@ build:
 
           - state: UP
             next:
-              guard:
-                guardType: Payload
+              condition:
+                conditionType: Payload
                 pattern: DOWN
                 encoding: ascii
                 l4: true
               if_true:
-                guard:
-                  guardType: EveryN
+                condition:
+                  conditionType: EveryN
                   N: 3
                 if_true:
                   action:
@@ -139,8 +139,8 @@ build:
             
           - state: DOWN
             next:
-              guard:
-                guardType: Payload
+              condition:
+                conditionType: Payload
                 pattern: DOWN
                 encoding: ascii
                 l4: true

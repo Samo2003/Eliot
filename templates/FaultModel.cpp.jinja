@@ -6,8 +6,8 @@ namespace eliot_generated {
             switch (packet->state) {
 {% for node in cases %}
                 case {{ node.id }}:
-                    {% if node.type == "GuardCase" %}
-                    packet->state = {{ '!' if node.guard.invert else '' }}evaluate_guard{{ node.guard.cpp_call() }}packet) ? {{ node.if_true.id }} : {{ node.if_false.id }};
+                    {% if node.type == "DecisionCase" %}
+                    packet->state = {{ '!' if node.condition.invert else '' }}evaluate_condition{{ node.condition.cpp_call() }}packet) ? {{ node.if_true.id }} : {{ node.if_false.id }};
                     {% elif node.type == "StateCase" %}
                     packet->state = get_next_state({{ node.state_node.cpp_name() }});
                     {% else %}

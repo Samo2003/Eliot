@@ -1,11 +1,11 @@
-name: Dst port guard test
+name: Dst port condition test
 
 build:
   defaultAction: Drop
   rules:
     - type: all
-      guards: 
-        - guardType: Port
+      conditions: 
+        - conditionType: Port
           dst: 5555
       actions:
         - actionType: Finish

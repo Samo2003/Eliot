@@ -4,7 +4,7 @@ build:
   defaultAction: Finish
   rules:
     - type: all
-      guards: []
+      conditions: []
       actions:
         - actionType: Reorder
           n: 100

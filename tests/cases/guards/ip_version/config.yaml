@@ -4,8 +4,8 @@ build:
   defaultAction: Drop
   rules:
     - type: all
-      guards: 
-        - guardType: IPVersion
+      conditions: 
+        - conditionType: IPVersion
           v: 4
       actions:
         - actionType: Finish

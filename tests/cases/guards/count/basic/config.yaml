@@ -4,8 +4,8 @@ build:
   defaultAction: Finish
   rules:
     - type: all
-      guards: 
-        - guardType: Count
+      conditions: 
+        - conditionType: Count
           after: 4
       actions:
         - actionType: Drop

@@ -17,8 +17,8 @@ build:
             final: true
       - state: open
         next:
-          guard:
-            guardType: Count
+          condition:
+            conditionType: Count
             after: 3
           if_false:
             action: 

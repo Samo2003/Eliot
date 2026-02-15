@@ -1,11 +1,11 @@
-name: Basic prob guard test
+name: Basic prob condition test
 
 build:
   defaultAction: Drop
   rules:
     - type: all
-      guards: 
-        - guardType: Prob
+      conditions: 
+        - conditionType: Prob
           x: 0.5
       actions:
         - actionType: Finish

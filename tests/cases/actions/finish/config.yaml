@@ -4,7 +4,7 @@ build:
   defaultAction: Drop
   rules:
     - type: all
-      guards: []
+      conditions: []
       actions:
         - actionType: Finish
 

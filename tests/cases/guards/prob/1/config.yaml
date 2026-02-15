@@ -4,8 +4,8 @@ build:
   defaultAction: Drop
   rules:
     - type: all
-      guards: 
-        - guardType: Prob
+      conditions: 
+        - conditionType: Prob
           x: 1
       actions:
         - actionType: Finish

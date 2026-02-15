@@ -9,7 +9,7 @@ def generate_fault_model_header(
     env: Environment, 
     output_dir: str, 
     api: NFQueueApiBase, 
-    guards: Set[Guard], 
+    conditions: Set[Condition], 
     actions: Set[Action],
     state_nodes: Set[StateNode],
     require_calendar: bool
@@ -25,7 +25,7 @@ def generate_fault_model_header(
         env, template_name, output_path, 
         { 
             "api": api, 
-            "guards": guards, 
+            "conditions": conditions, 
             "actions": actions,
             "states": state_nodes,
             "require_calendar": require_calendar 

@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import Any, Dict, List, Optional, Set
 from pydantic import BaseModel, model_validator
 from .dag_base_model import DAGBaseModel
-from .guards import Guard
+from .conditions import Condition
 from .actions import Action
 
 class ActionNode(BaseModel):
@@ -26,11 +26,11 @@ class ActionNode(BaseModel):
             raise ValueError("Non final action node requires next node")
         return self
 
-class GuardNode(BaseModel):
-    """Represents a Guard node in DAG"""
+class DecisionNode(BaseModel):
+    """Represents a decision node in DAG"""
 
-    # Contains guard to check
-    guard: Guard
+    # Contains condition to check
+    condition: Condition
 
     # True branch
     if_true: DAGNode
@@ -118,10 +118,10 @@ class StateNode(DAGBaseModel):
             transition.attach_id(state_transition_map[transition.state])
 
 # Define DAGNode Union type
-DAGNode = ActionNode | GuardNode | StateNode
+DAGNode = ActionNode | DecisionNode | StateNode
 
 class DAG(BaseModel):
-    """DAG root container containing Action node, Guard node or State node"""
+    """DAG root container containing Action node, Condition node or State node"""
 
     # DAG root node
     root: DAGNode

@@ -1,0 +1,42 @@
+from typing import Literal
+from pydantic import model_validator
+from ..generators.base import ValueGeneratorBase
+from .base import ConditionBase
+from ..generators import ValueGeneratorFloat
+
+class Prob(ConditionBase[Literal["Prob"]]):
+    """Fulfils based on probability"""
+
+    # Probability <0,1>
+    x: float | ValueGeneratorFloat
+
+    @model_validator(mode="after")
+    def validate_x(self):
+        if isinstance(self.x, float) and (self.x < 0 or self.x > 1):
+            raise ValueError("x must be in range <0,1>")
+        elif isinstance(self.x, ValueGeneratorBase):
+            if self.x.min is None:
+                self.x.min = 0
+            elif self.x.min < 0:
+                raise ValueError("min must be non negative")
+
+            if self.x.max is None:
+                self.x.max = 1
+            elif self.x.max > 1:
+                raise ValueError("max must be smaller than 1")
+            
+            if self.x.max < self.x.min:
+                raise ValueError("max must be bigger than min")
+        return self
+    
+    def cpp_type(self) -> str:
+        if isinstance(self.x, float):
+            return f"{self.cpp_type_base()}_{str(self.x).replace('.', '_')}"
+        return f"{self.cpp_type_base()}_{self.x}{'_' + str(id(self)) if self.is_state() else ''}"
+    
+    def is_state(self) -> bool:
+        return isinstance(self.x, ValueGeneratorBase) and self.x.is_state()
+    
+    def not_generator_x(self) -> bool:
+        """Condition used in generating representing if x is a generator"""
+        return isinstance(self.x, float)

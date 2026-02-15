@@ -1,6 +1,6 @@
 from typing import List, Literal
 from pydantic import BaseModel
-from ..DAG.guards import Guard
+from ..DAG.conditions import Condition
 from ..DAG.actions import Action
 import os
 import yaml
@@ -12,7 +12,7 @@ class Rule(BaseModel):
     """Represent rule in test case"""
 
     type: Literal["all", "any"]
-    guards: List[Guard]
+    conditions: List[Condition]
     actions: List[Action]
 
 class TestCase(BaseModel):
