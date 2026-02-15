@@ -3,6 +3,7 @@
 
 #include {{ api.include() }}
 #include <vector>
+#include "static/ItemPool.hpp"
 
 namespace eliot_generated {
     enum class PacketResult { Drop, Finish, Calendar, Processing };
@@ -10,6 +11,15 @@ namespace eliot_generated {
     struct Packet {
         explicit inline Packet({{ api.packet_type() }}&& packet) noexcept 
             : _packet(std::move(packet)) {}
+
+        template<typename... Args>
+        static inline Packet* acquire(Args&&... args) {
+            return _packet_pool().acquire(std::forward<Args>(args)...);
+        }
+
+        static inline void release(Packet *p) noexcept {
+            _packet_pool().release(p);
+        }
 
         inline {{ api.packet_type() }}&& move_packet() noexcept { return std::move(_packet); }
         
@@ -42,6 +52,16 @@ namespace eliot_generated {
             mutable int _l4_offset = -1;
             mutable int _nh = -1;
             mutable bool _l4_parsed = false;
+
+            static inline ItemPool<Packet>& _packet_pool() {
+                static ItemPool<Packet, 4096> pool;
+                return pool;
+            }
+
+            static void* operator new(std::size_t) = delete;
+            static void  operator delete(void*) = delete;
+            static void* operator new[](std::size_t) = delete;
+            static void  operator delete[](void*) = delete;
 
             inline void _parse_l4() const noexcept {
                 const std::vector<uint8_t>& p = payload();

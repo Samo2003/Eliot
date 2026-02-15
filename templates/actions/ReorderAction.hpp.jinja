@@ -89,7 +89,7 @@ namespace eliot_generated {
          */
         ~{{ action.cpp_type() }}() {
             for (int i = 0; i < _buffer_index; i++)
-                delete _buffer[i];
+                Packet::release(_buffer[i]);
         }
 
         private:

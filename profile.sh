@@ -13,26 +13,25 @@ if [[ "$MODE" == "clean" ]]; then
     exit 0
 fi
 
-# Run the program
-./eliot &
-ELIOT_PID=$!
-
 if [[ "$MODE" == "mac" ]]; then
-    rm -rf perf.trace
+    mkdir -p "$OUTPUT_DIR"
+
+    pushd "$OUTPUT_DIR" > /dev/null
 
     xctrace record \
         --template "Time Profiler" \
         --time-limit 10s \
-        --attach $ELIOT_PID \
-        --output perf.trace
+        --launch -- ../eliot
 
-    kill -SIGINT $ELIOT_PID
-    wait $ELIOT_PID || true
-
-    rm -rf "$OUTPUT_DIR/perf.trace"
-    mv perf.trace "$OUTPUT_DIR/"
-    open "$OUTPUT_DIR/perf.trace"
+    popd > /dev/null
 elif [[ "$MODE" == "linux" ]]; then
+    # Run the program
+    ./eliot &
+    ELIOT_PID=$!
+    
+    # Wait for process startup
+    sleep 0.5
+
     perf record -F 999 -g -p $ELIOT_PID -- sleep 20
 
     kill -SIGINT $ELIOT_PID

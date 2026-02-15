@@ -9,16 +9,15 @@
 namespace nf_queue_profiling {
     class NFQueue {
         public: 
-            NFQueue() {
-                _packets.reserve(_PACKET_COUNT);
-
-                for (size_t i = 0; i < _PACKET_COUNT; i++) {
-                    _packets.emplace_back(NFQueuePacket(_template_payload));
-                }
-            }
+            NFQueue() 
+                : _template_payload{_PAYLOAD_SIZE, 0xAB},
+                  _packet(_template_payload)
+            {}
 
             inline NFQueuePacket* get_packet() noexcept {
-                return _index < _PACKET_COUNT ? &_packets[_index++] : nullptr;
+                if (_index >= _PACKET_COUNT) return nullptr;
+                ++_index;
+                return &_packet;
             }
 
             inline void accept_packet(NFQueuePacket&& packet) const noexcept {}
@@ -33,8 +32,9 @@ namespace nf_queue_profiling {
         private:
             static constexpr size_t _PACKET_COUNT = 100000000;
             static constexpr size_t _PAYLOAD_SIZE = 128;
-            std::vector<NFQueuePacket> _packets;
-            std::vector<uint8_t> _template_payload{_PAYLOAD_SIZE, 0xAB};
+
+            std::vector<uint8_t> _template_payload;
+            NFQueuePacket _packet;
             size_t _index = 0;
     };
 }

@@ -3,12 +3,10 @@
 
 #include <stdint.h>
 #include <concepts>
-#include "../Packet.hpp"
 
 namespace eliot_generated {
     template<typename T>
     concept BucketItem = requires(T* item) {
-        { item->packet } -> std::convertible_to<Packet*>;
         { item->next }   -> std::convertible_to<T*>;
     };
 
@@ -32,16 +30,6 @@ namespace eliot_generated {
             if (!_head) 
                 _tail = nullptr;
             return item;
-        }
-
-        ~Bucket() noexcept {
-            Item* item = _head;
-            while (item) {
-                Item* next = item->next;
-                delete item->packet;
-                delete item;
-                item = next;
-            }
         }
         
         private:

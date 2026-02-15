@@ -12,7 +12,7 @@ namespace eliot_generated {
         uint64_t due_tick = _current_tick_from_clock() + delay;
 
         // Create new item
-        CalendarItem* item = new CalendarItem{ due_tick, packet, nullptr };
+        CalendarItem* item = _item_pool.acquire(due_tick, packet);
 
         // Number of ticks from now till due tick
         uint64_t diff = (due_tick > _current_tick) ? (due_tick - _current_tick) : 0;
@@ -87,7 +87,7 @@ namespace eliot_generated {
             // Check current bucket for packet
             if (CalendarItem* item = bucket.pop()) {
                 Packet* packet = item->packet;
-                delete item;
+                _item_pool.release(item);
                 _size--;
                 // Change packet state back to processing
                 packet->result = PacketResult::Processing;
@@ -108,5 +108,23 @@ namespace eliot_generated {
 
         // No packets ready to process yet
         return nullptr;
+    }
+
+    void Calendar::_clear_wheel(std::array<BucketT, _SLOTS>& wheel) noexcept {
+        for (uint32_t i = 0; i < _SLOTS; i++) {
+            CalendarItem *item;
+            while ((item = wheel[i].pop())) {
+                Packet::release(item->packet);
+                _item_pool.release(item);
+            }
+        }
+    }
+
+    Calendar::~Calendar() noexcept {
+        _clear_wheel(_wheel0);
+        _clear_wheel(_wheel1);
+        _clear_wheel(_wheel2);
+
+        _size = 0;
     }
 }

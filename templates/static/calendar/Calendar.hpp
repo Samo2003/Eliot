@@ -6,6 +6,8 @@
 #include <array>
 #include "../Time.hpp"
 #include "../Bucket.hpp"
+#include "../ItemPool.hpp"
+#include "../../Packet.hpp"
 
 namespace eliot_generated {
     struct Calendar {
@@ -14,6 +16,8 @@ namespace eliot_generated {
         Packet* get_ready() noexcept;
 
         inline bool empty() const noexcept { return _size == 0; }
+
+        ~Calendar() noexcept;
 
         private:
             static constexpr uint32_t _SLOTS = 256;
@@ -28,9 +32,16 @@ namespace eliot_generated {
             uint64_t _current_tick = 0;
         
             struct CalendarItem {
+                CalendarItem(uint64_t t, Packet *p) noexcept : tick(t), packet(p), next(nullptr) {}
+
                 uint64_t tick;
                 Packet* packet;
                 CalendarItem* next = nullptr;
+
+                static void* operator new(std::size_t) = delete;
+                static void operator delete(void*) = delete;
+                static void* operator new[](std::size_t) = delete;
+                static void  operator delete[](void*) = delete;
             };
 
             using BucketT = Bucket<CalendarItem>;
@@ -39,8 +50,12 @@ namespace eliot_generated {
             std::array<BucketT, _SLOTS> _wheel1{};
             std::array<BucketT, _SLOTS> _wheel2{};
 
+            ItemPool<CalendarItem, 4096> _item_pool;
+
             void _cascade_from_L1() noexcept;
             void _cascade_from_L2() noexcept;
+
+            void _clear_wheel(std::array<BucketT, _SLOTS>& wheel) noexcept;
             
             inline uint64_t _current_tick_from_clock() const noexcept {
                 uint64_t now = get_global_time();

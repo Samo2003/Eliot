@@ -26,14 +26,11 @@ namespace eliot_generated {
 
     inline uint64_t read_clock_ms() {
         static mach_timebase_info_data_t tb = {0};
-        static double factor = 0.0;
+        if (tb.denom == 0) mach_timebase_info(&tb);
 
-        if (factor == 0.0) {
-            mach_timebase_info(&tb);
-            factor = (double)tb.numer / (double)tb.denom / 1000000.0;
-        }
-
-        return (uint64_t)(mach_absolute_time() * factor);
+        uint64_t t = mach_absolute_time();
+        uint64_t ns = (t * tb.numer) / tb.denom;
+        return ns / 1000000ull;
     }
 
     #endif
