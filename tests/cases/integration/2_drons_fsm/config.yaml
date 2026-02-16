@@ -24,11 +24,9 @@ build:
               next:
                 action:
                   actionType: Finish
-                final: true
             if_false:
               action:
                 actionType: Finish
-              final: true
 
         - state: UP
           next:
@@ -49,15 +47,12 @@ build:
                 next:
                   action:
                     actionType: Finish
-                  final: true
               if_false:
                 action:
                   actionType: Drop
-                final: true
             if_false:
               action:
                 actionType: Finish
-              final: true
           
         - state: DOWN
           next:
@@ -74,11 +69,9 @@ build:
               next:
                 action:
                   actionType: Finish
-                final: true
             if_false:
               action:
                 actionType: Finish
-              final: true
     if_false:
       condition:
         conditionType: IP
@@ -102,11 +95,9 @@ build:
                 next:
                   action:
                     actionType: Finish
-                  final: true
               if_false:
                 action:
                   actionType: Finish
-                final: true
 
           - state: UP
             next:
@@ -127,15 +118,12 @@ build:
                   next:
                     action:
                       actionType: Finish
-                    final: true
                 if_false:
                   action:
                     actionType: Drop
-                  final: true
               if_false:
                 action:
                   actionType: Finish
-                final: true
             
           - state: DOWN
             next:
@@ -152,15 +140,12 @@ build:
                 next:
                   action:
                     actionType: Finish
-                  final: true
               if_false:
                 action:
                   actionType: Finish
-                final: true
       if_false:
         action:
           actionType: Finish
-        final: true
 
 send:
   - dst: 10.10.10.10      # drone 1 state -> UP

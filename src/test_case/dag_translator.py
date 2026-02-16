@@ -15,11 +15,10 @@ def build_action_chain(actions: List[Action], default_node: ActionNode | Decisio
     # Iterates in reversed to build list from bottom
     for i, action in enumerate(reversed(actions)):
         # First action is final if it is one of final action nodes
-        final = i == 0 and action.actionType in ["Finish", "Drop"]
+        final = i == 0 and action.is_final()
 
         next_node = ActionNode(
             action=action, 
-            final=final,
             next=None if final else next_node           # Final actions dont have next
         )
 
@@ -63,7 +62,7 @@ def translate_to_DAG(test_case: TestCase) -> DAG:
     default_action = Drop(actionType="Drop") if test_case.defaultAction == "Drop" else Finish(actionType="Finish")
 
     # Creates default ActionNode to add to the bottom of the tree
-    default_node = ActionNode(final=True, action=default_action, next=None)
+    default_node = ActionNode(action=default_action, next=None)
 
     # No rules given default action is applied to all packets
     if not test_case.rules:

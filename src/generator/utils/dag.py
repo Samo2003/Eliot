@@ -60,7 +60,6 @@ def collect_nodes(node: DAGNode) -> Tuple[Set[Condition], Set[Action], Set[State
 
     return conditions, actions, states, generators
 
-
 class DecisionCase(TypedDict):
     """Class representing Decision context for generating"""
 
@@ -118,7 +117,7 @@ def build_cases(node: DAGNode, counter: Iterator[int], path: List[str]) -> Case:
             "id": node_id,
             "type": "ActionCase",
             "action": node.action,
-            "final": node.final,
+            "final": node.action.is_final(),
             # Process subtree node if present
             "next": build_cases(node.next, counter, path + [f"ACTION({node.action.actionType})"]) if node.next else None,
             "path": path,

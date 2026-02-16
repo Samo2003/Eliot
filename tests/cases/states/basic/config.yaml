@@ -14,12 +14,10 @@ build:
           next:
             action: 
               actionType: Finish
-            final: true
       - state: end
         next:
           action: 
             actionType: Drop
-          final: true
 
 send:
   - count: 5

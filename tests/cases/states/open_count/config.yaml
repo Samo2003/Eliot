@@ -14,7 +14,6 @@ build:
           next:
             action: 
               actionType: Drop
-            final: true
       - state: open
         next:
           condition:
@@ -23,7 +22,6 @@ build:
           if_false:
             action: 
               actionType: Finish
-            final: true
           if_true:
             action: 
               actionType: ChangeState
@@ -32,12 +30,10 @@ build:
             next:
               action: 
                 actionType: Drop
-              final: true
       - state: close
         next:
           action:
             actionType: Drop
-          final: true
 
 send:
   - count: 7

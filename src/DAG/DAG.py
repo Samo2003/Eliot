@@ -8,9 +8,6 @@ from .actions import Action
 class ActionNode(BaseModel):
     """Represents an Action node in DAG"""
 
-    # Indicates if action is final
-    final: bool = False
-
     # Contains action to perform
     action: Action
 
@@ -20,9 +17,9 @@ class ActionNode(BaseModel):
     @model_validator(mode="after")
     def check_next_vs_final(self):
         """Final node cannot have next and non final node must have next"""
-        if self.final and self.next is not None:
+        if self.action.is_final() and self.next is not None:
             raise ValueError("Final action node can't have next")
-        if not self.final and self.next is None:
+        if not self.action.is_final() and self.next is None:
             raise ValueError("Non final action node requires next node")
         return self
 

@@ -23,7 +23,7 @@ int main() {
             {% endif %}
 
             if (auto{{ '' if api.returns_optional() else '*' }} maybe_packet = q{{ api.get_packet() }}) {
-                auto packet = Packet::acquire((std::move(*maybe_packet)));
+                auto packet = Packet::acquire(std::move(*maybe_packet));
                 model.evaluate(packet);
 
                 if (packet->result == PacketResult::Drop) {
