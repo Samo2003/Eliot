@@ -5,6 +5,9 @@ namespace eliot_generated {
         while (packet->result == PacketResult::Processing) {
             switch (packet->state) {
 {% for node in cases %}
+
+                // PATH: {{ node.path | join(" -> ") }}
+                // NODE: {{ node.label }}
                 case {{ node.id }}:
                     {% if node.type == "DecisionCase" %}
                     packet->state = {{ '!' if node.condition.invert else '' }}evaluate_condition{{ node.condition.cpp_call() }}packet) ? {{ node.if_true.id }} : {{ node.if_false.id }};
@@ -18,6 +21,7 @@ namespace eliot_generated {
                     {% endif %}
                     continue;
 {% endfor %}
+
                 default:
                     packet->result = PacketResult::Finish;
             }

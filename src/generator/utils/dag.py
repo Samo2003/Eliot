@@ -60,32 +60,42 @@ def collect_nodes(node: DAGNode) -> Tuple[Set[Condition], Set[Action], Set[State
 
     return conditions, actions, states, generators
 
+
 class DecisionCase(TypedDict):
     """Class representing Decision context for generating"""
+
     id: int
     type: Literal["DecisionCase"]
     condition: Condition
     if_true: Case
     if_false: Case
+    path: List[str]
+    label: str
 
 class ActionCase(TypedDict):
     """Class representing Action context for generating"""
+
     id: int
     type: Literal["ActionCase"]
     action: Action
     final: bool
     next: Optional[Case]
+    path: List[str]
+    label: str
 
 class StateCase(TypedDict):
     """Class representing State context for generating"""
+
     id: int
     type: Literal["StateCase"]
     state_node: StateNode
     transitions: List[Tuple[str, Case]]
+    path: List[str]
+    label: str
 
 Case = DecisionCase | ActionCase | StateCase
 
-def build_cases(node: DAGNode, counter: Iterator[int]) -> Case:
+def build_cases(node: DAGNode, counter: Iterator[int], path: List[str]) -> Case:
     """Traverse DAG and convert nodes to `Case`"""
 
     # Determine unique node id used in switch
@@ -98,8 +108,10 @@ def build_cases(node: DAGNode, counter: Iterator[int]) -> Case:
             "condition": node.condition,
 
             # Process subtree nodes
-            "if_true": build_cases(node.if_true, counter),
-            "if_false": build_cases(node.if_false, counter),
+            "if_true": build_cases(node.if_true, counter, path + [f"DECISION({node.condition.conditionType})=true"]),
+            "if_false": build_cases(node.if_false, counter, path + [f"DECISION({node.condition.conditionType})=false"]),
+            "path": path,
+            "label": f"DECISION({node.condition.conditionType})"
         }
     elif isinstance(node, ActionNode):
         return {
@@ -108,14 +120,18 @@ def build_cases(node: DAGNode, counter: Iterator[int]) -> Case:
             "action": node.action,
             "final": node.final,
             # Process subtree node if present
-            "next": build_cases(node.next, counter) if node.next else None
+            "next": build_cases(node.next, counter, path + [f"ACTION({node.action.actionType})"]) if node.next else None,
+            "path": path,
+            "label": f"ACTION({node.action.actionType})"
         }
     else:
         return {
             "id": node_id,
             "type": "StateCase",
             "state_node": node,
-            "transitions": [(transition.state, build_cases(transition.next, counter)) for transition in node.transitions]
+            "transitions": [(transition.state, build_cases(transition.next, counter, path + [f"STATE({node.id})={transition.state}"])) for transition in node.transitions],
+            "path": path,
+            "label": f"STATE({node.id})"
         }
 
 def flatten_cases(root: Case) -> List[Case]:
@@ -142,7 +158,7 @@ def get_cases(dag: DAG) -> List[Case]:
     """Creates case list context from DAG"""
 
     # Uses iterator to guarantee unique node ids
-    root = build_cases(dag.root, count(0))
+    root = build_cases(dag.root, count(0), ["ROOT"])
     return flatten_cases(root)
 
 def process_state_nodes(state_nodes: Set[StateNode], actions: List[ChangeState], cases: List[Case]) -> None:
