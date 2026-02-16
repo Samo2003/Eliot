@@ -10,6 +10,9 @@ class Prob(ConditionBase[Literal["Prob"]]):
     # Probability <0,1>
     x: float | ValueGeneratorFloat
 
+    # Set generator seed to ensure determinism
+    seed: int | None = None
+
     @model_validator(mode="after")
     def validate_x(self):
         if isinstance(self.x, float) and (self.x < 0 or self.x > 1):
@@ -27,6 +30,9 @@ class Prob(ConditionBase[Literal["Prob"]]):
             
             if self.x.max < self.x.min:
                 raise ValueError("max must be bigger than min")
+            
+        if self.seed is not None and self.seed < 0:
+            raise ValueError("Seed value has to be a positive integer")
         return self
     
     def cpp_type(self) -> str:
@@ -40,3 +46,8 @@ class Prob(ConditionBase[Literal["Prob"]]):
     def not_generator_x(self) -> bool:
         """Condition used in generating representing if x is a generator"""
         return isinstance(self.x, float)
+    
+    def seed_value(self) -> int:
+        if self.seed is not None:
+            return self.seed
+        return super().seed_value()

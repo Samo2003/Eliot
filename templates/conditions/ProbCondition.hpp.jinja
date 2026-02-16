@@ -13,6 +13,7 @@
 #ifndef {{ condition.hpp_define() }}
 #define {{ condition.hpp_define() }}
 
+#include <bit>
 #include "../Packet.hpp"
 #include "../static/xoroshiro128plus.hpp"
 {% if not condition.not_generator_x() %}
@@ -52,16 +53,18 @@ namespace eliot_generated {
             ///> Pseudo-random number generator.
             inline static xoroshiro128plus _rng{ {{ condition.seed_value() }} };
 
-            ///> Normalization constant for mapping random integers to [0,1).
-            static constexpr double _inv = 1.0 / double(UINT64_MAX);
-
             /**
-             * @brief Generates a uniformly distributed probability value.
+             * @brief Uniform random float in interval [0, 1).
              *
-             * @return Double in range [0,1).
+             * Uses bit manipulation to construct a float in [1, 2)
+             * by setting exponent bits to 127 (0x3F800000),
+             * then subtracts 1.0f.
+             * 
+             * @return Float value in interval [0, 1).
              */
-            inline static double _prob() noexcept { 
-                return  double(_rng.next()) * _inv; 
+            inline static float _prob() noexcept {
+                uint32_t r = static_cast<uint32_t>(_rng.next() >> 40);
+                return std::bit_cast<float>(0x3F800000u | r) - 1.0f;
             }
             {% if not condition.not_generator_x() and condition.x.is_state() %}
 
