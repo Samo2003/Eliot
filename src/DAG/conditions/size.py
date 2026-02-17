@@ -1,4 +1,6 @@
 from typing import Literal
+
+from pydantic import model_validator
 from ..generators.base import ValueGeneratorBase
 from ..generators import ValueGeneratorInt
 from .base import ConditionBase
@@ -11,6 +13,12 @@ class Size(ConditionBase[Literal["Size"]]):
 
     # Compare operation
     op: Literal["lt", "le", "eq", "ge", "gt"]
+
+    @model_validator(mode="after")
+    def validate_size(self):
+        if isinstance(self.size, int) and self.size < 0:
+            raise ValueError("Size has to be a positive integer")
+        return self
 
     def cpp_type(self) -> str:
         return f"{self.cpp_type_base()}_{self.size}_{self.op}{'_' + str(id(self)) if self.is_state() else ''}"

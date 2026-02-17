@@ -18,7 +18,7 @@
 namespace eliot_generated {
 
     /**
-     * @brief Stateless protocol-based condition condition.
+     * @brief Stateless protocol-based condition.
      *
      * This condition is fulfilled only for packets whose protocol
      * (IPv4 Protocol field or IPv6 Next Header field)
@@ -27,7 +27,7 @@ namespace eliot_generated {
     struct {{ condition.cpp_type() }} {
 
         /**
-         * @brief Evaluates whether the condition condition is fulfilled.
+         * @brief Evaluates whether the condition is fulfilled.
          *
          * The condition queries the protocol field at the configured
          * network-layer position and compares it against

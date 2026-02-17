@@ -15,6 +15,10 @@ class UniformBase(ValueGeneratorBase[T, N], ABC):
         return self
     
     @final
+    def _apply_factor_inner(self, factor: int) -> None:
+        """Just to implement abstract method nothing to do"""
+    
+    @final
     def get_min_max(self) -> Tuple[N, N]:
         """Convert interval range to specified type for Pylance"""
         min_val = cast(N, self.min)
@@ -23,8 +27,7 @@ class UniformBase(ValueGeneratorBase[T, N], ABC):
     
     @final
     def cpp_type(self) -> str:
-        min_val, max_val = self.get_min_max()
-        return f"{self.cpp_type_base()}_{self.N_to_str(min_val)}_{self.N_to_str(max_val)}_{self.once}"
+        return self.cpp_type_base()
 
 class UniformFloat(UniformBase[Literal["UniformFloat"], float]):
     """Uniform Float value generator"""

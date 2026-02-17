@@ -27,10 +27,7 @@ class TimePeriod(ConditionBase[Literal["TimePeriod"]]):
             if self.t <= 0:
                 raise ValueError("t must be greater that zero")
         else:
-            if self.t.min is not None:
-                self.t.min *= FACTORS[self.unit]
-            if self.t.max is not None:
-                self.t.max *= FACTORS[self.unit]
+            self.t.apply_factor(FACTORS[self.unit])
         
         if self.f is None:
             self.f = self.t
@@ -39,10 +36,7 @@ class TimePeriod(ConditionBase[Literal["TimePeriod"]]):
             if self.f <= 0:
                 raise ValueError("f must be greater that zero")
         else:
-            if self.f.min is not None:
-                self.f.min *= FACTORS[self.unit]
-            if self.f.max is not None:
-                self.f.max *= FACTORS[self.unit]
+            self.f.apply_factor(FACTORS[self.unit])
         self.unit = "ms"
         return self
     

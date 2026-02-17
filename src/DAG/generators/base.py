@@ -48,7 +48,7 @@ class ValueGeneratorBase(DAGBaseModel, Generic[T, N], ABC):
     @final
     def cpp_type_base(self) -> str:
         """Returns common generator base name"""
-        return f"{self.generatorType}Generator"
+        return f"{self.generatorType}Generator_{self.N_to_str(self.min)}_{self.N_to_str(self.min)}_{self.once}_{self.seed}"
     
     @abstractmethod
     def value(self) -> N:
@@ -56,7 +56,22 @@ class ValueGeneratorBase(DAGBaseModel, Generic[T, N], ABC):
         pass
 
     @final
-    def N_to_str(self, x: float | int) -> str:
+    def apply_factor(self, factor: int) -> None:
+        """Apply scaling factor to all generator attributes"""
+        if self.min is not None:
+            self.min *= factor      # type: ignore
+        if self.max is not None:
+            self.max *= factor      # type: ignore
+
+        self._apply_factor_inner(factor)
+
+    @abstractmethod
+    def _apply_factor_inner(self, factor: int) -> None:
+        """Apply scaling factor to generator type specific attributes"""
+        pass 
+
+    @final
+    def N_to_str(self, x: float | int | None) -> str:
         """Converts generic type to string representation for C++ type names"""
         return str(x).replace('.', '_')
     

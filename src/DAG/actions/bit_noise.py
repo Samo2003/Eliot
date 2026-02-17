@@ -33,18 +33,19 @@ class BitNoise(ActionBase[Literal["BitNoise"]]):
         if self.x is not None and isinstance(self.x, float) and not (0 <= self.x <= 1):
             raise ValueError("x must be between 0 and 1")
         if self.x is not None and isinstance(self.x, ValueGeneratorBase):
-            if self.x.min is None:
-                self.x.min = 0
-            elif not (0 <= self.x.min <= 1):
+            if self.x.min is not None and not (0 <= self.x.min <= 1):
                 raise ValueError("x must be between 0 and 1")
             if self.x.max is None:
                 self.x.max = 1
             elif not (0 <= self.x.max <= 1):
                 raise ValueError("x must be between 0 and 1")
-            if self.x.min > self.x.max:
+            if self.x.min is not None and self.x.min > self.x.max:
                 raise ValueError("Generator cannot produce values")
-        if self.n is not None and isinstance(self.n, int) and self.n < 0:
-            raise ValueError("n must be >= 0")
+        if self.n is not None:
+            if isinstance(self.n, int) and self.n <= 0:
+                raise ValueError("n must be > 0")
+            elif isinstance(self.n, ValueGeneratorBase) and self.n.min is not None and self.n.min <= 0:
+                raise ValueError("n must be > 0")
         if self.end is not None:
             if isinstance(self.start, int) and isinstance(self.end, int):
                 if self.start == self.end:
@@ -60,7 +61,7 @@ class BitNoise(ActionBase[Literal["BitNoise"]]):
         state_n = isinstance(self.n, ValueGeneratorBase) and self.n.is_state()
         state_start = isinstance(self.start, ValueGeneratorBase) and self.start.is_state()
         state_end = isinstance(self.end, ValueGeneratorBase) and self.end.is_state()
-        return state_x or state_n or state_start or state_end or self.mode == "random"
+        return state_x or state_n or state_start or state_end
     
     def cpp_type(self) -> str:
         type_name = f"{super().cpp_type_base()}_{self.x}_{self.n}_{self.start}_{self.end}_{self.mode.upper()}_{self.layer.upper()}"

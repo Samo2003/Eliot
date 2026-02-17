@@ -27,11 +27,14 @@ class Port(ConditionBase[Literal["Port"]]):
 
         for port in ports:
             if port < 0 or port > 65535:
-                    raise ValueError(f"invalid port number: {port}")
+                raise ValueError(f"invalid port number: {port}")
         return self
     
     def cpp_type(self) -> str:
         parts = [super().cpp_type_base()]
+
+        if self.port is not None:
+            parts.append(f"any_{self.port}")
 
         if self.src is not None:
             parts.append(f"src_{self.src}")

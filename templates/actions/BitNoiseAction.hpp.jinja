@@ -124,7 +124,7 @@ namespace eliot_generated {
 
             // Determine half open window interval
             const uint64_t beg_bit = static_cast<uint64_t>(layer_beg_bit) + beg_relative;
-            const uint64_t end_bit = {{ 'static_cast<uint64_t>(layer_end_bit)' if action.end is none else 'static_cast<uint64_t>(layer_beg_bit) + end_relative' }};
+            const uint64_t end_bit = static_cast<uint64_t>{{ '(layer_end_bit)' if action.end is none else '(layer_beg_bit) + end_relative' }};
             const uint64_t range = end_bit - beg_bit;
 
             {% if action.x is not none %}
@@ -187,24 +187,28 @@ namespace eliot_generated {
                 if (byte_index < p.size())
                     p[byte_index] ^= mask;
             }
-
             {% if action.mode == "random" %}
+            
             ///> Pseudo-random number generator used for random bit selection.
             inline static xoroshiro128plus _rng{ {{ action.seed_value() }} };
             {% endif %}
             {% if action.x is not none and not action.not_generator_x() and action.x.is_state() %}
+
             ///> Generator providing dynamic values for parameter x.
             inline static {{ action.x.cpp_type() }} {{ action.x.cpp_name() }};
             {% endif %}
             {% if action.n is not none and not action.not_generator_n() and action.n.is_state() %}
+
             ///> Generator providing dynamic values for parameter n.
             inline static {{ action.n.cpp_type() }} {{ action.n.cpp_name() }};
             {% endif %}
             {% if not action.not_generator_start() and action.start.is_state() %}
+
             ///> Generator providing dynamic values for parameter start.
             inline static {{ action.start.cpp_type() }} {{ action.start.cpp_name() }};
             {% endif %}
             {% if action.end is not none and not action.not_generator_end() and action.end.is_state() %}
+
             ///> Generator providing dynamic values for parameter end.
             inline static {{ action.end.cpp_type() }} {{ action.end.cpp_name() }};
             {% endif %}

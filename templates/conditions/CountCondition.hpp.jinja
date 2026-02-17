@@ -18,7 +18,7 @@
 namespace eliot_generated {
 
     /**
-     * @brief Counter-based condition condition.
+     * @brief Counter-based condition.
      *
      * This condition becomes fulfilled after a specified number of
      * packet evaluations. 
@@ -29,7 +29,7 @@ namespace eliot_generated {
     struct {{ condition.cpp_type() }} {
 
         /**
-         * @brief Evaluates whether the condition condition is fulfilled.
+         * @brief Evaluates whether the condition is fulfilled.
          *
          * The condition activates after {{ condition.after }} packet evaluations.
         {% if condition.duration is not none %}
@@ -37,7 +37,7 @@ namespace eliot_generated {
         {% endif %}
          *
          * @param packet Pointer to the evaluated packet (unused).
-         * @return true if the condition condition is satisfied.
+         * @return true if the condition is satisfied.
          */
         inline bool fulfilled(const Packet* /*packet*/) noexcept {
             {% if condition.duration is none %}

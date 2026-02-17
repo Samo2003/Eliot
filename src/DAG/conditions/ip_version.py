@@ -8,4 +8,4 @@ class IPVersion(ConditionBase[Literal["IPVersion"]]):
     v: Literal[4, 6] = 4
 
     def cpp_type(self) -> str:
-        return super().cpp_type_base()
+        return f"{super().cpp_type_base()}_{self.v}"

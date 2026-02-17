@@ -28,11 +28,17 @@ class SeqCountBase(ValueGeneratorBase[T, N], ABC):
             raise ValueError("T must be >= 1")
         if self.seed is not None:
             raise ValueError(f"Seed value has no effect in {self.generatorType}")
+        if self.mode == "reverse" and self.step >= 0 and self.max is None:
+            raise ValueError("max bound has to be defined for reverse mode with positive step")
         return self
     
     @final
+    def _apply_factor_inner(self, factor: int) -> None:
+        self.step *= factor    # type: ignore
+    
+    @final
     def cpp_type(self) -> str:
-        return f"{super().cpp_type_base()}_{self.T}_{self.N_to_str(self.step)}_{self.mode.upper()}_{self.once}_{id(self)}"
+        return f"{self.cpp_type_base()}_{self.T}_{self.N_to_str(self.step)}_{self.mode.upper()}_{id(self)}"
     
     @final
     def is_state(self) -> bool:

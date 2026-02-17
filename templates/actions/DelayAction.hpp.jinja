@@ -57,7 +57,7 @@ namespace eliot_generated {
             Calendar& _calendar;
             {% if not action.not_generator_n() and action.n.is_state() %}
             ///> Generator providing dynamic delay values.
-            {{ action.t.cpp_type() }} {{ action.t.cpp_name() }};
+            {{ action.n.cpp_type() }} {{ action.n.cpp_name() }};
             {% endif %}
     };
 }

@@ -15,7 +15,7 @@ class Time(ConditionBase[Literal["Time"]]):
     # If `True` time is counted from starting eliot else from first packet checked by condition
     instant: bool = False
 
-    # Time units, also applied for generator
+    # Time units
     unit: Literal["ms", "s", "min", "h"] = "ms"
 
     @model_validator(mode="after")
@@ -24,7 +24,7 @@ class Time(ConditionBase[Literal["Time"]]):
         self.after *= FACTORS[self.unit]
         if self.duration is not None:
             self.duration *= FACTORS[self.unit]
-        if self.after <= 0 or (self.duration and self.duration <= 0):
+        if self.after < 0 or (self.duration and self.duration <= 0):
             raise ValueError("after and duration have to be both positive")
         self.unit = "ms"
         return self

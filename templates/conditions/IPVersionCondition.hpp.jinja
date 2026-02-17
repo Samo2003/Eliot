@@ -18,7 +18,7 @@
 namespace eliot_generated {
 
     /**
-     * @brief IP version-based condition condition.
+     * @brief IP version-based condition.
      *
      * This condition is fulfilled only for packets
      * using IP version '{{ condition.v }}'.
@@ -26,7 +26,7 @@ namespace eliot_generated {
     struct {{ condition.cpp_type() }} {
 
         /**
-         * @brief Evaluates whether the condition condition is fulfilled.
+         * @brief Evaluates whether the condition is fulfilled.
          *
          * @param packet Pointer to the evaluated packet.
          * @return true if the packet uses IP version '{{ condition.v }}'.

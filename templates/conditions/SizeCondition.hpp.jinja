@@ -22,7 +22,7 @@
 namespace eliot_generated {
 
     /**
-     * @brief Packet size-based condition condition.
+     * @brief Packet size-based condition.
      *
      * This condition is fulfilled when the packet size
      * satisfies the configured comparison condition.
@@ -30,7 +30,7 @@ namespace eliot_generated {
     struct {{ condition.cpp_type() }} {
 
         /**
-         * @brief Evaluates whether the condition condition is fulfilled.
+         * @brief Evaluates whether the condition is fulfilled.
          *
          * Compares packet size against the configured value
          * using operator '{{ condition.get_op() }}'.

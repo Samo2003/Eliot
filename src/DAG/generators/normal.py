@@ -23,8 +23,13 @@ class NormalBase(ValueGeneratorBase[T, N], ABC):
         return self
     
     @final
+    def _apply_factor_inner(self, factor: int) -> None:
+        self.m *= factor
+        self.s *= factor
+    
+    @final
     def cpp_type(self) -> str:
-        return f"{self.cpp_type_base()}_{self.N_to_str(self.m)}_{self.N_to_str(self.s)}_{self.once}"
+        return f"{self.cpp_type_base()}_{self.N_to_str(self.m)}_{self.N_to_str(self.s)}"
 
 class NormalFloat(NormalBase[Literal["NormalFloat"], float]):
     """Normal Float value generator"""

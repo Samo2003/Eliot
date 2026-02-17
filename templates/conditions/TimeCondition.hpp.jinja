@@ -19,7 +19,7 @@
 namespace eliot_generated {
 
     /**
-     * @brief Time-based condition condition.
+     * @brief Time-based condition.
      *
      * This condition becomes fulfilled once a specified amount
      * of time has elapsed since initialization.
@@ -31,7 +31,7 @@ namespace eliot_generated {
     struct {{ condition.cpp_type() }} {
 
         /**
-         * @brief Evaluates whether the condition condition is fulfilled.
+         * @brief Evaluates whether the condition is fulfilled.
          *
          * The condition computes elapsed time using the global
          * simulation clock and compares it against the configured
@@ -44,8 +44,8 @@ namespace eliot_generated {
             {% if not condition.instant %}
             // Static initialization timestamp
             static const uint64_t start = read_clock_ms();
+            
             {% endif %}
-
             // Elapsed time in milliseconds
             uint64_t elapsed = get_global_time() - start;
             {% if condition.duration is none %}

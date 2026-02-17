@@ -26,13 +26,18 @@ class ExponentialBase(ValueGeneratorBase[T, N], ABC):
             raise ValueError("Mean value for exponential distribution has to be positive")
         if self.max is not None and self.max < 0:
             raise ValueError("Exponential distribution cannot generate negative values")
-        if self.min is not None and self.min < 0:
-            raise ValueError("Exponential distribution only generates positive values")
         return self
     
     @final
+    def _apply_factor_inner(self, factor: int) -> None:
+        if self.mean is not None:
+            self.mean *= factor
+        if self.rate is not None:
+            self.rate *= factor
+    
+    @final
     def cpp_type(self) -> str:
-        return f"{self.cpp_type_base()}_{str(self.mean).replace('.', '_')}_{str(self.rate).replace('.', '_')}_{self.once}"
+        return f"{self.cpp_type_base()}_{self.N_to_str(self.mean)}_{self.N_to_str(self.rate)}"
     
 class ExponentialFloat(ExponentialBase[Literal["ExponentialFloat"], float]):
     """Exponential Float value generator"""
