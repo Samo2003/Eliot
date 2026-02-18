@@ -1,9 +1,8 @@
 from jinja2 import Environment
-from ..nf_queue_api import NFQueueApiBase
 import os
 from ..utils import generate_to_file
 
-def generate_packet(env: Environment, output_dir: str, api: NFQueueApiBase) -> None:
+def generate_packet(env: Environment, output_dir: str, traits: str) -> None:
     """Generate packet wrapper"""
 
     # Configure file paths
@@ -11,4 +10,4 @@ def generate_packet(env: Environment, output_dir: str, api: NFQueueApiBase) -> N
     output_path = os.path.join(output_dir, "Packet.hpp")
 
     # Generate file with given context
-    generate_to_file(env, template_name, output_path, { "api": api })
+    generate_to_file(env, template_name, output_path, { "traits": traits })

@@ -1,31 +1,58 @@
 #ifndef ELIOT_PACKET_H
 #define ELIOT_PACKET_H
 
-#include {{ api.include() }}
+#include "{{ traits }}"
+#include <optional>
 #include <vector>
 #include "static/ItemPool.hpp"
+#include "static/interfaces/Traits.hpp"
 
 namespace eliot_generated {
+    static_assert(BackendTraitsConcept<ActiveTraits>, "ActiveTraits does not satisfy BackendTraits concept");
+
     enum class PacketResult { Drop, Finish, Calendar, Processing };
 
-    struct Packet {
-        explicit inline Packet({{ api.packet_type() }}&& packet) noexcept 
+    template<BackendTraitsConcept Traits>
+    struct InternalPacket {
+        using PacketType = typename Traits::PacketType;
+
+        explicit inline InternalPacket(PacketType&& packet) noexcept 
             : _packet(std::move(packet)) {}
 
         template<typename... Args>
-        static inline Packet* acquire(Args&&... args) {
+        static inline InternalPacket* acquire(Args&&... args) {
             return _packet_pool().acquire(std::forward<Args>(args)...);
         }
 
-        static inline void release(Packet *p) noexcept {
+        static inline void release(InternalPacket *p) noexcept {
             _packet_pool().release(p);
         }
 
-        inline {{ api.packet_type() }}&& move_packet() noexcept { return std::move(_packet); }
+        inline PacketType&& move_packet() noexcept { 
+            if constexpr (!Traits::modifiable_payload) {
+                if (_local_payload) {
+                    _packet = Traits::change_payload(
+                        std::move(_packet),
+                        std::move(*_local_payload)
+                    );
+                }
+            }
+            return std::move(_packet);
+        }
         
-        inline const std::vector<uint8_t>& payload() const noexcept { return _packet.{{ api.packet_payload() }}; }
+        inline const std::vector<uint8_t>& payload() const noexcept { 
+            return Traits::payload(_packet); 
+        }
 
-        inline std::vector<uint8_t>& mutable_payload() noexcept { return const_cast<std::vector<uint8_t>&>(_packet.{{ api.packet_payload() }}); }
+        inline std::vector<uint8_t>& mutable_payload() noexcept { 
+            if constexpr (Traits::modifiable_payload) {
+                return Traits::mutable_payload(_packet);
+            } else {
+                if (!_local_payload)
+                    _local_payload = Traits::payload(_packet);
+                return *_local_payload;
+            }
+        }
 
         inline const size_t size() const noexcept { return payload().size(); }
 
@@ -49,15 +76,16 @@ namespace eliot_generated {
         PacketResult result = PacketResult::Processing;
 
         private:
-            {{ api.packet_type() }} _packet;
+            PacketType _packet;
+            std::optional<std::vector<uint8_t>> _local_payload;
 
             mutable int _l4_protocol = -1;
             mutable int _l4_offset = -1;
             mutable int _nh = -1;
             mutable bool _l4_parsed = false;
 
-            static inline ItemPool<Packet>& _packet_pool() {
-                static ItemPool<Packet, 4096> pool;
+            static inline ItemPool<InternalPacket<Traits>>& _packet_pool() {
+                static ItemPool<InternalPacket<Traits>, 4096> pool;
                 return pool;
             }
 
@@ -132,6 +160,7 @@ namespace eliot_generated {
             }
     };
 
+    using Packet = InternalPacket<ActiveTraits>;
 }
 
 #endif

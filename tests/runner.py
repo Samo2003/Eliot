@@ -60,7 +60,8 @@ class CaseRunner:
             "eliot.py",
             *build_args,
             "-o", str(workspace_rel),
-            "-a", "echo"
+            "--backend", str((Path(generator_root) / "mocks/echo").resolve()),
+            "--traits", str((Path(generator_root) / "traits/echo.hpp").resolve())
         ]
 
         generator = subprocess.run(generator_args, cwd=generator_root, text=True, capture_output=True)

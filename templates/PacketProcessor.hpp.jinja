@@ -1,0 +1,95 @@
+#ifndef ELIOT_PACKET_PROCESSOR_H
+#define ELIOT_PACKET_PROCESSOR_H
+
+#include "FaultModel.hpp"
+#include <atomic>
+#include <iostream>
+
+namespace eliot_generated {
+
+    template<BackendTraitsConcept Traits>
+    struct PacketProcessor {
+        public:
+            using Queue = typename Traits::QueueType;
+
+            explicit PacketProcessor(int argc, char** argv)
+                : _queue(Traits::create_queue(argc, argv)),
+                _model()
+            {}
+
+            inline void run() {
+                std::cout << "Eliot running...\n";
+
+                while (!_stop_flag) {
+                    {% if require_time %}
+                    time_updated = false;
+                    {% endif %}
+                    process_input();
+                    {% if require_calendar %}
+                    process_calendar();
+                    {% endif %}
+                }
+
+                std::cout << "\nExiting\n";
+            }
+
+            static inline void stop() {
+                _stop_flag = true;
+            }
+
+        private:
+            Queue _queue;
+            FaultModel _model;
+            {% if require_calendar %}
+            bool _calendar_empty = true;
+            {% endif %}
+            inline static std::atomic_bool _stop_flag{false};
+
+            inline void process_input() {
+                if (auto maybe_packet = Traits::get_packet(_queue)) {
+                    auto packet = Packet::acquire(std::move(*maybe_packet));
+                    _model.evaluate(packet);
+                    handle_result(packet);
+                }
+            }
+
+            {% if require_calendar %}
+            inline void process_calendar() {
+                if (!_calendar_empty) {
+                    if (auto packet = _model.get_scheduled()) {
+                        _model.evaluate(packet);
+                        handle_result(packet);
+                    }
+                    else if (_model.calendar_empty()) {
+                        _calendar_empty = true;
+                    }
+                }
+            }
+            {% endif %}
+
+            inline void handle_result(Packet* packet) {
+                switch (packet->result) {
+                    case PacketResult::Drop:
+                        Traits::drop_packet(_queue, packet->move_packet());
+                        Packet::release(packet);
+                        break;
+
+                    case PacketResult::Finish:
+                        Traits::accept_packet(_queue, packet->move_packet());
+                        Packet::release(packet);
+                        break;
+                    {% if require_calendar %}
+
+                    case PacketResult::Calendar:
+                        _calendar_empty = false;
+                        break;
+                    {% endif %}
+
+                    default:
+                        break;
+                }
+            }
+    };
+}
+
+#endif

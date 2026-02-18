@@ -3,6 +3,12 @@ import shutil
 
 def generate_static(template_dir: str, output_dir: str, require_calendar: bool) -> None:
     """Copies required static files to output directory"""
+
+    # Configure file path for generating eliot
+    src = os.path.join(template_dir, "eliot.cpp")
+    dst = os.path.join(output_dir, "eliot.cpp")
+    shutil.copy(src, dst)
+
     static_dir = os.path.join(template_dir, "static")
     dst_dir = os.path.join(output_dir, "static")
 

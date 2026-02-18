@@ -1,7 +1,6 @@
 import sys
 import json
 from typing import cast
-from src.generator.nf_queue_api import *
 from src.DAG import *
 from src.test_case import *
 from src.generator import generate
@@ -39,7 +38,7 @@ def clear_output_dir(path: str) -> None:
         shutil.rmtree(path)
     os.makedirs(path, exist_ok=True)
 
-def run_build(clear_build: bool, api: str, output: str, generated_dir: str) -> None:
+def run_build(clear_build: bool, profiling: bool, output: str, generated_dir: str, traits: str, backend: str) -> None:
     """Compiles binary file and moves it to current working directory"""
     build_dir = os.path.join(output, "build")
     os.makedirs(build_dir, exist_ok=True)
@@ -49,12 +48,12 @@ def run_build(clear_build: bool, api: str, output: str, generated_dir: str) -> N
         "-S", source_root,
         "-B", build_dir,
         f"-DGENERATED_DIR={generated_dir}",
+        f"-DTRAITS_DIR={os.path.dirname(os.path.abspath(traits))}",
+        f"-DBACKEND_DIR={os.path.abspath(backend)}"
     ]
 
-    if api == "profiling":
+    if profiling:
         cmake_args.append("-DPROFILING=ON")
-    elif api == "echo":
-        cmake_args.append("-DTESTING=ON")
 
     if not os.path.exists(os.path.join(build_dir, "CMakeCache.txt")):
         subprocess.run(cmake_args, check=True)
@@ -74,9 +73,11 @@ def run_build(clear_build: bool, api: str, output: str, generated_dir: str) -> N
 @click.option("--test_case", "-t", type=click.Path(exists=True), help="Path to test case in JSON or YAML file")
 @click.option("--output", "-o", default=".", help="Generator output directory")
 @click.option("--dag_schema", "-s", is_flag=True, help="Print DAG JSON schema and exit")
-@click.option("--api", "-a", default="mock", help="Specify NFQueue api type")
+@click.option("--traits", type=click.Path(exists=True), help="Path to trait file for backed")
+@click.option("--backend", type=click.Path(exists=True), help="Path to directory containing CMakeLists.txt for backend")
+@click.option("--profiling", '-p', is_flag=True, help="Build generated for profiling")
 @click.option("--clear_build", "-c", is_flag=True, help="If set CMake build directory is deleted")
-def main(dag: str | None, test_case: str | None, output: str, dag_schema: bool, api: str, clear_build: bool):
+def main(dag: str | None, test_case: str | None, output: str, dag_schema: bool, traits: str, backend: str, profiling: bool, clear_build: bool):
     """Main entry point for generator"""
 
     if dag_schema:
@@ -92,20 +93,9 @@ def main(dag: str | None, test_case: str | None, output: str, dag_schema: bool, 
     try:
         dag_model = load_dag(dag, test_case)
         
-        # Determine which NFQueue API is used
-        api_interface: NFQueueApiBase
-        if api == "mock":
-            api_interface = MockApi()
-        elif api == "profiling":
-            api_interface = ProfilingApi()
-        elif api == "echo":
-            api_interface = EchoApi()
-        else:
-            raise RuntimeError(f"ERROR: unknown api type: {api}")
-        
-        generate(dag_model, TEMPLATE_DIR, generated_dir, api_interface)
+        generate(dag_model, TEMPLATE_DIR, generated_dir, os.path.basename(traits))
 
-        run_build(clear_build, api, output, generated_dir)
+        run_build(clear_build, profiling, output, generated_dir, traits, backend)
     except RuntimeError as e:
         print(e)
         sys.exit(1)

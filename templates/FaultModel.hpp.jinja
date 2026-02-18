@@ -20,13 +20,23 @@
 
 namespace eliot_generated {
     struct FaultModel {
-        void evaluate(Packet* packet) noexcept;
 
+        void evaluate(Packet* packet) noexcept;
         {% if require_calendar %}
-        Calendar calendar;
+
+        inline Packet* get_scheduled() noexcept {
+            return _calendar.get_ready();
+        }
+
+        inline bool calendar_empty() const noexcept {
+            return _calendar.empty();
+        }
         {% endif %}
 
         private: 
+            {% if require_calendar %}
+            Calendar _calendar;
+            {% endif %}
 {% for state in states %}
             {{ state.cpp_type() }} {{ state.cpp_name() }};
 {% endfor %}

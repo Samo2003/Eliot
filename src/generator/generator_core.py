@@ -1,11 +1,10 @@
 from ..DAG.actions.change_state import ChangeState
 from ..DAG import *
-from .nf_queue_api import *
 from jinja2 import Environment, FileSystemLoader
 from .generators import *
 from .utils import collect_nodes, process_state_nodes, get_cases
 
-def generate(dag: DAG, template_dir: str, output_dir: str, api: NFQueueApiBase) -> None:
+def generate(dag: DAG, template_dir: str, output_dir: str, traits: str) -> None:
     """Main generator function handling generating"""
 
     # Collect nodes from DAG that need to be generated
@@ -35,8 +34,8 @@ def generate(dag: DAG, template_dir: str, output_dir: str, api: NFQueueApiBase) 
     actions.generate_actions(env, output_dir, collected_actions)
     states.generate_states(env, output_dir, state_nodes)
     generators.generate_generators(env, output_dir, collected_generators)
-    packet.generate_packet(env, output_dir, api)
-    fault_model.generate_fault_model_header(env, output_dir, api, collected_conditions, collected_actions, state_nodes, require_calendar)
+    packet.generate_packet(env, output_dir, traits)
+    fault_model.generate_fault_model_header(env, output_dir, collected_conditions, collected_actions, state_nodes, require_calendar)
     fault_model.generate_fault_model(env, output_dir, cases)
-    eliot.generate_eliot(env, output_dir, api, require_calendar, require_time)
+    packet_processor.generate_packet_processor(env, output_dir, require_calendar, require_time)
     static.generate_static(template_dir, output_dir, require_calendar)

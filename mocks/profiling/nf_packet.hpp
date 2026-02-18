@@ -18,7 +18,7 @@ namespace nf_queue_profiling {
             NFQueuePacket(const NFQueuePacket&) = delete;
             NFQueuePacket& operator=(const NFQueuePacket&) = delete;
 
-            inline const std::vector<uint8_t>& get_payload() const noexcept { return _payload; }
+            inline std::vector<uint8_t>& get_payload() const noexcept { return _payload; }
     };
 }
 

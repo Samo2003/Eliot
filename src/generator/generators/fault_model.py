@@ -1,5 +1,4 @@
 from jinja2 import Environment
-from ..nf_queue_api import NFQueueApiBase
 from typing import List, Set
 from ...DAG import *
 import os
@@ -8,7 +7,6 @@ from ..utils import generate_to_file, Case
 def generate_fault_model_header(
     env: Environment, 
     output_dir: str, 
-    api: NFQueueApiBase, 
     conditions: Set[Condition], 
     actions: Set[Action],
     state_nodes: Set[StateNode],
@@ -23,8 +21,7 @@ def generate_fault_model_header(
     # Generate file with given context
     generate_to_file(
         env, template_name, output_path, 
-        { 
-            "api": api, 
+        {
             "conditions": conditions, 
             "actions": actions,
             "states": state_nodes,

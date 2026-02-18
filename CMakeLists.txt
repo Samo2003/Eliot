@@ -10,9 +10,19 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 option(PROFILING "Enable profiling mode" OFF)
-option(TESTING "Enable testing mode" OFF)
 
 set(GENERATED_DIR "generated" CACHE STRING "Generated sources directory")
+set(BACKEND_DIR "" CACHE PATH "Path to backend directory")
+
+if(NOT EXISTS "${BACKEND_DIR}" OR NOT EXISTS "${BACKEND_DIR}/CMakeLists.txt")
+    message(FATAL_ERROR "BACKEND_DIR not set or invalid (must contain CMakeLists.txt), ${BACKEND_DIR}")
+endif()
+
+set(TRAITS_DIR "" CACHE STRING "Directory containing backend traits")
+
+if(NOT EXISTS "${TRAITS_DIR}")
+    message(FATAL_ERROR "TRAITS_DIR not set or invalid")
+endif()
 
 if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${GENERATED_DIR}")
     message(FATAL_ERROR "GENERATED_DIR does not exist: ${GENERATED_DIR}")
@@ -25,21 +35,24 @@ if(CCACHE_PROGRAM)
 endif()
 
 if(PROFILING)
-    set(NFQUEUE_LIB nf_queue_profiling)
     add_compile_options(-O1 -g -fno-inline -fno-omit-frame-pointer)
-    add_subdirectory(mocks/profiling)
-elseif(TESTING)
-    set(NFQUEUE_LIB nf_queue_echo)
-    add_compile_options(-O3)
-    add_subdirectory(mocks/echo)
 else()
-    set(NFQUEUE_LIB nf_queue_mock)
     add_compile_options(-O3)
-    add_subdirectory(mocks/mock)
 endif()
+
+add_subdirectory(${BACKEND_DIR} backend_build)
 
 add_subdirectory(${GENERATED_DIR}/static)
 
-target_link_libraries(eliot_generated PUBLIC ${NFQUEUE_LIB})
+target_include_directories(eliot_generated PUBLIC ${TRAITS_DIR})
+
 add_executable(eliot ${GENERATED_DIR}/eliot.cpp)
-target_link_libraries(eliot PUBLIC eliot_generated ${NFQUEUE_LIB})
+
+get_property(BACKEND_TARGETS DIRECTORY ${BACKEND_DIR} PROPERTY BUILDSYSTEM_TARGETS)
+
+foreach(t ${BACKEND_TARGETS})
+    target_link_libraries(eliot_generated PUBLIC ${t})
+endforeach()
+
+target_link_libraries(eliot PRIVATE eliot_generated)
+
