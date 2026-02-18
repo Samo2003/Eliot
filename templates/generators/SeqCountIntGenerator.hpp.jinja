@@ -39,11 +39,12 @@ namespace eliot_generated {
             {% if generator.once %}
             return {{ generator.value() }};
             {% else %}
+            int current = _value;
             if (--_wait == 0) {
                 _wait = _CALLS_TO_ADVANCE;
                 _advance();
             }
-            return _value;
+            return current;
             {% endif %}
         }
 

@@ -11,6 +11,7 @@ namespace eliot_generated {
     requires(
         typename T::QueueType q,
         typename T::PacketType p,
+        const typename T::PacketType cp,
         int argc,
         char** argv
     ) {
@@ -30,6 +31,8 @@ namespace eliot_generated {
         requires requires { 
             { std::bool_constant<T::modifiable_payload>{} };
         };
+
+        { T::clone(cp) } -> std::same_as<typename T::PacketType>;
     };
 
     template<typename T>

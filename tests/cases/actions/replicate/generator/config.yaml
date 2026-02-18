@@ -1,0 +1,17 @@
+name: Generator replicate
+
+build:
+  defaultAction: Finish
+  rules:
+    - type: all
+      conditions: []
+      actions:
+        - actionType: Replicate
+          n:
+            generatorType: SeqCountInt
+            min: 1
+            step: 10
+
+send:
+  - count: 2
+  

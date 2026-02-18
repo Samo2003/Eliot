@@ -41,9 +41,6 @@ class Reorder(ActionBase[Literal["Reorder"]]):
     def calendar(self) -> bool:
         return True
     
-    def init(self) -> str:
-        return f" = {self.cpp_type()}(_calendar)"
-    
     def not_generator_n(self) -> bool:
         """Condition used in generating representing if n is a generator"""
         return isinstance(self.n, int)

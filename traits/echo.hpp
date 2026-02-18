@@ -36,6 +36,14 @@ struct EchoTraits {
             *old_packet.get_from()
         );
     }
+
+    inline static PacketType clone(const PacketType& p) {
+        return PacketType(
+            p.get_id(),
+            std::vector<uint8_t>(p.get_payload()),
+            *p.get_from()
+        );
+    }
 };
 
 using ActiveTraits = EchoTraits;

@@ -23,3 +23,8 @@ class ActionBase(DAGBaseModel, Generic[T], ABC):
     def calendar(self) -> bool:
         """Signalizes that action needs calendar"""
         return False
+    
+    def init(self) -> str:
+        if self.calendar():
+            return f" = {self.cpp_type()}(_calendar)"
+        return super().init()

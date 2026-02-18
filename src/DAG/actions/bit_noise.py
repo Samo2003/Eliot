@@ -57,7 +57,7 @@ class BitNoise(ActionBase[Literal["BitNoise"]]):
         return self
     
     def cpp_type(self) -> str:
-        type_name = f"{super().cpp_type_base()}_{self.x}_{self.n}_{self.start}_{self.end}_{self.mode.upper()}_{self.layer.upper()}"
+        type_name = f"{self.cpp_type_base()}_{self.x}_{self.n}_{self.start}_{self.end}_{self.mode.upper()}_{self.layer.upper()}"
 
         state_x = isinstance(self.x, ValueGeneratorBase) and self.x.is_state()
         state_n = isinstance(self.n, ValueGeneratorBase) and self.n.is_state()

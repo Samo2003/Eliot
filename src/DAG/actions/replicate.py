@@ -1,7 +1,7 @@
 from typing import Literal
 from pydantic import model_validator
 from .base import ActionBase
-from ..generators import ValueGeneratorInt
+from ..generators import ValueGeneratorInt, ValueGeneratorBase
 
 class Replicate(ActionBase[Literal["Replicate"]]):
     """Replicates packet given amount of times"""
@@ -18,3 +18,16 @@ class Replicate(ActionBase[Literal["Replicate"]]):
             if self.n.min is not None and self.n.min <= 0:
                 raise ValueError("n must be a positive number")
         return self
+    
+    def cpp_type(self) -> str:
+        return f"{self.cpp_type_base()}_{self.n}{'_' + str(id(self)) if isinstance(self.n, ValueGeneratorBase) and self.n.is_state() else ''}"
+    
+    def is_state(self) -> bool:
+        return True
+
+    def calendar(self) -> bool:
+        return True
+    
+    def not_generator_n(self) -> bool:
+        """Condition used in generating representing if n is a generator"""
+        return isinstance(self.n, int)

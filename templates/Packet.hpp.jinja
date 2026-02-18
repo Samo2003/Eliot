@@ -19,16 +19,28 @@ namespace eliot_generated {
         explicit inline InternalPacket(PacketType&& packet) noexcept 
             : _packet(std::move(packet)) {}
 
-        template<typename... Args>
-        static inline InternalPacket* acquire(Args&&... args) {
-            return _packet_pool().acquire(std::forward<Args>(args)...);
+        static inline InternalPacket* acquire(PacketType&& packet) {
+            return _packet_pool().acquire(std::move(packet));
         }
 
         static inline void release(InternalPacket *p) noexcept {
             _packet_pool().release(p);
         }
 
-        inline PacketType&& move_packet() noexcept { 
+        inline InternalPacket* clone() {
+            auto new_packet = Traits::clone(_packet);
+            auto* p = acquire(std::move(new_packet));
+
+            if (_local_payload)
+                p->_local_payload = *_local_payload;
+
+            p->state = state;
+            p->result = PacketResult::Processing;
+
+            return p;
+        }
+
+        inline PacketType move_packet() noexcept { 
             if constexpr (!Traits::modifiable_payload) {
                 if (_local_payload) {
                     _packet = Traits::change_payload(
@@ -45,6 +57,7 @@ namespace eliot_generated {
         }
 
         inline std::vector<uint8_t>& mutable_payload() noexcept { 
+            _invalidate_cache();
             if constexpr (Traits::modifiable_payload) {
                 return Traits::mutable_payload(_packet);
             } else {
@@ -83,6 +96,13 @@ namespace eliot_generated {
             mutable int _l4_offset = -1;
             mutable int _nh = -1;
             mutable bool _l4_parsed = false;
+
+            inline void _invalidate_cache() noexcept {
+                _l4_parsed = false;
+                _l4_protocol = -1;
+                _l4_offset = -1;
+                _nh = -1;
+            }
 
             static inline ItemPool<InternalPacket<Traits>>& _packet_pool() {
                 static ItemPool<InternalPacket<Traits>, 4096> pool;

@@ -40,9 +40,6 @@ namespace eliot_generated {
         private:
             Queue _queue;
             FaultModel _model;
-            {% if require_calendar %}
-            bool _calendar_empty = true;
-            {% endif %}
             inline static std::atomic_bool _stop_flag{false};
 
             inline void process_input() {
@@ -55,13 +52,10 @@ namespace eliot_generated {
 
             {% if require_calendar %}
             inline void process_calendar() {
-                if (!_calendar_empty) {
+                if (!_model.calendar_empty()) {
                     if (auto packet = _model.get_scheduled()) {
                         _model.evaluate(packet);
                         handle_result(packet);
-                    }
-                    else if (_model.calendar_empty()) {
-                        _calendar_empty = true;
                     }
                 }
             }
@@ -78,12 +72,6 @@ namespace eliot_generated {
                         Traits::accept_packet(_queue, packet->move_packet());
                         Packet::release(packet);
                         break;
-                    {% if require_calendar %}
-
-                    case PacketResult::Calendar:
-                        _calendar_empty = false;
-                        break;
-                    {% endif %}
 
                     default:
                         break;

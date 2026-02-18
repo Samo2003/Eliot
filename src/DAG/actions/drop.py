@@ -8,4 +8,4 @@ class Drop(ActionBase[Literal["Drop"]]):
         return True
     
     def cpp_type(self) -> str:
-        return super().cpp_type_base()
+        return self.cpp_type_base()

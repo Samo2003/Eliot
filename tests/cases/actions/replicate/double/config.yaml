@@ -1,0 +1,16 @@
+name: Double replicate
+
+build:
+  defaultAction: Finish
+  rules:
+    - type: all
+      conditions: []
+      actions:
+        - actionType: Replicate
+          n: 10
+        - actionType: Replicate
+          n: 10
+
+send:
+  - count: 2
+  

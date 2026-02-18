@@ -34,7 +34,4 @@ class Throttle(ActionBase[Literal["Throttle"]]):
         return True
     
     def cpp_type(self) -> str:
-        return f"{super().cpp_type_base()}_{self.rate}_{self.burst}_{id(self)}".replace(".", "_")
-    
-    def init(self) -> str:
-        return f" = {self.cpp_type()}(_calendar)" if self.calendar() else ""
+        return f"{self.cpp_type_base()}_{self.rate}_{self.burst}_{id(self)}".replace(".", "_")

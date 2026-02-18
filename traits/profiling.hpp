@@ -35,6 +35,10 @@ struct ProfilingTraits {
     inline static std::vector<uint8_t>& mutable_payload(PacketType& p) {
         return p.get_payload();
     }
+
+    inline static PacketType clone(const PacketType& p) {
+        return PacketType(p.get_payload());
+    }
 };
 
 using ActiveTraits = ProfilingTraits;
