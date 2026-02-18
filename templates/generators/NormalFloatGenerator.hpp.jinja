@@ -33,8 +33,8 @@ namespace eliot_generated {
         {% if generator.once %}
          * This method always returns the same value.
         {% else %}
-         * Values are sampled from a normal distribution until
-         * a value satisfying the configured bounds is obtained.
+         * Values are sampled from a normal distribution
+         * and clamped to the configured bounds.
         {% endif %}
          *
          * @return Generated floating-point value.
@@ -43,23 +43,31 @@ namespace eliot_generated {
             {% if generator.once %}
             return {{ generator.value() }};
             {% else %}
-            while (true) {
-                // Transform standard normal sample to N(m, s)
-                float x = {{ generator.m }}f + {{ generator.s }}f * rnor();
+            // Transform standard normal sample to N(m, s)
+            float x = {{ generator.m }}f + {{ generator.s }}f * rnor();
 
-                // Check generated value bound
-                {% if generator.max is not none %}
-                if (x >= {{ generator.min }} && x <= {{ generator.max }})
-                {% else %}
-                if (x >= {{ generator.min }})
-                {% endif %}
-                    return x;
-            }
+            // Check minimum bound
+            if (x < _MIN) return _MIN;
+
+            {% if generator.max is not none %}
+            // Check maximum bound
+            if (x > _MAX) return _MAX;
+
+            {% endif %}
+            return x;
             {% endif %}
         }
 
         {% if not generator.once %}
         private:
+
+            ///> Minimal possible value the generator can generate.
+            static constexpr float _MIN = {{ generator.min }}f;
+            {% if generator.max is not none %}
+
+            ///> Maximal possible value the generator can generate.
+            static constexpr float _MAX = {{ generator.max }}f;
+            {% endif %}
 
             ///> Pseudo-random number generator.
             inline static xoroshiro128plus _rng{ {{ generator.seed_value() }} };

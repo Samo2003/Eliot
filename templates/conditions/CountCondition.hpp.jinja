@@ -41,9 +41,9 @@ namespace eliot_generated {
          */
         inline bool fulfilled(const Packet* /*packet*/) noexcept {
             {% if condition.duration is none %}
-            return ++_counter > {{ condition.after }};
+            return ++_counter > _AFTER;
             {% else %}
-            return  ++_counter > {{ condition.after }} && _counter <= {{ condition.after + condition.duration }};
+            return  ++_counter > _AFTER && _counter <= _AFTER + _DURATION;
             {% endif %}
         }
 
@@ -51,6 +51,14 @@ namespace eliot_generated {
 
             ///> Packet evaluation counter.
             size_t _counter = 0;
+
+            ///> Condition after parameter.
+            static constexpr int _AFTER = {{ condition.after }};
+            {% if condition.duration is not none %}
+
+            ///> Condition after parameter.
+            static constexpr int _DURATION = {{ condition.duration }};
+            {% endif %}
     };
 }
 

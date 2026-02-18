@@ -21,7 +21,7 @@ class Size(ConditionBase[Literal["Size"]]):
         return self
 
     def cpp_type(self) -> str:
-        return f"{self.cpp_type_base()}_{self.size}_{self.op}{'_' + str(id(self)) if self.is_state() else ''}"
+        return f"{self.cpp_type_base()}_{self.size}_{self.op}{'_' + str(id(self)) if isinstance(self.size, ValueGeneratorBase) and self.size.is_state() else ''}"
 
     def get_op(self) -> str:
         """Maps operation to C++ operator"""
@@ -37,6 +37,3 @@ class Size(ConditionBase[Literal["Size"]]):
     def not_generator_size(self) -> bool:
         """Condition used in generating representing if size is a generator"""
         return isinstance(self.size, int)
-    
-    def is_state(self) -> bool:
-        return isinstance(self.size, ValueGeneratorBase) and self.size.is_state()

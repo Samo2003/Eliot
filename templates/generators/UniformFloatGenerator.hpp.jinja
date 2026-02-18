@@ -55,20 +55,26 @@ namespace eliot_generated {
         {% if not generator.once %}
         private:
 
+            ///> Minimal possible value the generator can generate.
+            static constexpr float _MIN = {{ generator.min }}f;
+
+            ///> Maximal possible value the generator can generate.
+            static constexpr float _MAX = {{ generator.max }}f;
+
             ///> Pseudo-random number generator.
             inline static xoroshiro128plus _rng{ {{ generator.seed_value() }} };
 
             /**
              * @brief Generates a uniformly distributed value.
              *
-             * The generated value lies within the interval [{{ generator.min }}, {{ generator.max }}].
+             * The generated value lies within the interval [_MIN, _MAX].
              *
              * @return Uniformly distributed floating-point value.
              */
             inline static float _generate() noexcept {
                 uint32_t r = static_cast<uint32_t>(_rng.next() >> 40);
                 float f = std::bit_cast<float>(0x3F800000u | r) - 1.0f;
-                return {{ generator.min }} + f * {{ generator.max - generator.min }};
+                return _MIN + f * (_MAX - _MIN);
             }
         {% endif %}
     };

@@ -50,17 +50,23 @@ namespace eliot_generated {
         {% if not generator.once %}
         private:
 
+            ///> Minimal possible value the generator can generate.
+            static constexpr float _MIN = {{ generator.min }}f;
+
+            ///> Maximal possible value the generator can generate.
+            static constexpr float _MAX = {{ generator.max if generator.max is not none else 0 }}f;
+
             ///> Number of calls required to advance.
             static constexpr int _CALLS_TO_ADVANCE = {{ generator.T }};
 
             ///> Current generated value.
-            float _value = {{ generator.value() }};
+            float _value = {{ generator.value() }}f;
 
             ///> Countdown until the next value update.
             int _wait = _CALLS_TO_ADVANCE;
 
             ///> Step applied when advancing the value.
-            static constexpr float _step = {{ generator.step }};
+            static constexpr float _step = {{ generator.step }}f;
             {% if generator.mode == "reverse" %}
 
             ///> Current stepping direction.
@@ -85,9 +91,9 @@ namespace eliot_generated {
 
                 // Check for bound
                 {% if generator.step < 0 %}
-                if (_value < {{ generator.min }})
+                if (_value < _MIN)
                 {% else %}
-                if (_value > {{ generator.max }})
+                if (_value > _MAX)
                 {% endif %}
                     _value = {{ generator.value() }};
 
@@ -97,9 +103,9 @@ namespace eliot_generated {
 
                 // Advance only when next value in bound
                 {% if generator.step < 0 %}
-                if (next >= {{ generator.min }})
+                if (next >= _MIN)
                 {% else %}
-                if (next <= {{ generator.max }})
+                if (next <= _MAX)
                 {% endif %}
                     _value = next;
 
@@ -109,9 +115,9 @@ namespace eliot_generated {
                 
                 // Change stepping direction when bound is reached
                 {% if generator.step < 0 %}
-                if (next < {{ generator.min }} || next > {{ generator.max if generator.max is not none else 0}})
+                if (next < _MIN || next > _MAX)
                 {% else %}
-                if (next > {{ generator.max }} || next < {{ generator.min }})
+                if (next > _MAX || next < _MIN)
                 {% endif %}
                     _direction = - _direction;
 

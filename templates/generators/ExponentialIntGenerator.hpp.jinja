@@ -32,9 +32,8 @@ namespace eliot_generated {
         {% if generator.once %}
          * This method always returns the same value.
         {% else %}
-         * Values are sampled from an exponential distribution until
-         * a value satisfying the configured bounds is obtained.
-         * Obtained value is then floored to an integer value.
+         * Values are sampled from an exponential distribution
+         * floored to an integer value and clamped to the configured bounds.
         {% endif %}
          *
          * @return Generated integer value.
@@ -43,31 +42,39 @@ namespace eliot_generated {
             {% if generator.once %}
             return {{ generator.value() }};
             {% else %}
-            while (true) {
-                float u;
-                do {
-                    u = _uni();         // Avoid log(0)
-                } while (u <= 0.0f);
+            float u;
+            do {
+                u = _uni();         // Avoid log(0)
+            } while (u <= 0.0f);
 
-                // Inverse transform sampling
-                float x = -_INV_LAMBDA * std::logf(u);
+            // Inverse transform sampling
+            float x = -_INV_LAMBDA * std::logf(u);
 
-                // Floor generated value
-                int xi = static_cast<int>(std::floor(x));
+            // Floor generated value
+            int xi = static_cast<int>(std::floor(x));
 
-                // Check generated value bound
-                {% if generator.max is not none %}
-                if (xi >= {{ generator.min }} && xi <= {{ generator.max }})
-                {% else %}
-                if (xi >= {{ generator.min }})
-                {% endif %}
-                    return xi;
-            }
+            // Check minimum bound
+            if (xi < _MIN) return _MIN;
+
+            {% if generator.max is not none %}
+            // Check maximum bound
+            if (xi > _MAX) return _MAX;
+
+            {% endif %}
+            return xi;
             {% endif %}
         }
 
         {% if not generator.once %}
         private:
+
+            ///> Minimal possible value the generator can generate.
+            static constexpr int _MIN = {{ generator.min }};
+            {% if generator.max is not none %}
+
+            ///> Maximal possible value the generator can generate.
+            static constexpr int _MAX = {{ generator.max }};
+            {% endif %}
 
             ///> Pseudo-random number generator.
             inline static xoroshiro128plus _rng{ {{ generator.seed_value() }} };

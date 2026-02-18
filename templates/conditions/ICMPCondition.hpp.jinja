@@ -55,12 +55,12 @@ namespace eliot_generated {
                 return false;
 
             // Check ICMP type field
-            if (p[offset] != {{ condition.type }})
+            if (p[offset] != _TYPE)
                 return false;
 
             {% if condition.code is not none %}
             // Check ICMP code field
-            if (p[offset + 1] != {{ condition.code }})
+            if (p[offset + 1] != _CODE)
                 return false;
 
             {% endif %}
@@ -74,6 +74,14 @@ namespace eliot_generated {
 
             ///> Protocol number for ICMPv6.
             static constexpr int ICMPv6 = 58;
+
+            ///> ICMP type to check.
+            static constexpr uint8_t _TYPE = {{ condition.type }};
+            {% if condition.code is not none %}
+
+            ///> ICMP code to check.
+            static constexpr uint8_t _CODE = {{ condition.code }};
+            {% endif %}
     };
 }
 

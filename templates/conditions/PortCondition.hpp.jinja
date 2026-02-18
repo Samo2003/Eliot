@@ -63,25 +63,42 @@ namespace eliot_generated {
             uint16_t dst_port = (uint16_t(p[offset + 2]) << 8) | p[offset + 3];
 
             // Match either source or destination port
-            return src_port == {{ condition.port }} || dst_port == {{ condition.port }};
+            return src_port == _PORT || dst_port == _PORT;
             {% else %}
             {% if condition.src is not none %}
             // Extract and check source port
             uint16_t src_port = (uint16_t(p[offset]) << 8) | p[offset + 1];
-            if (src_port != {{ condition.src }})
+            if (src_port != _SRC)
                 return false;
 
             {% endif %}
             {% if condition.dst is not none %}
             // Extract and check destination port
             uint16_t dst_port = (uint16_t(p[offset + 2]) << 8) | p[offset + 3];
-            if (dst_port != {{ condition.dst }})
+            if (dst_port != _DST)
                 return false;
 
             {% endif %}
             return true;
             {% endif %}
         }
+
+        private:
+            {% if condition.port is not none %}
+
+            ///> Condition port to check.
+            static constexpr uint16_t _PORT = {{ condition.port }};
+            {% endif %}
+            {% if condition.src is not none %}
+
+            ///> Condition source port to check.
+            static constexpr uint16_t _SRC = {{ condition.src }};
+            {% endif %}
+            {% if condition.dst is not none %}
+
+            ///> Condition destination port to check.
+            static constexpr uint16_t _DST = {{ condition.dst }};
+            {% endif %}
     };
 }
 

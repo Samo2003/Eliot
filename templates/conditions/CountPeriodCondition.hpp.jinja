@@ -53,11 +53,11 @@ namespace eliot_generated {
                 _counter = 0;
                 _state = !_state;
                 {% if condition.not_generator_t() and condition.not_generator_f() %}
-                _threshold = _state ? {{ condition.t }} : {{ condition.f }};
+                _threshold = _state ? _T : _F;
                 {% elif condition.not_generator_t() %}
-                _threshold =  _state ? {{ condition.t }} : generate{{ condition.f.cpp_call() }}); 
+                _threshold =  _state ? _T : generate{{ condition.f.cpp_call() }}); 
                 {% elif condition.not_generator_f() %}
-                _threshold = _state ? generate{{ condition.t.cpp_call() }}) : {{ condition.f }}; 
+                _threshold = _state ? generate{{ condition.t.cpp_call() }}) : _F;
                 {% else %}
                 _threshold = _state ? generate{{ condition.t.cpp_call() }}) : generate{{ condition.f.cpp_call() }});
                 {% endif %}
@@ -73,6 +73,17 @@ namespace eliot_generated {
 
             ///> Current condition state.
             bool _state = true;
+            {% if condition.not_generator_t() %}
+
+            ///> Condition `t` parameter.
+            static constexpr size_t _T = {{ condition.t }};
+            {% endif %}
+
+            {% if condition.not_generator_f() %}
+
+            ///> Condition `f` parameter.
+            static constexpr size_t _F = {{ condition.f }};
+            {% endif %}
 
             ///> Current threshold defining the duration of the active/inactive phase.
             {% if condition.not_generator_t() %}

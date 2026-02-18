@@ -50,6 +50,12 @@ namespace eliot_generated {
         {% if not generator.once %}
         private:
 
+            ///> Minimal possible value the generator can generate.
+            static constexpr int _MIN = {{ generator.min }};
+
+            ///> Maximal possible value the generator can generate.
+            static constexpr int _MAX = {{ generator.max if generator.max is not none else 0}};
+
             ///> Number of calls required to advance.
             static constexpr int _CALLS_TO_ADVANCE = {{ generator.T }};
 
@@ -85,9 +91,9 @@ namespace eliot_generated {
 
                 // Check for bound
                 {% if generator.step < 0 %}
-                if (_value < {{ generator.min }})
+                if (_value < _MIN)
                 {% else %}
-                if (_value > {{ generator.max }})
+                if (_value > _MAX)
                 {% endif %}
                     _value = {{ generator.value() }};
                 {% elif generator.mode == "keep" %}
@@ -96,9 +102,9 @@ namespace eliot_generated {
 
                 // Advance only when next value in bound
                 {% if generator.step < 0 %}
-                if (next >= {{ generator.min }})
+                if (next >= _MIN)
                 {% elif generator.max is not none %}
-                if (next <= {{ generator.max }})
+                if (next <= _MAX)
                 {% endif %}
                     _value = next;
                 {% else %}
@@ -107,9 +113,9 @@ namespace eliot_generated {
 
                 // Change stepping direction when bound is reached
                 {% if generator.step < 0 %}
-                if (next < {{ generator.min }} || next > {{ generator.max if generator.max is not none else 0}})
+                if (next < _MIN || next > _MAX)
                 {% else %}
-                if (next > {{ generator.max }} || next < {{ generator.min }})
+                if (next > _MAX || next < _MIN)
                 {% endif %}
                     _direction = - _direction;
 

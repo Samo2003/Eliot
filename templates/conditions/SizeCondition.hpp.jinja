@@ -38,7 +38,7 @@ namespace eliot_generated {
          * @param packet Pointer to the evaluated packet.
          * @return true if the size comparison condition is satisfied.
          */
-        {{ 'static ' if condition.not_generator_size() or not condition.size.is_state() else '' }}inline bool fulfilled(const Packet* packet) noexcept {
+        static inline bool fulfilled(const Packet* packet) noexcept {
             {% if condition.not_generator_size() %}
             return packet->size() {{ condition.get_op() }} {{ condition.size }};
             {% else %}
@@ -50,7 +50,7 @@ namespace eliot_generated {
         private:
 
             ///> Generator providing dynamic size threshold values.
-            {{ condition.size.cpp_type() }} {{ condition.size.cpp_name() }};
+            inline static {{ condition.size.cpp_type() }} {{ condition.size.cpp_name() }};
         {% endif %}
     };
 

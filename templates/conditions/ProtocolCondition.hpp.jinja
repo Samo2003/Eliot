@@ -37,8 +37,13 @@ namespace eliot_generated {
          * @return true if the packet uses protocol '{{ condition.id }}'.
          */
         static inline bool fulfilled(const Packet* packet) noexcept {
-            return packet->protocol({{ condition.get_nh() }}) == {{ condition.id }};
+            return packet->protocol({{ condition.get_nh() }}) == _PROTOCOL;
         }
+
+        private:
+
+            ///> Protocol id to check.
+            static constexpr int _PROTOCOL = {{ condition.id }};
     };
 }
 

@@ -40,15 +40,19 @@ namespace eliot_generated {
          * @param packet Pointer to the evaluated packet (unused).
          * @return true with a given probability.
          */
-        {{ 'static ' if condition.not_generator_x() or not condition.x.is_state() else '' }}inline bool fulfilled(const Packet* packet) noexcept {
+        static inline bool fulfilled(const Packet* packet) noexcept {
             {% if condition.not_generator_x() %}
-            return _prob() < {{ condition.x }};
+            return _prob() < _X;
             {% else %}
             return _prob() < generate{{ condition.x.cpp_call() }});
             {% endif %}
         }
 
         private:
+            {% if condition.not_generator_x() %}
+
+            static constexpr float _X = {{ condition.x }}f;
+            {% endif %}
 
             ///> Pseudo-random number generator.
             inline static xoroshiro128plus _rng{ {{ condition.seed_value() }} };
@@ -69,7 +73,7 @@ namespace eliot_generated {
             {% if not condition.not_generator_x() and condition.x.is_state() %}
 
             ///> Generator providing dynamic probability values.
-            {{ condition.x.cpp_type() }} {{ condition.x.cpp_name() }};
+            inline static {{ condition.x.cpp_type() }} {{ condition.x.cpp_name() }};
             {% endif %}
     };
 }
