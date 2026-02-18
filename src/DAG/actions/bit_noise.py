@@ -56,16 +56,14 @@ class BitNoise(ActionBase[Literal["BitNoise"]]):
                     raise ValueError("invalid window length")
         return self
     
-    def is_state(self) -> bool:
+    def cpp_type(self) -> str:
+        type_name = f"{super().cpp_type_base()}_{self.x}_{self.n}_{self.start}_{self.end}_{self.mode.upper()}_{self.layer.upper()}"
+
         state_x = isinstance(self.x, ValueGeneratorBase) and self.x.is_state()
         state_n = isinstance(self.n, ValueGeneratorBase) and self.n.is_state()
         state_start = isinstance(self.start, ValueGeneratorBase) and self.start.is_state()
         state_end = isinstance(self.end, ValueGeneratorBase) and self.end.is_state()
-        return state_x or state_n or state_start or state_end
-    
-    def cpp_type(self) -> str:
-        type_name = f"{super().cpp_type_base()}_{self.x}_{self.n}_{self.start}_{self.end}_{self.mode.upper()}_{self.layer.upper()}"
-        if self.is_state():
+        if state_x or state_n or state_start or state_end or self.mode == "random":
             type_name += f"{id(self)}"
         return type_name.replace('-', "neg").replace('.', '_')
     

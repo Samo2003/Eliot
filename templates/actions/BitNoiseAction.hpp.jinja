@@ -52,10 +52,7 @@ namespace eliot_generated {
          *
          * @param packet Pointer to the packet being modified.
          */
-        {{ 'static ' if not action.is_state() else '' }}inline void execute(Packet* packet) noexcept {
-            // Obtain mutable reference to packet payload
-            auto& p = packet->mutable_payload();
-
+        static inline void execute(Packet* packet) noexcept {
             // Packet size in bytes
             const size_t size = packet->size();
 
@@ -152,6 +149,9 @@ namespace eliot_generated {
             // Clamp bits to invert to valid layer range
             if (bits_to_invert > range)
                 bits_to_invert = range;
+
+            // Obtain mutable reference to packet payload
+            auto& p = packet->mutable_payload();
 
             {% if action.mode == "first" %}
             // Invert first N bits in window

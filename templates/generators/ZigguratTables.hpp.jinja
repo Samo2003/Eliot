@@ -15,7 +15,7 @@
 
 namespace eliot_generated {
     ///> Integer thresholds for fast acceptance test.
-    static inline constexpr uint32_t kn[128] = {
+    inline static constexpr uint32_t kn[128] = {
 {% for row in kn|batch(8) %}
     {%- for v in row %}
         {{ v }}u,
