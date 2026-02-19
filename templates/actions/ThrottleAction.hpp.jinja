@@ -53,7 +53,7 @@ namespace eliot_generated {
          * @param packet Pointer to the packet being processed.
          */
         inline void execute(Packet* packet) noexcept {
-            const uint64_t now = get_global_time();
+            const uint64_t now = Time::now();
             {% if action.mode == "shaping"%}
 
             // Refill tokens based on elapsed time
@@ -108,10 +108,10 @@ namespace eliot_generated {
             double _tokens = _MAX_SIZE;
 
             ///> Timestamp of the last token update.
-            uint64_t _last = get_global_time();
+            uint64_t _last = Time::now();
             {% else %}
             ///> Timestamp when the next packet transmission is allowed.
-            uint64_t _next_allowed_time = get_global_time();
+            uint64_t _next_allowed_time = Time::now();
             {% endif %}
     };
 }

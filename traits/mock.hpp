@@ -8,7 +8,9 @@ struct MockTraits {
     using QueueType = nf_queue_mock::NFQueue;
 
     inline static QueueType create_queue(int argc, char **argv) {
-        return QueueType();
+        if (argc < 2)
+            throw std::runtime_error("Missing config path");
+        return QueueType(argv[1]);
     }
 
     inline static std::optional<PacketType> get_packet(QueueType& q) {

@@ -59,9 +59,9 @@ namespace eliot_generated {
         inline bool fulfilled(const Packet* /*packet*/) noexcept {
             {% if not condition.instant %}
             // Reference timestamp
-            static uint64_t last = get_global_time();
+            static uint64_t last = Time::now();
             {% endif %}
-            uint64_t now = get_global_time();
+            uint64_t now = Time::now();
 
             // Advance through all elapsed time windows
             while (now - last  >= _threshold) {
@@ -108,7 +108,7 @@ namespace eliot_generated {
             {% if condition.instant %}
 
             ///> Reference timestamp.
-            uint64_t last = get_global_time();
+            uint64_t last = Time::now();
             {% endif %}
             {% if not condition.not_generator_t() and condition.t.is_state() %}
 

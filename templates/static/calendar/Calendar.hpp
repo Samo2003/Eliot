@@ -28,7 +28,7 @@ namespace eliot_generated {
             static constexpr uint64_t _L2_SPAN = _L1_SPAN * _SLOTS;
 
             size_t _size = 0;
-            uint64_t _start = read_clock_ms();
+            uint64_t _start = Time::now();
             uint64_t _current_tick = 0;
         
             struct CalendarItem {
@@ -58,7 +58,7 @@ namespace eliot_generated {
             void _clear_wheel(std::array<BucketT, _SLOTS>& wheel) noexcept;
             
             inline uint64_t _current_tick_from_clock() const noexcept {
-                uint64_t now = get_global_time();
+                uint64_t now = Time::now();
                 return now < _start ? _current_tick : now - _start;
             }
     };

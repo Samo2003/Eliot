@@ -13,8 +13,7 @@ namespace eliot_generated {
             using Queue = typename Traits::QueueType;
 
             explicit PacketProcessor(int argc, char** argv)
-                : _queue(Traits::create_queue(argc, argv)),
-                _model()
+                : _queue(Traits::create_queue(argc, argv))
             {}
 
             inline void run() {
@@ -22,7 +21,7 @@ namespace eliot_generated {
 
                 while (!_stop_flag) {
                     {% if require_time %}
-                    time_updated = false;
+                    Time::reset();
                     {% endif %}
                     process_input();
                     {% if require_calendar %}

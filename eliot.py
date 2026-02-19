@@ -35,7 +35,7 @@ def load_dag(dag: str | None, test_case: str | None) -> DAG:
 def clear_output_dir(path: str) -> None:
     """Clears the provided repository if it exists and ensures it is created"""
     if os.path.exists(path):
-        shutil.rmtree(path)
+        shutil.rmtree(path, ignore_errors=True)
     os.makedirs(path, exist_ok=True)
 
 def run_build(clear_build: bool, profiling: bool, output: str, generated_dir: str, traits: str, backend: str) -> None:
