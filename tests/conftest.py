@@ -1,4 +1,6 @@
 import pytest
+from _pytest.config import Config
+from _pytest.config.argparsing import Parser
 from pathlib import Path
 from tests.runner import CaseRunner
 
@@ -8,6 +10,15 @@ def output_dir() -> Path:
     output.mkdir(exist_ok=True)
     return output
 
+def pytest_addoption(parser: Parser):
+    parser.addoption(
+        "--eliot-debug",
+        action="store_true",
+        default=False,
+        help="Enable debug dump on failure"
+    )
+
 @pytest.fixture
-def case_runner(output_dir: Path) -> CaseRunner:
-    return CaseRunner(output_dir)
+def case_runner(output_dir: Path, pytestconfig: Config) -> CaseRunner:
+    debug: bool = pytestconfig.getoption("--eliot-debug")
+    return CaseRunner(output_dir, debug)

@@ -11,8 +11,9 @@ BUFFER_SIZE = 4 * 1024 * 1024
 AssertFn = Callable[[ExchangeStats], None]
 
 class CaseRunner:
-    def __init__(self, output_dir: Path):
+    def __init__(self, output_dir: Path, debug: bool):
         self.output_dir = output_dir
+        self.debug = debug
         self.workspace: Path
 
     def run(self, case_path: Path):
@@ -29,9 +30,10 @@ class CaseRunner:
             stats = ExchangeStats(sent, received)
             self._assert(case_path, stats)
         except Exception:
-            if proc.poll() is None:
-                self._stop_binary(proc)
-            self._dump_output(proc)
+            if self.debug:
+                if proc.poll() is None:
+                    self._stop_binary(proc)
+                self._dump_output(proc)
             raise
         finally:
             if proc.poll() is None:
