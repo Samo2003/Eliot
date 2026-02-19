@@ -43,7 +43,10 @@ class ExponentialFloat(ExponentialBase[Literal["ExponentialFloat"], float]):
     """Exponential Float value generator"""
     
     def value(self) -> float:
-        u = random.random()
+        if self.seed is not None:
+            u = random.Random(self.seed).random()
+        else:
+            u = random.random()
         x = 0.0
         if self.mean is not None:
             x = -self.mean * math.log(u)
@@ -55,7 +58,10 @@ class ExponentialInt(ExponentialBase[Literal["ExponentialInt"], int]):
     """Exponential Int value generator"""
     
     def value(self) -> int:
-        u = random.random()
+        if self.seed is not None:
+            u = random.Random(self.seed).random()
+        else:
+            u = random.random()
         x = 0.0
         if self.mean is not None:
             x = -self.mean * math.log(u)

@@ -28,6 +28,15 @@ namespace eliot_generated {
      * After triggering, the internal counter is reset.
      */
     struct {{ condition.cpp_type() }} {
+        {% if not condition.not_generator_N() %}
+
+        /**
+         * @brief Constructs the condition and initializes `_N`.
+         */
+        explicit {{ condition.cpp_type() }}() 
+            : _N(generate{{ condition.N.cpp_call() }})) 
+        {}
+        {% endif %}
 
         /**
          * @brief Evaluates whether the condition is fulfilled.
@@ -58,17 +67,17 @@ namespace eliot_generated {
 
             ///> Packet evaluation counter.
             size_t _counter = 0;
-
-            ///> Activation threshold.
-            {% if not condition.not_generator_N() %}
-            size_t _N = {{ condition.N.value() }};
-            {% else %}
-            static constexpr size_t _N = {{ condition.N }};
-            {% endif %}
             {% if not condition.not_generator_N() and condition.N.is_state() %}
 
             ///> Generator providing dynamic values for N.
             {{ condition.N.cpp_type() }} {{ condition.N.cpp_name() }};
+            {% endif %}
+
+            ///> Activation threshold.
+            {% if not condition.not_generator_N() %}
+            size_t _N;
+            {% else %}
+            static constexpr size_t _N = {{ condition.N }};
             {% endif %}
     };
 }

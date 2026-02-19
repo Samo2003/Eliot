@@ -10,13 +10,14 @@ build:
             generatorType: UniformInt
             min: 1
             max: 5
-            seed: 12345678
+            seed: 1234567
           f:
             generatorType: SeqCountInt
+            min: 1
             step: 2
       actions:
         - actionType: Drop
 
 send: 
-  - count: 12
+  - count: 20
   

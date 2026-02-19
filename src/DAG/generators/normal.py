@@ -35,13 +35,19 @@ class NormalFloat(NormalBase[Literal["NormalFloat"], float]):
     """Normal Float value generator"""
     
     def value(self) -> float:
-        x = random.gauss(self.m, self.s)
+        if self.seed is not None:
+            x = random.Random(self.seed).gauss(self.m, self.s)
+        else:
+            x = random.gauss(self.m, self.s)
         return self.clamp(x)
 
 class NormalInt(NormalBase[Literal["NormalInt"], int]):
     """Normal Int value generator"""
     
     def value(self) -> int:
-        x = random.gauss(self.m, self.s)
+        if self.seed is not None:
+            x = random.Random(self.seed).gauss(self.m, self.s)
+        else:
+            x = random.gauss(self.m, self.s)
         x = self.clamp(x)
         return int(round(x))

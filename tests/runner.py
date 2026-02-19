@@ -28,8 +28,14 @@ class CaseRunner:
             sent, received = self._send_packets(case, port)
             stats = ExchangeStats(sent, received)
             self._assert(case_path, stats)
+        except Exception:
+            if proc.poll() is None:
+                self._stop_binary(proc)
+            self._dump_output(proc)
+            raise
         finally:
-            self._stop_binary(proc)
+            if proc.poll() is None:
+                self._stop_binary(proc)
 
     def _workspace(self, case_path: Path) -> Path:
         cases_root = (Path(__file__).resolve().parent / "cases").resolve()
@@ -118,6 +124,17 @@ class CaseRunner:
 
         check = cast(AssertFn, namespace["check"])
         check(stats)
+
+    def _dump_output(self, proc: subprocess.Popen[str]):
+        try:
+            out, err = proc.communicate(timeout=1)
+            print("\n====== STDOUT ======")
+            print(out)
+            print("\n====== STDERR ======")
+            print(err)
+            print("\n====================\n")
+        except Exception as e:
+            print(f"Failed to dump process output: {e}")
 
     def _stop_binary(self, proc: subprocess.Popen[str]):
         proc.terminate()

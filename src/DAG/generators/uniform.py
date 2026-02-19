@@ -34,6 +34,8 @@ class UniformFloat(UniformBase[Literal["UniformFloat"], float]):
 
     def value(self) -> float:
         min_val, max_val = self.get_min_max()
+        if self.seed is not None:
+            return random.Random(self.seed).uniform(min_val, max_val)
         return random.uniform(min_val, max_val)
 
 class UniformInt(UniformBase[Literal["UniformInt"], int]):
@@ -41,4 +43,6 @@ class UniformInt(UniformBase[Literal["UniformInt"], int]):
 
     def value(self) -> int:
         min_val, max_val = self.get_min_max()
+        if self.seed is not None:
+            return random.Random(self.seed).randint(min_val, max_val)
         return random.randint(min_val, max_val)

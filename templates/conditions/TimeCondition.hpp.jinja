@@ -43,7 +43,7 @@ namespace eliot_generated {
         {{ 'static ' if not condition.instant else '' }}inline bool fulfilled(const Packet* /*packet*/) noexcept {
             {% if not condition.instant %}
             // Static initialization timestamp
-            static const uint64_t start = read_clock_ms();
+            static const uint64_t start = get_global_time();
             
             {% endif %}
             // Elapsed time in milliseconds
@@ -63,7 +63,7 @@ namespace eliot_generated {
         private:
 
             ///> Initialization timestamp.
-            const uint64_t start = read_clock_ms();
+            const uint64_t start = get_global_time();
         {% endif %}
     };
 

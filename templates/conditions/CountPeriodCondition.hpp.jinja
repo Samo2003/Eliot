@@ -37,6 +37,15 @@ namespace eliot_generated {
      * and the duration of the inactive state by parameter `f`.
      */
     struct {{ condition.cpp_type() }} {
+        {% if not condition.not_generator_t() %}
+
+        /**
+         * @brief Constructs the condition and initializes `_threshold`. 
+         */
+        explicit {{ condition.cpp_type() }}() 
+            : _threshold(generate{{ condition.t.cpp_call() }})) 
+        {}
+        {% endif %}
 
         /**
          * @brief Evaluates whether the condition is fulfilled.
@@ -49,21 +58,33 @@ namespace eliot_generated {
          * @return true if the condition is currently in active state.
          */
         inline bool fulfilled(const Packet* /*packet*/) noexcept {
-            if (_counter == _threshold) {
-                _counter = 0;
-                _state = !_state;
+            if (_counter == 0) {
                 {% if condition.not_generator_t() and condition.not_generator_f() %}
                 _threshold = _state ? _T : _F;
                 {% elif condition.not_generator_t() %}
-                _threshold =  _state ? _T : generate{{ condition.f.cpp_call() }}); 
+                _threshold =  _state 
+                    ? _T 
+                    : generate{{ condition.f.cpp_call() }}); 
                 {% elif condition.not_generator_f() %}
-                _threshold = _state ? generate{{ condition.t.cpp_call() }}) : _F;
+                _threshold = _state 
+                    ? generate{{ condition.t.cpp_call() }}) 
+                    : _F;
                 {% else %}
-                _threshold = _state ? generate{{ condition.t.cpp_call() }}) : generate{{ condition.f.cpp_call() }});
+                _threshold = _state 
+                    ? generate{{ condition.t.cpp_call() }}) 
+                    : generate{{ condition.f.cpp_call() }});
                 {% endif %}
             }
+            bool result = _state;
+
             _counter++;
-            return _state;
+
+            if (_counter >= _threshold) {
+                _counter = 0;
+                _state = !_state;
+            }
+
+            return result;
         }
 
         private:
@@ -84,22 +105,22 @@ namespace eliot_generated {
             ///> Condition `f` parameter.
             static constexpr size_t _F = {{ condition.f }};
             {% endif %}
+            {% if not condition.not_generator_t() and condition.t.is_state() %}
+
+            ///> Generator providing dynamic values for active-phase duration.
+            inline static {{ condition.t.cpp_type() }} {{ condition.t.cpp_name() }};
+            {% endif %}
+            {% if not condition.not_generator_f() and condition.f.is_state() %}
+
+            ///> Generator providing dynamic values for inactive-phase duration.
+            inline static {{ condition.f.cpp_type() }} {{ condition.f.cpp_name() }};
+            {% endif %}
 
             ///> Current threshold defining the duration of the active/inactive phase.
             {% if condition.not_generator_t() %}
             size_t _threshold = {{ condition.t }};
             {% else %}
-            size_t _threshold = {{ condition.t.value() }};
-            {% endif %}
-            {% if not condition.not_generator_t() and condition.t.is_state() %}
-
-            ///> Generator providing dynamic values for active-phase duration.
-            {{ condition.t.cpp_type() }} {{ condition.t.cpp_name() }};
-            {% endif %}
-            {% if not condition.not_generator_f() and condition.f.is_state() %}
-
-            ///> Generator providing dynamic values for inactive-phase duration.
-            {{ condition.f.cpp_type() }} {{ condition.f.cpp_name() }};
+            size_t _threshold;
             {% endif %}
     };
 }

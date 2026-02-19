@@ -17,11 +17,19 @@ class CountPeriod(ConditionBase[Literal["CountPeriod"]]):
         """Default value of `f` is `t`"""
         if self.f is None:
             self.f = self.t
-        if isinstance(self.t, int) and self.t <= 0:
-            raise ValueError("t must be greater than zero")
+        if isinstance(self.t, int):
+            if self.t <= 0:
+                raise ValueError("t must be greater than zero")
+        else:
+            if self.t.min is not None and self.t.min <= 0:
+                raise ValueError("t must be greater than zero")
             
-        if isinstance(self.f, int) and self.f <= 0:
-            raise ValueError("f must be greater than zero")
+        if isinstance(self.f, int):
+            if self.f <= 0:
+                raise ValueError("f must be greater than zero")
+        else: 
+            if self.f.min is not None and self.f.min <= 0:
+                raise ValueError("f must be greater than zero")
         return self
 
     def cpp_type(self) -> str:
