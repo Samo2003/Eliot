@@ -38,7 +38,7 @@ class SeqCountBase(ValueGeneratorBase[T, N], ABC):
     
     @final
     def cpp_type(self) -> str:
-        return f"{self.cpp_type_base()}_{self.T}_{self.N_to_str(self.step)}_{self.mode.upper()}_{id(self)}"
+        return f"{self.cpp_type_base()}_{self.T}_{self.N_to_str(self.step)}_{self.mode.upper()}"
     
     @final
     def is_state(self) -> bool:

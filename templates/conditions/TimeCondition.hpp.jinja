@@ -51,22 +51,29 @@ namespace eliot_generated {
             {% if condition.duration is none %}
 
             // Activate after specified delay
-            return elapsed >= {{ condition.after }};
+            return elapsed >= _AFTER;
             {% else %}
 
             // Activate within configured time window
-            return  elapsed >= {{ condition.after }} && elapsed < {{ condition.after + condition.duration }};
+            return  elapsed >= _AFTER && elapsed < _AFTER + _DURATION;
             {% endif %}
         }
 
-        {% if condition.instant %}
         private:
+            {% if condition.instant %}
 
             ///> Initialization timestamp.
             const uint64_t start = Time::now();
-        {% endif %}
-    };
+            {% endif %}
 
+            ///> Condition after parameter.
+            static constexpr uint64_t _AFTER = {{ condition.after }};
+            {% if condition.duration is not none %}
+
+            ///> Condition duration parameter.
+            static constexpr uint64_t _DURATION = {{ condition.duration }};
+            {% endif %}
+    };
 }
 
 #endif

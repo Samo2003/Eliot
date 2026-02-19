@@ -56,7 +56,7 @@ namespace eliot_generated {
             static constexpr int _AFTER = {{ condition.after }};
             {% if condition.duration is not none %}
 
-            ///> Condition after parameter.
+            ///> Condition duration parameter.
             static constexpr int _DURATION = {{ condition.duration }};
             {% endif %}
     };
