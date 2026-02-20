@@ -17,7 +17,7 @@
 
 #include <concepts>
 
-namespace eliot_generated {
+namespace eliot::core {
 
     /**
      * @brief Concept defining a valid state node.

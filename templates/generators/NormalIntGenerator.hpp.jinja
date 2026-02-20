@@ -18,7 +18,7 @@
 #include "../static/xoroshiro128plus.hpp"
 #include "ZigguratTables.hpp"
 
-namespace eliot_generated {
+namespace eliot::generated {
 
     /**
      * @brief Integer value generator.
@@ -76,7 +76,7 @@ namespace eliot_generated {
             {% endif %}
 
             ///> Pseudo-random number generator.
-            inline static xoroshiro128plus _rng{ {{ generator.seed_value() }} };
+            inline static core::xoroshiro128plus _rng{ {{ generator.seed_value() }} };
 
             /**
              * @brief Uniform random float in interval [0, 1).

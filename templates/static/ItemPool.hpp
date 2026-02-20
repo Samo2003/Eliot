@@ -21,7 +21,7 @@
 #include <utility>
 #include <cstdint>
 
-namespace eliot_generated {
+namespace eliot::core {
 
     /**
      * @brief Fixed-size object pool.

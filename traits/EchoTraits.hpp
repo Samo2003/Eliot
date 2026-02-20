@@ -16,90 +16,92 @@
 
 #include "../mocks/echo/nf_queue_echo.hpp"
 
-/**
- * @brief Echo backend traits.
- *
- * This backend simulates echo-like NFQUEUE behavior
- * for testing and validation purposes.
- *
- * Payload is immutable and any modification results
- * in creation of a new PacketType instance.
- */
-struct EchoTraits {
-
-    ///> Backend packet representation.
-    using PacketType = nf_queue_echo::NFQueuePacket;
-
-    ///> Backend queue implementation.
-    using QueueType = nf_queue_echo::NFQueue;
-
+namespace eliot::backend {
     /**
-     * @brief Creates backend queue instance.
-     */
-    inline static QueueType create_queue(int argc, char **argv) {
-        return QueueType();
-    }
-
-    /**
-     * @brief Retrieves next packet from backend queue.
+     * @brief Echo backend traits.
      *
-     * @return std::optional containing PacketType if available.
-     */
-    inline static std::optional<PacketType> get_packet(QueueType& q) {
-        return q.get_packet();
-    }
-
-    /**
-     * @brief Forwards packet to backend.
-     */
-    inline static void accept_packet(QueueType& q, PacketType&& p) {
-        q.accept_packet(std::move(p));
-    }
-
-    /**
-     * @brief Drops packet in backend.
-     */
-    inline static void drop_packet(QueueType& q, PacketType&& p) {
-        q.drop_packet(std::move(p));
-    }
-
-    /**
-     * @brief Creates packet clone.
+     * This backend simulates echo-like NFQUEUE behavior
+     * for testing and validation purposes.
      *
-     * Performs deep copy of payload while preserving metadata.
+     * Payload is immutable and any modification results
+     * in creation of a new PacketType instance.
      */
-    inline static PacketType clone(const PacketType& p) {
-        return PacketType(
-            std::vector<uint8_t>(p.get_payload()),
-            *p.get_from()
-        );
-    }
+    struct EchoTraits {
 
-    /**
-     * @brief Returns read-only packet payload reference.
-     */
-    inline static const std::vector<uint8_t>& payload(const PacketType& p) {
-        return p.get_payload();
-    }
+        ///> Backend packet representation.
+        using PacketType = nf_queue_echo::NFQueuePacket;
 
-    ///> Payload is immutable in this backend.
-    static constexpr bool modifiable_payload = false;
+        ///> Backend queue implementation.
+        using QueueType = nf_queue_echo::NFQueue;
 
-    /**
-     * @brief Returns new packet instance with replaced payload.
-     *
-     * Used by engine when payload modifications are required.
-     * The original packet metadata must be preserved for backend requirements.
-     */
-    inline static PacketType change_payload(PacketType&& old_packet, std::vector<uint8_t>&& new_payload) {
-        return PacketType(
-            std::move(new_payload),
-            *old_packet.get_from()
-        );
-    }
-};
+        /**
+         * @brief Creates backend queue instance.
+         */
+        inline static QueueType create_queue(int argc, char **argv) {
+            return QueueType();
+        }
 
-///> Alias used by generated code.
-using ActiveTraits = EchoTraits;
+        /**
+         * @brief Retrieves next packet from backend queue.
+         *
+         * @return std::optional containing PacketType if available.
+         */
+        inline static std::optional<PacketType> get_packet(QueueType& q) {
+            return q.get_packet();
+        }
+
+        /**
+         * @brief Forwards packet to backend.
+         */
+        inline static void accept_packet(QueueType& q, PacketType&& p) {
+            q.accept_packet(std::move(p));
+        }
+
+        /**
+         * @brief Drops packet in backend.
+         */
+        inline static void drop_packet(QueueType& q, PacketType&& p) {
+            q.drop_packet(std::move(p));
+        }
+
+        /**
+         * @brief Creates packet clone.
+         *
+         * Performs deep copy of payload while preserving metadata.
+         */
+        inline static PacketType clone(const PacketType& p) {
+            return PacketType(
+                std::vector<uint8_t>(p.get_payload()),
+                *p.get_from()
+            );
+        }
+
+        /**
+         * @brief Returns read-only packet payload reference.
+         */
+        inline static const std::vector<uint8_t>& payload(const PacketType& p) {
+            return p.get_payload();
+        }
+
+        ///> Payload is immutable in this backend.
+        static constexpr bool modifiable_payload = false;
+
+        /**
+         * @brief Returns new packet instance with replaced payload.
+         *
+         * Used by engine when payload modifications are required.
+         * The original packet metadata must be preserved for backend requirements.
+         */
+        inline static PacketType change_payload(PacketType&& old_packet, std::vector<uint8_t>&& new_payload) {
+            return PacketType(
+                std::move(new_payload),
+                *old_packet.get_from()
+            );
+        }
+    };
+
+    ///> Alias used by generated code.
+    using ActiveTraits = EchoTraits;
+}
 
 #endif

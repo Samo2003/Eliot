@@ -17,7 +17,7 @@
 #include <bit>
 #include "../static/xoroshiro128plus.hpp"
 
-namespace eliot_generated {
+namespace eliot::generated {
 
     /**
      * @brief Floating-point value generator.
@@ -74,7 +74,7 @@ namespace eliot_generated {
             {% endif %}
 
             ///> Pseudo-random number generator.
-            inline static xoroshiro128plus _rng{ {{ generator.seed_value() }} };
+            inline static core::xoroshiro128plus _rng{ {{ generator.seed_value() }} };
 
             ///> Inverse lambda value used for value generation.
             {% if generator.mean is not none %}

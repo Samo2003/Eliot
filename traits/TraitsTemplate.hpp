@@ -35,100 +35,102 @@
 #include <vector>
 #include "your_backend.hpp"
 
-/**
- * @brief Template for implementing custom backend traits.
- *
- * Replace PacketType and QueueType with backend-specific types.
- *
- * - get_packet()
- *      - Must return ownership of a PacketType instance.
- *      - std::nullopt indicates no packet available.
- *
- * - accept_packet() / drop_packet()
- *      - Must consume PacketType (rvalue).
- *      - PacketType must not be used after forwarding.
- *
- * - clone()
- *      - Must return a semantically valid duplicate of PacketType.
- *      - Deep copy or shallow copy semantics are backend-defined.
- */
-struct TraitsTemplate {
-
-    ///> Backend packet representation.
-    ///> Must be move-constructible and destructible.
-    using PacketType = /* your packet type */;
-
-    ///> Backend queue implementation.
-    using QueueType = /* your queue type */;
-
+namespace eliot::backend {
     /**
-     * @brief Creates backend queue instance.
+     * @brief Template for implementing custom backend traits.
      *
-     * Called once during PacketProcessor construction.
+     * Replace PacketType and QueueType with backend-specific types.
+     *
+     * - get_packet()
+     *      - Must return ownership of a PacketType instance.
+     *      - std::nullopt indicates no packet available.
+     *
+     * - accept_packet() / drop_packet()
+     *      - Must consume PacketType (rvalue).
+     *      - PacketType must not be used after forwarding.
+     *
+     * - clone()
+     *      - Must return a semantically valid duplicate of PacketType.
+     *      - Deep copy or shallow copy semantics are backend-defined.
      */
-    static QueueType create_queue(int argc, char** argv);
+    struct TraitsTemplate {
 
-    /**
-     * @brief Retrieves next packet from backend.
-     *
-     * @return std::optional containing PacketType if available.
-     */
-    static std::optional<PacketType> get_packet(QueueType& q);
+        ///> Backend packet representation.
+        ///> Must be move-constructible and destructible.
+        using PacketType = /* your packet type */;
 
-    /**
-     * @brief Forwards packet to backend.
-     *
-     * Consumes PacketType instance.
-     */
-    static void accept_packet(QueueType& q, PacketType&& p);
+        ///> Backend queue implementation.
+        using QueueType = /* your queue type */;
 
-    /**
-     * @brief Drops packet in backend.
-     *
-     * Consumes PacketType instance.
-     */
-    static void drop_packet(QueueType& q, PacketType&& p);
+        /**
+         * @brief Creates backend queue instance.
+         *
+         * Called once during PacketProcessor construction.
+         */
+        static QueueType create_queue(int argc, char** argv);
 
-    /**
-     * @brief Creates packet clone.
-     *
-     * Used internally by the engine during model evaluation.
-     */
-    static PacketType clone(const PacketType& p);
+        /**
+         * @brief Retrieves next packet from backend.
+         *
+         * @return std::optional containing PacketType if available.
+         */
+        static std::optional<PacketType> get_packet(QueueType& q);
 
-    /**
-     * @brief Returns read-only payload reference.
-     *
-     * Must return reference to payload buffer.
-     */
-    static const std::vector<uint8_t>& payload(const PacketType& p);
+        /**
+         * @brief Forwards packet to backend.
+         *
+         * Consumes PacketType instance.
+         */
+        static void accept_packet(QueueType& q, PacketType&& p);
 
-    /**
-     * @brief Payload handling strategy selector.
-     *
-     * Set to true  -> implement mutable_payload()
-     * Set to false -> implement change_payload()
-     */
-    static constexpr bool modifiable_payload = /* true or false */;
+        /**
+         * @brief Drops packet in backend.
+         *
+         * Consumes PacketType instance.
+         */
+        static void drop_packet(QueueType& q, PacketType&& p);
 
-    /**
-     * @brief Returns mutable reference to payload.
-     *
-     * Implement only if modifiable_payload == true.
-     */
-    static std::vector<uint8_t>& mutable_payload(PacketType& p);
+        /**
+         * @brief Creates packet clone.
+         *
+         * Used internally by the engine during model evaluation.
+         */
+        static PacketType clone(const PacketType& p);
 
-    /**
-     * @brief Returns new packet with replaced payload.
-     *
-     * Implement only if modifiable_payload == false.
-     *
-     * Must return a new PacketType instance with modified payload.
-     */
-    static PacketType change_payload(PacketType&& old_packet, std::vector<uint8_t>&& new_payload);
-};
+        /**
+         * @brief Returns read-only payload reference.
+         *
+         * Must return reference to payload buffer.
+         */
+        static const std::vector<uint8_t>& payload(const PacketType& p);
 
-///> Alias used by generated code.
-using ActiveTraits = TraitsTemplate;
+        /**
+         * @brief Payload handling strategy selector.
+         *
+         * Set to true  -> implement mutable_payload()
+         * Set to false -> implement change_payload()
+         */
+        static constexpr bool modifiable_payload = /* true or false */;
+
+        /**
+         * @brief Returns mutable reference to payload.
+         *
+         * Implement only if modifiable_payload == true.
+         */
+        static std::vector<uint8_t>& mutable_payload(PacketType& p);
+
+        /**
+         * @brief Returns new packet with replaced payload.
+         *
+         * Implement only if modifiable_payload == false.
+         *
+         * Must return a new PacketType instance with modified payload.
+         */
+        static PacketType change_payload(PacketType&& old_packet, std::vector<uint8_t>&& new_payload);
+    };
+
+    ///> Alias used by generated code.
+    using ActiveTraits = TraitsTemplate;
+}
 
 #endif

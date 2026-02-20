@@ -17,14 +17,14 @@
 #include <atomic>
 #include <iostream>
 
-namespace eliot_generated {
+namespace eliot::generated {
 
     /**
      * @brief Generic packet processor bound to backend traits.
      *
      * @tparam Traits Backend-specific implementation.
      */
-    template<BackendTraitsConcept Traits>
+    template<core::BackendTraitsConcept Traits>
     struct PacketProcessor {
 
         ///> Backend queue type defined by traits.
@@ -61,7 +61,7 @@ namespace eliot_generated {
             while (!_stop_flag) {
                 {% if require_time %}
                 // Reset time cache for current iteration
-                Time::reset();
+                core::Time::reset();
 
                 {% endif %}
                 // Process incoming packets

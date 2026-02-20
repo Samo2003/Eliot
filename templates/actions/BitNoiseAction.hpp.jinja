@@ -35,7 +35,7 @@
 #include "../generators/{{ action.end.cpp_type() }}.hpp"
 {% endif %}
 
-namespace eliot_generated {
+namespace eliot::generated {
 
     /**
      * @brief Fault injection action operating on packet payload bits.
@@ -98,7 +98,7 @@ namespace eliot_generated {
             {% if action.not_generator_start() %}
             constexpr int64_t start_offset = {{ action.start }};
             {% else %}
-            const int64_t start_offset = generate{{ action.start.cpp_call() }});
+            const int64_t start_offset = core::generate{{ action.start.cpp_call() }});
             {% endif %}
             // Convert negative offset to positive
             const int64_t beg_rel = start_offset >= 0 ? start_offset : (static_cast<int64_t>(layer_len) + start_offset);
@@ -109,7 +109,7 @@ namespace eliot_generated {
             {% if action.not_generator_end() %}
             constexpr int64_t end_offset = {{ action.end }};
             {% else %}
-            const int64_t end_offset = generate{{ action.end.cpp_call() }});
+            const int64_t end_offset = core::generate{{ action.end.cpp_call() }});
             {% endif %}
             // Convert negative offset to positive
             const int64_t end_rel = end_offset >= 0 ? end_offset : (static_cast<int64_t>(layer_len) + end_offset);
@@ -129,7 +129,7 @@ namespace eliot_generated {
             {% if action.not_generator_x() %}
             constexpr float x = {{ action.x }};
             {% else %}
-            const float x = generate{{ action.x.cpp_call() }});
+            const float x = core::generate{{ action.x.cpp_call() }});
             {% endif %}
             // Convert part to number of bits
             uint64_t bits_to_invert = static_cast<uint64_t>(x * (float)range);
@@ -138,7 +138,7 @@ namespace eliot_generated {
             {% if action.not_generator_n() %}
             const int n = {{ action.n }};
             {% else %}
-            const int n = generate{{ action.n.cpp_call() }});
+            const int n = core::generate{{ action.n.cpp_call() }});
             {% endif %}
             uint64_t bits_to_invert = static_cast<uint64_t>(n);
             {% endif %}
@@ -190,7 +190,7 @@ namespace eliot_generated {
             {% if action.mode == "random" %}
             
             ///> Pseudo-random number generator used for random bit selection.
-            inline static xoroshiro128plus _rng{ {{ action.seed_value() }} };
+            inline static core::xoroshiro128plus _rng{ {{ action.seed_value() }} };
             {% endif %}
             {% if action.x is not none and not action.not_generator_x() and action.x.is_state() %}
 

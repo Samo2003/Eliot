@@ -26,7 +26,7 @@
 {% endif %}
 #include <iostream>
 
-namespace eliot_generated {
+namespace eliot::generated {
 
     /**
      * @brief Time-based state-switching condition.
@@ -41,7 +41,7 @@ namespace eliot_generated {
          * @brief Constructs the condition and initializes `_threshold`.
          */
         explicit {{ condition.cpp_type() }}() 
-            : _threshold(generate{{ condition.t.cpp_call() }})) 
+            : _threshold(core::generate{{ condition.t.cpp_call() }})) 
         {}
         {% endif %}
 
@@ -59,9 +59,9 @@ namespace eliot_generated {
         inline bool fulfilled(const Packet* /*packet*/) noexcept {
             {% if not condition.instant %}
             // Reference timestamp
-            static uint64_t last = Time::now();
+            static uint64_t last = core::Time::now();
             {% endif %}
-            uint64_t now = Time::now();
+            uint64_t now = core::Time::now();
 
             // Advance through all elapsed time windows
             while (now - last  >= _threshold) {
@@ -77,15 +77,15 @@ namespace eliot_generated {
                 {% elif condition.not_generator_t() %}
                 _threshold =  _state 
                     ? _T 
-                    : generate{{ condition.f.cpp_call() }}); 
+                    : core::generate{{ condition.f.cpp_call() }}); 
                 {% elif condition.not_generator_f() %}
                 _threshold = _state 
-                    ? generate{{ condition.t.cpp_call() }}) 
+                    ? core::generate{{ condition.t.cpp_call() }}) 
                     : _F; 
                 {% else %}
                 _threshold = _state 
-                    ? generate{{ condition.t.cpp_call() }}) 
-                    : generate{{ condition.f.cpp_call() }});
+                    ? core::generate{{ condition.t.cpp_call() }}) 
+                    : core::generate{{ condition.f.cpp_call() }});
                 {% endif %}
             }
             return _state;
@@ -108,7 +108,7 @@ namespace eliot_generated {
             {% if condition.instant %}
 
             ///> Reference timestamp.
-            uint64_t last = Time::now();
+            uint64_t last = core::Time::now();
             {% endif %}
             {% if not condition.not_generator_t() and condition.t.is_state() %}
 

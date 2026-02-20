@@ -5,7 +5,7 @@
 #include <optional>
 #include <vector>
 
-namespace eliot_generated {
+namespace eliot::core {
 
     /**
      * @brief Base requirements for backend traits.

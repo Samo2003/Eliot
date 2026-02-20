@@ -21,7 +21,7 @@
 #include "../generators/{{ condition.x.cpp_type() }}.hpp"
 {% endif %}
 
-namespace eliot_generated {
+namespace eliot::generated {
 
     /**
      * @brief Probabilistic condition.
@@ -44,7 +44,7 @@ namespace eliot_generated {
             {% if condition.not_generator_x() %}
             return _prob() < _X;
             {% else %}
-            return _prob() < generate{{ condition.x.cpp_call() }});
+            return _prob() < core::generate{{ condition.x.cpp_call() }});
             {% endif %}
         }
 
@@ -55,7 +55,7 @@ namespace eliot_generated {
             {% endif %}
 
             ///> Pseudo-random number generator.
-            inline static xoroshiro128plus _rng{ {{ condition.seed_value() }} };
+            inline static core::xoroshiro128plus _rng{ {{ condition.seed_value() }} };
 
             /**
              * @brief Uniform random float in interval [0, 1).

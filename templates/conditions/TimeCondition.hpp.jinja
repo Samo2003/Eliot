@@ -16,7 +16,7 @@
 #include "../Packet.hpp"
 #include "../static/Time.hpp"
 
-namespace eliot_generated {
+namespace eliot::generated {
 
     /**
      * @brief Time-based condition.
@@ -43,11 +43,11 @@ namespace eliot_generated {
         {{ 'static ' if not condition.instant else '' }}inline bool fulfilled(const Packet* /*packet*/) noexcept {
             {% if not condition.instant %}
             // Static initialization timestamp
-            static const uint64_t start = Time::now();
+            static const uint64_t start = core::Time::now();
             
             {% endif %}
             // Elapsed time in milliseconds
-            uint64_t elapsed = Time::now() - start;
+            uint64_t elapsed = core::Time::now() - start;
             {% if condition.duration is none %}
 
             // Activate after specified delay
@@ -63,7 +63,7 @@ namespace eliot_generated {
             {% if condition.instant %}
 
             ///> Initialization timestamp.
-            const uint64_t start = Time::now();
+            const uint64_t start = core::Time::now();
             {% endif %}
 
             ///> Condition after parameter.

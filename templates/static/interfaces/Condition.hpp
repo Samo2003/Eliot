@@ -19,7 +19,7 @@
 #include "../../Packet.hpp"
 #include <concepts>
 
-namespace eliot_generated {
+namespace eliot::core {
 
     /**
      * @brief Concept defining a valid condition.
@@ -31,10 +31,10 @@ namespace eliot_generated {
      */
     template<typename T>
     concept ConditionConcept = 
-        requires(T condition, const Packet* packet) {
+        requires(T condition, const generated::Packet* packet) {
             { condition.fulfilled(packet) } -> std::convertible_to<bool>;
         } || 
-        requires(const Packet* packet) {
+        requires(const generated::Packet* packet) {
             { T::fulfilled(packet) } -> std::convertible_to<bool>;
         };
 
@@ -48,7 +48,7 @@ namespace eliot_generated {
      * @return True if condition is satisfied.
      */
     template<ConditionConcept C>
-    inline bool evaluate_condition(C& condition, const Packet* packet) noexcept {
+    inline bool evaluate_condition(C& condition, const generated::Packet* packet) noexcept {
         return condition.fulfilled(packet);
     }
 
@@ -61,7 +61,7 @@ namespace eliot_generated {
      * @return True if condition is satisfied.
      */
     template<ConditionConcept C>
-    inline bool evaluate_condition(const Packet* packet) noexcept {
+    inline bool evaluate_condition(const generated::Packet* packet) noexcept {
         return C::fulfilled(packet);
     }
 }

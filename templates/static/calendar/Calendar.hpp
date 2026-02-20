@@ -24,7 +24,7 @@
 #include "../ItemPool.hpp"
 #include "../../Packet.hpp"
 
-namespace eliot_generated {
+namespace eliot::core {
 
     /**
      * @brief Multi-level timer wheel scheduler.
@@ -40,14 +40,14 @@ namespace eliot_generated {
          * @param packet Packet to schedule.
          * @param delay Delay in milliseconds.
          */
-        void schedule(Packet* packet, uint64_t delay) noexcept;
+        void schedule(generated::Packet* packet, uint64_t delay) noexcept;
 
         /**
          * @brief Returns next ready packet if available.
          *
          * @return Pointer to ready packet or nullptr.
          */
-        Packet* get_ready() noexcept;
+        generated::Packet* get_ready() noexcept;
 
         /**
          * @brief Returns true if no packets are scheduled.
@@ -91,14 +91,14 @@ namespace eliot_generated {
              * Represents one scheduled packet.
              */
             struct CalendarItem {
-                CalendarItem(uint64_t t, Packet *p) noexcept 
+                CalendarItem(uint64_t t, generated::Packet *p) noexcept 
                     : tick(t), packet(p), next(nullptr) {}
 
                 ///> Scheduled tick.
                 uint64_t tick;
 
                 ///> Associated packet.
-                Packet* packet;
+                generated::Packet* packet;
 
                 ///> Intrusive linked list pointer.
                 CalendarItem* next = nullptr;

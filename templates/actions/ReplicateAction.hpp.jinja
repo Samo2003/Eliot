@@ -20,7 +20,7 @@
 #include "../generators/{{ action.n.cpp_type() }}.hpp"
 {% endif %}
 
-namespace eliot_generated {
+namespace eliot::generated {
 
     /**
      * @brief Fault injection action performing packet replication.
@@ -38,7 +38,7 @@ namespace eliot_generated {
          *
          * @param calendar Reference to the calendar used for packet scheduling.
          */
-        explicit {{ action.cpp_type() }}(Calendar& calendar) : _calendar(calendar) {}
+        explicit {{ action.cpp_type() }}(core::Calendar& calendar) : _calendar(calendar) {}
 
         /**
          * @brief Creates packet replicas and schedules them.
@@ -49,7 +49,7 @@ namespace eliot_generated {
             {% if action.not_generator_n() %}
             for (int i = 0; i < _N; i++) {
             {% else %}
-            const int n = generate{{ action.n.cpp_call() }});
+            const int n = core::generate{{ action.n.cpp_call() }});
 
             for (int i = 0; i < n; i++) {
             {% endif %}
@@ -66,7 +66,7 @@ namespace eliot_generated {
             {% endif %}
 
             ///> Reference to the shared calendar instance.
-            Calendar& _calendar;
+            core::Calendar& _calendar;
             {% if not action.not_generator_n() and action.n.is_state() %}
 
             ///> Generator providing dynamic delay values.

@@ -19,7 +19,7 @@
 #include "../generators/{{ condition.N.cpp_type() }}.hpp"
 {% endif %}
 
-namespace eliot_generated {
+namespace eliot::generated {
 
     /**
      * @brief Periodic condition triggered every N evaluations.
@@ -34,7 +34,7 @@ namespace eliot_generated {
          * @brief Constructs the condition and initializes `_N`.
          */
         explicit {{ condition.cpp_type() }}() 
-            : _N(generate{{ condition.N.cpp_call() }})) 
+            : _N(core::generate{{ condition.N.cpp_call() }})) 
         {}
         {% endif %}
 
@@ -56,7 +56,7 @@ namespace eliot_generated {
             if (++_counter >= _N) {
                 _counter = 0;
                 {% if not condition.not_generator_N() %}
-                _N = generate{{ condition.N.cpp_call() }});
+                _N = core::generate{{ condition.N.cpp_call() }});
                 {% endif %}
                 return true;
             }

@@ -23,9 +23,9 @@
 #include "static/ItemPool.hpp"
 #include "static/interfaces/Traits.hpp"
 
-namespace eliot_generated {
+namespace eliot::generated {
     // Validate BackendTrait against concept
-    static_assert(BackendTraitsConcept<ActiveTraits>, "ActiveTraits does not satisfy BackendTraits concept");
+    static_assert(core::BackendTraitsConcept<backend::ActiveTraits>, "ActiveTraits does not satisfy BackendTraits concept");
 
     /**
      * @brief Result of packet evaluation.
@@ -47,7 +47,7 @@ namespace eliot_generated {
      *
      * @tparam Traits Backend-specific implementation.
      */
-    template<BackendTraitsConcept Traits>
+    template<core::BackendTraitsConcept Traits>
     struct InternalPacket {
 
         ///> Backend packet type.
@@ -206,8 +206,8 @@ namespace eliot_generated {
             /**
              * @brief Returns static item pool instance.
              */
-            static inline ItemPool<InternalPacket<Traits>>& _packet_pool() {
-                static ItemPool<InternalPacket<Traits>, 4096> pool;
+            static inline core::ItemPool<InternalPacket<Traits>>& _packet_pool() {
+                static core::ItemPool<InternalPacket<Traits>, 4096> pool;
                 return pool;
             }
 
@@ -294,7 +294,7 @@ namespace eliot_generated {
     };
 
     ///> Active packet type.
-    using Packet = InternalPacket<ActiveTraits>;
+    using Packet = InternalPacket<backend::ActiveTraits>;
 }
 
 #endif

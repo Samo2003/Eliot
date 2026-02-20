@@ -15,7 +15,7 @@
 
 #include "../static/xoroshiro128plus.hpp"
 
-namespace eliot_generated {
+namespace eliot::generated {
 
     /**
      * @brief Uniform floating-point value generator.
@@ -62,7 +62,7 @@ namespace eliot_generated {
             static constexpr float _MAX = {{ generator.max }}f;
 
             ///> Pseudo-random number generator.
-            inline static xoroshiro128plus _rng{ {{ generator.seed_value() }} };
+            inline static core::xoroshiro128plus _rng{ {{ generator.seed_value() }} };
 
             /**
              * @brief Generates a uniformly distributed value.

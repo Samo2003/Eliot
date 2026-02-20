@@ -24,7 +24,7 @@
 #include "../generators/{{ condition.f.cpp_type() }}.hpp"
 {% endif %}
 
-namespace eliot_generated {
+namespace eliot::generated {
 
     /**
      * @brief Periodic state-switching condition.
@@ -43,7 +43,7 @@ namespace eliot_generated {
          * @brief Constructs the condition and initializes `_threshold`. 
          */
         explicit {{ condition.cpp_type() }}() 
-            : _threshold(generate{{ condition.t.cpp_call() }})) 
+            : _threshold(core::generate{{ condition.t.cpp_call() }})) 
         {}
         {% endif %}
 
@@ -64,15 +64,15 @@ namespace eliot_generated {
                 {% elif condition.not_generator_t() %}
                 _threshold =  _state 
                     ? _T 
-                    : generate{{ condition.f.cpp_call() }}); 
+                    : core::generate{{ condition.f.cpp_call() }}); 
                 {% elif condition.not_generator_f() %}
                 _threshold = _state 
-                    ? generate{{ condition.t.cpp_call() }}) 
+                    ? core::generate{{ condition.t.cpp_call() }}) 
                     : _F;
                 {% else %}
                 _threshold = _state 
-                    ? generate{{ condition.t.cpp_call() }}) 
-                    : generate{{ condition.f.cpp_call() }});
+                    ? core::generate{{ condition.t.cpp_call() }}) 
+                    : core::generate{{ condition.f.cpp_call() }});
                 {% endif %}
             }
             bool result = _state;

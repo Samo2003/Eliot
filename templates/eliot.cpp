@@ -13,8 +13,6 @@
 #include "PacketProcessor.hpp"
 #include <csignal>
 
-using namespace eliot_generated;
-
 /**
  * @brief Application entry point.
  *
@@ -33,12 +31,12 @@ using namespace eliot_generated;
 int main(int argc, char **argv) {
     // Register SIGINT handler for graceful shutdown
     std::signal(SIGINT, [](int){
-        PacketProcessor<ActiveTraits>::stop();
+        eliot::generated::PacketProcessor<eliot::backend::ActiveTraits>::stop();
     });
 
     try {
         // Create packet processor
-        PacketProcessor<ActiveTraits> processor(argc, argv);
+        eliot::generated::PacketProcessor<eliot::backend::ActiveTraits> processor(argc, argv);
 
         // Start processing loop
         processor.run();

@@ -19,7 +19,7 @@
 #include "../generators/{{ condition.size.cpp_type() }}.hpp"
 {% endif %}
 
-namespace eliot_generated {
+namespace eliot::generated {
 
     /**
      * @brief Packet size-based condition.
@@ -42,7 +42,7 @@ namespace eliot_generated {
             {% if condition.not_generator_size() %}
             return packet->size() {{ condition.get_op() }} {{ condition.size }};
             {% else %}
-            return packet->size() {{ condition.get_op() }} generate{{ condition.size.cpp_call() }});
+            return packet->size() {{ condition.get_op() }} core::generate{{ condition.size.cpp_call() }});
             {% endif %}
         }
 

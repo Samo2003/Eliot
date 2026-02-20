@@ -33,7 +33,7 @@
 #include "actions/{{ action.cpp_type() }}.hpp"
 {% endfor %}
 
-namespace eliot_generated {
+namespace eliot::generated {
 
     /**
      * @brief Generated fault model.
@@ -75,7 +75,7 @@ namespace eliot_generated {
             {% if require_calendar %}
 
             ///> Shared calendar instance.
-            Calendar _calendar;
+            core::Calendar _calendar;
             {% endif %}
 
 {% for state in states %}

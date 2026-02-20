@@ -23,7 +23,7 @@
 #include <mach/mach_time.h>
 #endif
 
-namespace eliot_generated {
+namespace eliot::core {
 
     /**
      * @brief Cached time utility.

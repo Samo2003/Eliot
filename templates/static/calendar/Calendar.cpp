@@ -12,7 +12,7 @@
 
 #include "Calendar.hpp"
 
-namespace eliot_generated {
+namespace eliot::core {
 
     /**
      * @brief Schedules packet for delayed processing.
@@ -20,12 +20,12 @@ namespace eliot_generated {
      * Packet is inserted into appropriate timer wheel level
      * based on delay distance from current tick.
      */
-    void Calendar::schedule(Packet* packet, uint64_t delay) noexcept {
+    void Calendar::schedule(generated::Packet* packet, uint64_t delay) noexcept {
         if (!packet)
             return;
 
         // Mark packet as scheduled
-        packet->result = PacketResult::Calendar;
+        packet->result = generated::PacketResult::Calendar;
         
         // Time when packet processing should continue
         uint64_t due_tick = _current_tick_from_clock() + delay;
@@ -100,7 +100,7 @@ namespace eliot_generated {
      * Advances internal tick and performs cascading
      * between wheel levels when necessary.
      */
-    Packet* Calendar::get_ready() noexcept {
+    generated::Packet* Calendar::get_ready() noexcept {
         if (_size == 0)
             return nullptr;
 
@@ -121,11 +121,11 @@ namespace eliot_generated {
 
             // Check current bucket for packet
             if (CalendarItem* item = bucket.pop()) {
-                Packet* packet = item->packet;
+                generated::Packet* packet = item->packet;
                 _item_pool.release(item);
                 _size--;
                 // Restore packet processing state
-                packet->result = PacketResult::Processing;
+                packet->result = generated::PacketResult::Processing;
                 return packet;
             }
 
@@ -152,7 +152,7 @@ namespace eliot_generated {
         for (uint32_t i = 0; i < _SLOTS; i++) {
             CalendarItem *item;
             while ((item = wheel[i].pop())) {
-                Packet::release(item->packet);
+                generated::Packet::release(item->packet);
                 _item_pool.release(item);
             }
         }

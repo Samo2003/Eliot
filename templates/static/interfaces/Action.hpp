@@ -16,7 +16,7 @@
 #include "../../Packet.hpp"
 #include <concepts>
 
-namespace eliot_generated {
+namespace eliot::core {
 
     /**
      * @brief Concept defining a valid action.
@@ -28,10 +28,10 @@ namespace eliot_generated {
      */
     template<typename T>
     concept ActionConcept = 
-        requires(T action, Packet* packet) {
+        requires(T action, generated::Packet* packet) {
             { action.execute(packet) };
         } || 
-        requires(Packet* packet) {
+        requires(generated::Packet* packet) {
             { T::execute(packet) };
         };
 
@@ -43,7 +43,7 @@ namespace eliot_generated {
      * @param packet Pointer to packet.
      */
     template<ActionConcept A>
-    inline void execute_action(A& action, Packet* packet) noexcept {
+    inline void execute_action(A& action, generated::Packet* packet) noexcept {
         action.execute(packet);
     }
 
@@ -54,7 +54,7 @@ namespace eliot_generated {
      * @param packet Pointer to packet.
      */
     template<ActionConcept A>
-    inline void execute_action(Packet* packet) noexcept {
+    inline void execute_action(generated::Packet* packet) noexcept {
         A::execute(packet);
     }
 }

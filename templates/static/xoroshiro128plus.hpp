@@ -20,7 +20,7 @@
 
 #include <stdint.h>
 
-namespace eliot_generated {
+namespace eliot::core {
 
     /**
      * @brief xoroshiro128+ random number generator.

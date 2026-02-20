@@ -20,7 +20,7 @@
 #include "../static/calendar/Calendar.hpp"
 {% endif %}
 
-namespace eliot_generated {
+namespace eliot::generated {
 
     /**
      * @brief Fault injection action implementing rate limiting.
@@ -36,7 +36,7 @@ namespace eliot_generated {
          *
          * @param calendar Reference to the calendar used for delayed packet scheduling.
          */
-        explicit {{ action.cpp_type() }}(Calendar& calendar) : _calendar(calendar) {}
+        explicit {{ action.cpp_type() }}(core::Calendar& calendar) : _calendar(calendar) {}
 
         {% endif %}
         /**
@@ -53,7 +53,7 @@ namespace eliot_generated {
          * @param packet Pointer to the packet being processed.
          */
         inline void execute(Packet* packet) noexcept {
-            const uint64_t now = Time::now();
+            const uint64_t now = core::Time::now();
             {% if action.mode == "shaping"%}
 
             // Refill tokens based on elapsed time
@@ -99,7 +99,7 @@ namespace eliot_generated {
 
             {% if action.mode == "shaping"%}
             ///> Reference to the calendar used for delayed scheduling.
-            Calendar& _calendar;
+            core::Calendar& _calendar;
 
             ///> Maximum token bucket size (burst size).
             static constexpr double _MAX_SIZE = {{ action.burst }};
@@ -108,10 +108,10 @@ namespace eliot_generated {
             double _tokens = _MAX_SIZE;
 
             ///> Timestamp of the last token update.
-            uint64_t _last = Time::now();
+            uint64_t _last = core::Time::now();
             {% else %}
             ///> Timestamp when the next packet transmission is allowed.
-            uint64_t _next_allowed_time = Time::now();
+            uint64_t _next_allowed_time = core::Time::now();
             {% endif %}
     };
 }

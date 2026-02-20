@@ -24,7 +24,7 @@
 #include "../Packet.hpp"
 #include "../static/calendar/Calendar.hpp"
 
-namespace eliot_generated {
+namespace eliot::generated {
 
     /**
      * @brief Fault injection action performing packet buffering and reordering.
@@ -40,9 +40,9 @@ namespace eliot_generated {
          *
          * @param calendar Reference to the calendar used for packet scheduling.
          */
-        explicit {{ action.cpp_type() }}(Calendar& calendar) : 
+        explicit {{ action.cpp_type() }}(core::Calendar& calendar) : 
             _calendar(calendar){% if not action.not_generator_n() %},
-            _size(generate{{ action.n.cpp_call() }}))
+            _size(core::generate{{ action.n.cpp_call() }}))
             {% endif %}
         {}
 
@@ -80,7 +80,7 @@ namespace eliot_generated {
 
             {% if not action.not_generator_n() %}
             // Update buffer size dynamically
-            _size = generate{{ action.n.cpp_call() }});
+            _size = core::generate{{ action.n.cpp_call() }});
             {% endif %}
             _buffer_index = 0;
         }
@@ -99,7 +99,7 @@ namespace eliot_generated {
         private:
 
             ///> Reference to the shared calendar instance.
-            Calendar& _calendar;
+            core::Calendar& _calendar;
             {% if action.not_generator_n() %}
 
             ///> Fixed size of the packet buffer.
@@ -129,7 +129,7 @@ namespace eliot_generated {
             {% if action.strategy == "random" %}
 
             ///> Pseudo-random number generator used for packet shuffling.
-            inline static xoroshiro128plus _rng{ {{ action.seed_value() }} };
+            inline static core::xoroshiro128plus _rng{ {{ action.seed_value() }} };
             {% endif %}
     };
 }
