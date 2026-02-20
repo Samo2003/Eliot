@@ -27,6 +27,10 @@ namespace eliot_generated {
             typename T::PacketType;
             typename T::QueueType;
 
+            // Packet must be storable in wrappers/optionals
+            requires std::move_constructible<typename T::PacketType>;
+            requires std::destructible<typename T::PacketType>;
+
             // Queue creation
             { T::create_queue(argc, argv) } -> std::same_as<typename T::QueueType>;
             
@@ -39,16 +43,16 @@ namespace eliot_generated {
             // Packet dropping
             { T::drop_packet(q, std::move(p)) } -> std::same_as<void>;
 
+            // Packet cloning
+            { T::clone(cp) } -> std::same_as<typename T::PacketType>;
+
             // Read-only payload access
-            { T::payload(p) } -> std::same_as<const std::vector<uint8_t>&>;
+            { T::payload(cp) } -> std::same_as<const std::vector<uint8_t>&>;
 
             // Compile-time payload mutability flag
             requires requires { 
-                { std::bool_constant<T::modifiable_payload>{} };
+                { T::modifiable_payload } -> std::convertible_to<bool>;
             };
-
-            // Packet cloning
-            { T::clone(cp) } -> std::same_as<typename T::PacketType>;
         };
 
     /**
@@ -78,6 +82,8 @@ namespace eliot_generated {
         ) {
             requires (T::modifiable_payload == false);
 
+            requires std::assignable_from<typename T::PacketType&, typename T::PacketType>;
+
             { T::change_payload(std::move(p), std::move(payload)) } -> std::same_as<typename T::PacketType>;
         };
 
@@ -88,7 +94,7 @@ namespace eliot_generated {
      * payload handling strategy.
      */
     template<typename T>
-    concept BackendTraitsConcept = BaseTraitsConcept<T> && (ModifiablePayloadTraitsConcept<T> || ImmutablePayloadTraitsConcept<T>);
+    concept BackendTraitsConcept = BaseTraitsConcept<T> && (ModifiablePayloadTraitsConcept<T> != ImmutablePayloadTraitsConcept<T>);
 }
 
 #endif

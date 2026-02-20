@@ -81,7 +81,7 @@ namespace nf_queue_mock {
                 origin = Origin::Client;
             else if (from.sin_addr.s_addr == _server_addr.sin_addr.s_addr && from.sin_port == _server_addr.sin_port) 
                 origin = Origin::Server;
-            _queue.push(NFQueuePacket(_packet_id++, std::move(payload), origin));
+            _queue.push(NFQueuePacket(std::move(payload), origin));
         }
     }
 

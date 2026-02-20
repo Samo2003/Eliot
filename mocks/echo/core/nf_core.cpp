@@ -74,7 +74,7 @@ namespace nf_queue_echo {
                 break;
             }
             std::vector<uint8_t> payload(buf, buf + n);
-            _queue.push(NFQueuePacket(_packet_id++, std::move(payload), from));
+            _queue.push(NFQueuePacket(std::move(payload), from));
         }
     }
 

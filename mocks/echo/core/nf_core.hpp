@@ -25,7 +25,6 @@ namespace nf_queue_echo {
 
         private:
             Socket _socket;
-            uint64_t _packet_id = 1;
             std::queue<NFQueuePacket> _queue;
             static constexpr const char* _ip = "127.0.0.1";
             static constexpr int _port = 0;

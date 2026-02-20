@@ -128,7 +128,7 @@ def receive_packets(sock: socket.socket, timeout: float) -> List[ReceivedPacket]
 
         recv_time = time.time()
         try:
-            ip = IP(data)
+            ip: Packet = IP(data)
             ip_proto = ip.proto
         except Exception:
             try:

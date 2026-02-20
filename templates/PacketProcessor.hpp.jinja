@@ -108,7 +108,7 @@ namespace eliot_generated {
                     // Wrap backend packet into internal Packet object
                     auto packet = Packet::acquire(std::move(*maybe_packet));
 
-                    ///> Evaluate fault model
+                    // Evaluate fault model
                     _model.evaluate(packet);
 
                     // Handle packet result

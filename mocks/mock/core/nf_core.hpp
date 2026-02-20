@@ -40,7 +40,6 @@ namespace nf_queue_mock {
             Socket _send_socket;
             sockaddr_in _client_addr{};
             sockaddr_in _server_addr{};
-            uint64_t _packet_id = 1;
             std::queue<NFQueuePacket> _queue;
 
             static Socket _make_recv_socket(const std::string& bind_addr, uint16_t port);
