@@ -14,158 +14,159 @@
 
 namespace eliot::core {
 
-    /**
-     * @brief Schedules packet for delayed processing.
-     *
-     * Packet is inserted into appropriate timer wheel level
-     * based on delay distance from current tick.
-     */
-    void Calendar::schedule(generated::Packet* packet, uint64_t delay) noexcept {
-        if (!packet)
-            return;
+/**
+ * @brief Schedules packet for delayed processing.
+ *
+ * Packet is inserted into appropriate timer wheel level
+ * based on delay distance from current tick.
+ */
+void Calendar::schedule(generated::Packet* packet, uint64_t delay) noexcept {
+    if (!packet)
+        return;
 
-        // Mark packet as scheduled
-        packet->result = generated::PacketResult::Calendar;
-        
-        // Time when packet processing should continue
-        uint64_t due_tick = _current_tick_from_clock() + delay;
+    // Mark packet as scheduled
+    packet->result = generated::Packet::Result::Calendar;
+    
+    // Time when packet processing should continue
+    uint64_t due_tick = _current_tick_from_clock() + delay;
 
-        // Allocate new item
-        CalendarItem* item = _item_pool.acquire(due_tick, packet);
+    // Allocate new item
+    CalendarItem* item = _item_pool.acquire(due_tick, packet);
 
-        // Number of ticks from now till due tick
-        uint64_t diff = (due_tick > _current_tick) ? (due_tick - _current_tick) : 0;
-        if (diff < _L0_SPAN) {
-            // Insert into L0
-            uint32_t slot = static_cast<uint32_t>(due_tick & _MASK);
-            _wheel0[slot].push(item);
-        } else if (diff < _L1_SPAN) {
-            // L1 tick resolution
-            uint32_t slot = static_cast<uint32_t>((due_tick / _L0_SPAN) & _MASK);
-            // Insert into L1
-            _wheel1[slot].push(item);
-        } else {
-            // L2 tick resolution
-            uint32_t slot = static_cast<uint32_t>((due_tick / _L1_SPAN) & _MASK);
-            // Insert into L2
-            _wheel2[slot].push(item);
-        }
-
-        _size++;
+    // Number of ticks from now till due tick
+    uint64_t diff = (due_tick > _current_tick) ? (due_tick - _current_tick) : 0;
+    if (diff < _L0_SPAN) {
+        // Insert into L0
+        uint32_t slot = static_cast<uint32_t>(due_tick & _MASK);
+        _wheel0[slot].push(item);
+    } else if (diff < _L1_SPAN) {
+        // L1 tick resolution
+        uint32_t slot = static_cast<uint32_t>((due_tick / _L0_SPAN) & _MASK);
+        // Insert into L1
+        _wheel1[slot].push(item);
+    } else {
+        // L2 tick resolution
+        uint32_t slot = static_cast<uint32_t>((due_tick / _L1_SPAN) & _MASK);
+        // Insert into L2
+        _wheel2[slot].push(item);
     }
 
-    /**
-     * @brief Cascades items from level 1 to level 0.
-     *
-     * Triggered when L0 completes full rotation.
-     */
-    void Calendar::_cascade_from_L1() noexcept {
-        // L1 slot index
-        uint32_t slot = static_cast<uint32_t>((_current_tick / _L0_SPAN) & _MASK);
-        BucketT& bucket = _wheel1[slot];
+    _size++;
+}
 
-        CalendarItem* item;
-        while ((item = bucket.pop())) {
-            // L0 tick resolution
-            slot = static_cast<uint32_t>(item->tick & _MASK);
+/**
+ * @brief Cascades items from level 1 to level 0.
+ *
+ * Triggered when L0 completes full rotation.
+ */
+void Calendar::_cascade_from_L1() noexcept {
+    // L1 slot index
+    uint32_t slot = static_cast<uint32_t>((_current_tick / _L0_SPAN) & _MASK);
+    BucketT& bucket = _wheel1[slot];
 
-            // Insert into corresponding L0 slot
-            _wheel0[slot].push(item);
-        }
-    }
+    CalendarItem* item;
+    while ((item = bucket.pop())) {
+        // L0 tick resolution
+        slot = static_cast<uint32_t>(item->tick & _MASK);
 
-    /**
-     * @brief Cascades items from level 2 to level 1.
-     *
-     * Triggered when L1 completes full rotation.
-     */
-    void Calendar::_cascade_from_L2() noexcept {
-        // L2 slot index
-        uint32_t slot = static_cast<uint32_t>((_current_tick / _L1_SPAN) & _MASK);
-        BucketT& bucket = _wheel2[slot];
-
-        CalendarItem* item;
-        while ((item = bucket.pop())) {
-            // L1 tick resolution
-            slot = static_cast<uint32_t>(item->tick / _L0_SPAN) & _MASK;
-
-            // Insert into corresponding L1 slot
-            _wheel1[slot].push(item);
-        }
-    }
-
-    /**
-     * @brief Returns next packet ready for processing.
-     *
-     * Advances internal tick and performs cascading
-     * between wheel levels when necessary.
-     */
-    generated::Packet* Calendar::get_ready() noexcept {
-        if (_size == 0)
-            return nullptr;
-
-        // Current tick based on clock
-        uint64_t now_tick = _current_tick_from_clock();
-        if (now_tick < _current_tick) 
-            return nullptr;
-
-        // Clock tick and calendar tick difference max 1 L1 wheel size
-        uint64_t max_steps = (now_tick - _current_tick) + 1;
-        if (max_steps > _L0_SPAN) 
-            max_steps = _L0_SPAN;
-
-        for (uint64_t i = 0; i < max_steps; i++) {
-            // Current L0 slot corresponding to calendar tick
-            uint32_t slot = static_cast<uint32_t>(_current_tick & _MASK);
-            BucketT& bucket = _wheel0[slot];
-
-            // Check current bucket for packet
-            if (CalendarItem* item = bucket.pop()) {
-                generated::Packet* packet = item->packet;
-                _item_pool.release(item);
-                _size--;
-                // Restore packet processing state
-                packet->result = generated::PacketResult::Processing;
-                return packet;
-            }
-
-            // Advance calendar tick
-            _current_tick++;
-
-            // L0 made whole wheel cascading from L1 slot
-            if (slot == _MASK) {
-                _cascade_from_L1();
-                uint64_t coarse_tick = (_current_tick / _L0_SPAN) & _MASK;
-                if (coarse_tick == 0)
-                    _cascade_from_L2();
-            }
-        }
-
-        // No packets ready to process yet
-        return nullptr;
-    }
-
-    /**
-     * @brief Clears all items from specified wheel level.
-     */
-    void Calendar::_clear_wheel(std::array<BucketT, _SLOTS>& wheel) noexcept {
-        for (uint32_t i = 0; i < _SLOTS; i++) {
-            CalendarItem *item;
-            while ((item = wheel[i].pop())) {
-                generated::Packet::release(item->packet);
-                _item_pool.release(item);
-            }
-        }
-    }
-
-    /**
-     * @brief Destroys calendar and releases all resources.
-     */
-    Calendar::~Calendar() noexcept {
-        _clear_wheel(_wheel0);
-        _clear_wheel(_wheel1);
-        _clear_wheel(_wheel2);
-
-        _size = 0;
+        // Insert into corresponding L0 slot
+        _wheel0[slot].push(item);
     }
 }
+
+/**
+ * @brief Cascades items from level 2 to level 1.
+ *
+ * Triggered when L1 completes full rotation.
+ */
+void Calendar::_cascade_from_L2() noexcept {
+    // L2 slot index
+    uint32_t slot = static_cast<uint32_t>((_current_tick / _L1_SPAN) & _MASK);
+    BucketT& bucket = _wheel2[slot];
+
+    CalendarItem* item;
+    while ((item = bucket.pop())) {
+        // L1 tick resolution
+        slot = static_cast<uint32_t>(item->tick / _L0_SPAN) & _MASK;
+
+        // Insert into corresponding L1 slot
+        _wheel1[slot].push(item);
+    }
+}
+
+/**
+ * @brief Returns next packet ready for processing.
+ *
+ * Advances internal tick and performs cascading
+ * between wheel levels when necessary.
+ */
+generated::Packet* Calendar::get_ready() noexcept {
+    if (_size == 0)
+        return nullptr;
+
+    // Current tick based on clock
+    uint64_t now_tick = _current_tick_from_clock();
+    if (now_tick < _current_tick) 
+        return nullptr;
+
+    // Clock tick and calendar tick difference max 1 L1 wheel size
+    uint64_t max_steps = (now_tick - _current_tick) + 1;
+    if (max_steps > _L0_SPAN) 
+        max_steps = _L0_SPAN;
+
+    for (uint64_t i = 0; i < max_steps; i++) {
+        // Current L0 slot corresponding to calendar tick
+        uint32_t slot = static_cast<uint32_t>(_current_tick & _MASK);
+        BucketT& bucket = _wheel0[slot];
+
+        // Check current bucket for packet
+        if (CalendarItem* item = bucket.pop()) {
+            generated::Packet* packet = item->packet;
+            _item_pool.release(item);
+            _size--;
+            // Restore packet processing state
+            packet->result = generated::Packet::Result::Processing;
+            return packet;
+        }
+
+        // Advance calendar tick
+        _current_tick++;
+
+        // L0 made whole wheel cascading from L1 slot
+        if (slot == _MASK) {
+            _cascade_from_L1();
+            uint64_t coarse_tick = (_current_tick / _L0_SPAN) & _MASK;
+            if (coarse_tick == 0)
+                _cascade_from_L2();
+        }
+    }
+
+    // No packets ready to process yet
+    return nullptr;
+}
+
+/**
+ * @brief Clears all items from specified wheel level.
+ */
+void Calendar::_clear_wheel(std::array<BucketT, _SLOTS>& wheel) noexcept {
+    for (uint32_t i = 0; i < _SLOTS; i++) {
+        CalendarItem *item;
+        while ((item = wheel[i].pop())) {
+            generated::Packet::release(item->packet);
+            _item_pool.release(item);
+        }
+    }
+}
+
+/**
+ * @brief Destroys calendar and releases all resources.
+ */
+Calendar::~Calendar() noexcept {
+    _clear_wheel(_wheel0);
+    _clear_wheel(_wheel1);
+    _clear_wheel(_wheel2);
+
+    _size = 0;
+}
+
+}   // namespace eliot::core

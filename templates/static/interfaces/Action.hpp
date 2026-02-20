@@ -13,50 +13,54 @@
 #ifndef ELIOT_ACTION_H
 #define ELIOT_ACTION_H
 
-#include "../../Packet.hpp"
 #include <concepts>
 
 namespace eliot::core {
 
-    /**
-     * @brief Concept defining a valid action.
-     *
-     * An action must provide:
-     *  - void execute(Packet*)
-     *
-     * either as a member function or as a static function.
-     */
-    template<typename T>
-    concept ActionConcept = 
-        requires(T action, generated::Packet* packet) {
-            { action.execute(packet) };
-        } || 
-        requires(generated::Packet* packet) {
-            { T::execute(packet) };
-        };
+/**
+ * @brief Concept defining a valid action.
+ *
+ * An action must provide:
+ *  - void execute(Packet*)
+ *
+ * either as a member function or as a static function.
+ */
+template<typename T, typename Packet>
+concept ActionConcept = 
+    requires(T action, Packet* packet) {
+        { action.execute(packet) };
+    } || 
+    requires(Packet* packet) {
+        { T::execute(packet) };
+    };
 
-    /**
-     * @brief Executes instance-based action.
-     *
-     * @tparam A Action type.
-     * @param action Action instance.
-     * @param packet Pointer to packet.
-     */
-    template<ActionConcept A>
-    inline void execute_action(A& action, generated::Packet* packet) noexcept {
-        action.execute(packet);
-    }
-
-    /**
-     * @brief Executes static action.
-     *
-     * @tparam A Action type.
-     * @param packet Pointer to packet.
-     */
-    template<ActionConcept A>
-    inline void execute_action(generated::Packet* packet) noexcept {
-        A::execute(packet);
-    }
+/**
+ * @brief Executes instance-based action.
+ *
+ * @tparam A Action type.
+ * @tparam Packet Packet type.
+ * @param action Action instance.
+ * @param packet Pointer to packet.
+ */
+template<typename A, typename Packet>
+requires ActionConcept<A, Packet>
+inline void execute_action(A& action, Packet* packet) noexcept {
+    action.execute(packet);
 }
+
+/**
+ * @brief Executes static action.
+ *
+ * @tparam A Action type.
+ * @tparam Packet Packet type.
+ * @param packet Pointer to packet.
+ */
+template<typename A, typename Packet>
+requires ActionConcept<A, Packet>
+inline void execute_action(Packet* packet) noexcept {
+    A::execute(packet);
+}
+
+}   // namespace eliot::core
 
 #endif

@@ -28,107 +28,106 @@
 
 namespace eliot::generated {
 
+/**
+ * @brief Time-based state-switching condition.
+ *
+ * This condition alternates between active and inactive states
+ * based on elapsed time.
+ */
+class {{ condition.cpp_type() }} {
+public:
+{% if not condition.not_generator_t() %}
     /**
-     * @brief Time-based state-switching condition.
-     *
-     * This condition alternates between active and inactive states
-     * based on elapsed time.
+     * @brief Constructs the condition and initializes `_threshold`.
      */
-    struct {{ condition.cpp_type() }} {
-        {% if not condition.not_generator_t() %}
+    explicit {{ condition.cpp_type() }}() 
+        : _threshold(core::generate{{ condition.t.cpp_call() }})) 
+    {}
 
-        /**
-         * @brief Constructs the condition and initializes `_threshold`.
-         */
-        explicit {{ condition.cpp_type() }}() 
-            : _threshold(core::generate{{ condition.t.cpp_call() }})) 
-        {}
+{% endif %}
+    /**
+     * @brief Evaluates whether the condition is fulfilled.
+     *
+     * The condition:
+     *  - computes elapsed time,
+     *  - toggles state when the configured threshold is exceeded,
+     *  - updates the next phase duration.
+     *
+     * @param packet Pointer to evaluated packet (unused).
+     * @return true if condition is currently in active phase.
+     */
+    inline bool fulfilled(const Packet* /*packet*/) noexcept {
+        {% if not condition.instant %}
+        // Reference timestamp
+        static uint64_t last = core::Time::now();
         {% endif %}
+        uint64_t now = core::Time::now();
 
-        /**
-         * @brief Evaluates whether the condition is fulfilled.
-         *
-         * The condition:
-         *  - computes elapsed time,
-         *  - toggles state when the configured threshold is exceeded,
-         *  - updates the next phase duration.
-         *
-         * @param packet Pointer to evaluated packet (unused).
-         * @return true if condition is currently in active phase.
-         */
-        inline bool fulfilled(const Packet* /*packet*/) noexcept {
-            {% if not condition.instant %}
-            // Reference timestamp
-            static uint64_t last = core::Time::now();
-            {% endif %}
-            uint64_t now = core::Time::now();
+        // Advance through all elapsed time windows
+        while (now - last  >= _threshold) {
+            // Move reference time forward
+            last += _threshold;
 
-            // Advance through all elapsed time windows
-            while (now - last  >= _threshold) {
-                // Move reference time forward
-                last += _threshold;
+            // Toggle active/inactive state
+            _state = !_state;
 
-                // Toggle active/inactive state
-                _state = !_state;
-
-                // Determine next phase duration
-                {% if condition.not_generator_t() and condition.not_generator_f() %}
-                _threshold = _state ? _T : _F;
-                {% elif condition.not_generator_t() %}
-                _threshold =  _state 
-                    ? _T 
-                    : core::generate{{ condition.f.cpp_call() }}); 
-                {% elif condition.not_generator_f() %}
-                _threshold = _state 
-                    ? core::generate{{ condition.t.cpp_call() }}) 
-                    : _F; 
-                {% else %}
-                _threshold = _state 
-                    ? core::generate{{ condition.t.cpp_call() }}) 
-                    : core::generate{{ condition.f.cpp_call() }});
-                {% endif %}
-            }
-            return _state;
-        }
-
-        private:
-
-            ///> Current condition state.
-            bool _state = true;
-            {% if condition.not_generator_t() %}
-
-            ///> Condition `t` parameter.
-            static constexpr size_t _T = {{ condition.t }};
-            {% endif %}
-            {% if condition.not_generator_f() %}
-
-            ///> Condition `f` parameter.
-            static constexpr size_t _F = {{ condition.f }};
-            {% endif %}
-            {% if condition.instant %}
-
-            ///> Reference timestamp.
-            uint64_t last = core::Time::now();
-            {% endif %}
-            {% if not condition.not_generator_t() and condition.t.is_state() %}
-
-            ///> Generator for active-phase duration.
-            {{ condition.t.cpp_type() }} {{ condition.t.cpp_name() }};
-            {% endif %}
-            {% if not condition.not_generator_f() and condition.f.is_state() %}
-
-            ///> Generator for inactive-phase duration.
-            {{ condition.f.cpp_type() }} {{ condition.f.cpp_name() }};
-            {% endif %}
-
-            ///> Current time threshold defining remaining duration of active/inactive phase.
-            {% if condition.not_generator_t() %}
-            size_t _threshold = {{ condition.t }};
+            // Determine next phase duration
+            {% if condition.not_generator_t() and condition.not_generator_f() %}
+            _threshold = _state ? _T : _F;
+            {% elif condition.not_generator_t() %}
+            _threshold =  _state 
+                ? _T 
+                : core::generate{{ condition.f.cpp_call() }}); 
+            {% elif condition.not_generator_f() %}
+            _threshold = _state 
+                ? core::generate{{ condition.t.cpp_call() }}) 
+                : _F; 
             {% else %}
-            size_t _threshold;
+            _threshold = _state 
+                ? core::generate{{ condition.t.cpp_call() }}) 
+                : core::generate{{ condition.f.cpp_call() }});
             {% endif %}
-    };
+        }
+        return _state;
+    }
 
-}
+private:
+    ///> Current condition state.
+    bool _state = true;
+    {% if condition.not_generator_t() %}
+
+    ///> Condition `t` parameter.
+    static constexpr size_t _T = {{ condition.t }};
+    {% endif %}
+    {% if condition.not_generator_f() %}
+
+    ///> Condition `f` parameter.
+    static constexpr size_t _F = {{ condition.f }};
+    {% endif %}
+    {% if condition.instant %}
+
+    ///> Reference timestamp.
+    uint64_t last = core::Time::now();
+    {% endif %}
+    {% if not condition.not_generator_t() and condition.t.is_state() %}
+
+    ///> Generator for active-phase duration.
+    {{ condition.t.cpp_type() }} {{ condition.t.cpp_name() }};
+    {% endif %}
+    {% if not condition.not_generator_f() and condition.f.is_state() %}
+
+    ///> Generator for inactive-phase duration.
+    {{ condition.f.cpp_type() }} {{ condition.f.cpp_name() }};
+    {% endif %}
+
+    ///> Current time threshold defining remaining duration of active/inactive phase.
+    {% if condition.not_generator_t() %}
+    size_t _threshold = {{ condition.t }};
+    {% else %}
+    size_t _threshold;
+    {% endif %}
+};
+
+}   // namespace eliot::generated
 
 #endif

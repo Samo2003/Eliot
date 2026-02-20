@@ -14,71 +14,71 @@
 #ifndef ELIOT_BUCKET_H
 #define ELIOT_BUCKET_H
 
-#include <stdint.h>
+#include <cstdint>
 #include <concepts>
 
 namespace eliot::core {
 
+/**
+ * @brief Concept defining a valid bucket item.
+ *
+ * Item must contain a member pointer `next`
+ * convertible to T*.
+ */
+template<typename T>
+concept BucketItem = requires(T* item) {
+    { item->next } -> std::convertible_to<T*>;
+};
+
+/**
+ * @brief Intrusive FIFO queue.
+ *
+ * Does not allocate memory. Instead, stored items
+ * contain their own linkage pointer (`next`).
+ *
+ * @tparam Item Type satisfying BucketItem concept.
+ */
+template<BucketItem Item>
+class Bucket {
+public:
     /**
-     * @brief Concept defining a valid bucket item.
+     * @brief Inserts item at the end of the bucket.
      *
-     * Item must contain a member pointer `next`
-     * convertible to T*.
+     * @param item Pointer to item.
      */
-    template<typename T>
-    concept BucketItem = requires(T* item) {
-        { item->next } -> std::convertible_to<T*>;
-    };
+    inline void push(Item* item) noexcept {
+        item->next = nullptr;
+        if (_tail) {
+            _tail->next = item;
+        } else {
+            _head = item;
+        }
+        _tail = item;
+    }
 
     /**
-     * @brief Intrusive FIFO queue.
+     * @brief Removes and returns first item.
      *
-     * Does not allocate memory. Instead, stored items
-     * contain their own linkage pointer (`next`).
-     *
-     * @tparam Item Type satisfying BucketItem concept.
+     * @return Pointer to item or nullptr if empty.
      */
-    template<BucketItem Item>
-    struct Bucket {
+    inline Item* pop() noexcept {
+        if (!_head) 
+            return nullptr;
+        Item* item = _head;
+        _head = _head->next;
+        if (!_head) 
+            _tail = nullptr;
+        return item;
+    }
+    
+private:
+    ///> Pointer to first item.
+    Item* _head = nullptr;
 
-        /**
-         * @brief Inserts item at the end of the bucket.
-         *
-         * @param item Pointer to item.
-         */
-        inline void push(Item* item) noexcept {
-            item->next = nullptr;
-            if (_tail) {
-                _tail->next = item;
-            } else {
-                _head = item;
-            }
-            _tail = item;
-        }
+    ///> Pointer to last item.
+    Item* _tail = nullptr;
+};
 
-        /**
-         * @brief Removes and returns first item.
-         *
-         * @return Pointer to item or nullptr if empty.
-         */
-        inline Item* pop() noexcept {
-            if (!_head) 
-                return nullptr;
-            Item* item = _head;
-            _head = _head->next;
-            if (!_head) 
-                _tail = nullptr;
-            return item;
-        }
-        
-        private:
-
-            ///> Pointer to first item.
-            Item* _head = nullptr;
-
-            ///> Pointer to last item.
-            Item* _tail = nullptr;
-    };
-}
+}   // namespace eliot::core
 
 #endif

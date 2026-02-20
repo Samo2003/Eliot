@@ -26,112 +26,112 @@
 
 namespace eliot::generated {
 
+/**
+ * @brief Fault injection action performing packet buffering and reordering.
+ *
+ * This action collects incoming packets into an internal buffer.
+ * Once the buffer is full, the packets are reordered according to
+ * the '{{ action.strategy }}' strategy and scheduled for immediate processing.
+ */
+class {{ action.cpp_type() }} {
+public:
     /**
-     * @brief Fault injection action performing packet buffering and reordering.
+     * @brief Constructs the action with a reference to a calendar.
      *
-     * This action collects incoming packets into an internal buffer.
-     * Once the buffer is full, the packets are reordered according to
-     * the '{{ action.strategy }}' strategy and scheduled for immediate processing.
+     * @param calendar Reference to the calendar used for packet scheduling.
      */
-    struct {{ action.cpp_type() }} {
+    explicit {{ action.cpp_type() }}(core::Calendar& calendar) : 
+        _calendar(calendar){% if not action.not_generator_n() %},
+        _size(core::generate{{ action.n.cpp_call() }}))
+        {% endif %}
+    {}
 
-        /**
-         * @brief Constructs the action with a reference to a calendar.
-         *
-         * @param calendar Reference to the calendar used for packet scheduling.
-         */
-        explicit {{ action.cpp_type() }}(core::Calendar& calendar) : 
-            _calendar(calendar){% if not action.not_generator_n() %},
-            _size(core::generate{{ action.n.cpp_call() }}))
-            {% endif %}
-        {}
+    /**
+     * @brief Buffers the packet and triggers reordering when the buffer is full.
+     *
+     * The packet is temporarily stored and marked as handled by the calendar.
+     * Once the internal buffer reaches its configured size, all buffered
+     * packets are reordered and scheduled for immediate execution.
+     *
+     * @param packet Pointer to the packet being processed.
+     */
+    inline void execute(Packet* packet) noexcept {
+        _buffer[_buffer_index++] = packet;
+        packet->result = Packet::Result::Calendar;
 
-        /**
-         * @brief Buffers the packet and triggers reordering when the buffer is full.
-         *
-         * The packet is temporarily stored and marked as handled by the calendar.
-         * Once the internal buffer reaches its configured size, all buffered
-         * packets are reordered and scheduled for immediate execution.
-         *
-         * @param packet Pointer to the packet being processed.
-         */
-        inline void execute(Packet* packet) noexcept {
-            _buffer[_buffer_index++] = packet;
-            packet->result = PacketResult::Calendar;
+        // Wait until the buffer is full
+        if (_buffer_index < _size)
+            return;
 
-            // Wait until the buffer is full
-            if (_buffer_index < _size)
-                return;
-
-            {% if action.strategy == "random" %}
-            // Randomly shuffle buffered packets
-            for (int i = _size - 1; i > 0; i--) {
-                int j = _rng.next_range(i + 1);
-                std::swap(_buffer[i], _buffer[j]);
-            }
-            {% else %}
-            // Deterministically reverse packet order
-            std::reverse(_buffer, _buffer + _size);
-            {% endif %}
-
-            // Schedule reordered packets for immediate processing
-            for (int i = 0; i < _size; i++)
-                _calendar.schedule(_buffer[i], 0);
-
-            {% if not action.not_generator_n() %}
-            // Update buffer size dynamically
-            _size = core::generate{{ action.n.cpp_call() }});
-            {% endif %}
-            _buffer_index = 0;
+        {% if action.strategy == "random" %}
+        // Randomly shuffle buffered packets
+        for (int i = _size - 1; i > 0; i--) {
+            int j = _rng.next_range(i + 1);
+            std::swap(_buffer[i], _buffer[j]);
         }
+        {% else %}
+        // Deterministically reverse packet order
+        std::reverse(_buffer, _buffer + _size);
+        {% endif %}
 
-        /**
-         * @brief Destructor releasing all buffered packets.
-         *
-         * Ensures that packets remaining in the buffer are properly
-         * destroyed if the action instance is destroyed.
-         */
-        ~{{ action.cpp_type() }}() {
-            for (int i = 0; i < _buffer_index; i++)
-                Packet::release(_buffer[i]);
-        }
+        // Schedule reordered packets for immediate processing
+        for (int i = 0; i < _size; i++)
+            _calendar.schedule(_buffer[i], 0);
 
-        private:
+        {% if not action.not_generator_n() %}
+        // Update buffer size dynamically
+        _size = core::generate{{ action.n.cpp_call() }});
+        {% endif %}
+        _buffer_index = 0;
+    }
 
-            ///> Reference to the shared calendar instance.
-            core::Calendar& _calendar;
-            {% if action.not_generator_n() %}
+    /**
+     * @brief Destructor releasing all buffered packets.
+     *
+     * Ensures that packets remaining in the buffer are properly
+     * destroyed if the action instance is destroyed.
+     */
+    ~{{ action.cpp_type() }}() {
+        for (int i = 0; i < _buffer_index; i++)
+            Packet::release(_buffer[i]);
+    }
 
-            ///> Fixed size of the packet buffer.
-            static constexpr int _size = {{ action.n }};
+private:
+    ///> Reference to the shared calendar instance.
+    core::Calendar& _calendar;
+    {% if action.not_generator_n() %}
 
-            ///> Maximum allowed buffer size.
-            static constexpr int MAX_BUFFER_SIZE = {{ action.n }};
-            {% else %}
+    ///> Fixed size of the packet buffer.
+    static constexpr int _size = {{ action.n }};
 
-            ///> Maximum allowed buffer size.
-            static constexpr int MAX_BUFFER_SIZE = 2048;
-            {% if action.n.is_state() %}
+    ///> Maximum allowed buffer size.
+    static constexpr int MAX_BUFFER_SIZE = {{ action.n }};
+    {% else %}
 
-            ///> Generator providing dynamic buffer size values.
-            inline static {{ action.n.cpp_type() }} {{ action.n.cpp_name() }};
-            {% endif %}
+    ///> Maximum allowed buffer size.
+    static constexpr int MAX_BUFFER_SIZE = 2048;
+    {% if action.n.is_state() %}
 
-            ///> Current buffer size.
-            int _size;
-            {% endif %}
+    ///> Generator providing dynamic buffer size values.
+    inline static {{ action.n.cpp_type() }} {{ action.n.cpp_name() }};
+    {% endif %}
 
-            ///> Internal packet buffer.
-            Packet* _buffer[MAX_BUFFER_SIZE];
+    ///> Current buffer size.
+    int _size;
+    {% endif %}
 
-            ///> Current number of buffered packets.
-            int _buffer_index = 0;
-            {% if action.strategy == "random" %}
+    ///> Internal packet buffer.
+    Packet* _buffer[MAX_BUFFER_SIZE];
 
-            ///> Pseudo-random number generator used for packet shuffling.
-            inline static core::xoroshiro128plus _rng{ {{ action.seed_value() }} };
-            {% endif %}
-    };
-}
+    ///> Current number of buffered packets.
+    int _buffer_index = 0;
+    {% if action.strategy == "random" %}
+
+    ///> Pseudo-random number generator used for packet shuffling.
+    inline static core::xoroshiro128plus _rng{ {{ action.seed_value() }} };
+    {% endif %}
+};
+
+}   // namespace eliot::generated
 
 #endif

@@ -21,39 +21,38 @@
 
 namespace eliot::generated {
 
+/**
+ * @brief Packet size-based condition.
+ *
+ * This condition is fulfilled when the packet size
+ * satisfies the configured comparison condition.
+ */
+class {{ condition.cpp_type() }} {
+public:
     /**
-     * @brief Packet size-based condition.
+     * @brief Evaluates whether the condition is fulfilled.
      *
-     * This condition is fulfilled when the packet size
-     * satisfies the configured comparison condition.
+     * Compares packet size against the configured value
+     * using operator '{{ condition.get_op() }}'.
+     *
+     * @param packet Pointer to the evaluated packet.
+     * @return true if the size comparison condition is satisfied.
      */
-    struct {{ condition.cpp_type() }} {
-
-        /**
-         * @brief Evaluates whether the condition is fulfilled.
-         *
-         * Compares packet size against the configured value
-         * using operator '{{ condition.get_op() }}'.
-         *
-         * @param packet Pointer to the evaluated packet.
-         * @return true if the size comparison condition is satisfied.
-         */
-        static inline bool fulfilled(const Packet* packet) noexcept {
-            {% if condition.not_generator_size() %}
-            return packet->size() {{ condition.get_op() }} {{ condition.size }};
-            {% else %}
-            return packet->size() {{ condition.get_op() }} core::generate{{ condition.size.cpp_call() }});
-            {% endif %}
-        }
-
-        {% if not condition.not_generator_size() and condition.size.is_state() %}
-        private:
-
-            ///> Generator providing dynamic size threshold values.
-            inline static {{ condition.size.cpp_type() }} {{ condition.size.cpp_name() }};
+    static inline bool fulfilled(const Packet* packet) noexcept {
+        {% if condition.not_generator_size() %}
+        return packet->size() {{ condition.get_op() }} {{ condition.size }};
+        {% else %}
+        return packet->size() {{ condition.get_op() }} core::generate{{ condition.size.cpp_call() }});
         {% endif %}
-    };
+    }
 
-}
+{% if not condition.not_generator_size() and condition.size.is_state() %}
+private:
+    ///> Generator providing dynamic size threshold values.
+    inline static {{ condition.size.cpp_type() }} {{ condition.size.cpp_name() }};
+{% endif %}
+};
+
+}   // namespace eliot::generated
 
 #endif

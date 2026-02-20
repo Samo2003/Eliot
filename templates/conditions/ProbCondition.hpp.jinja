@@ -23,59 +23,60 @@
 
 namespace eliot::generated {
 
+/**
+ * @brief Probabilistic condition.
+ *
+ * This condition becomes fulfilled with a given probability
+ * for each evaluation.
+ */
+class {{ condition.cpp_type() }} {
+public:
     /**
-     * @brief Probabilistic condition.
+     * @brief Evaluates whether the condition is fulfilled.
      *
-     * This condition becomes fulfilled with a given probability
-     * for each evaluation.
+     * A uniformly distributed value in the interval [0,1)
+     * is generated and compared against the configured probability.
+     *
+     * @param packet Pointer to the evaluated packet (unused).
+     * @return true with a given probability.
      */
-    struct {{ condition.cpp_type() }} {
+    static inline bool fulfilled(const Packet* packet) noexcept {
+        {% if condition.not_generator_x() %}
+        return _prob() < _X;
+        {% else %}
+        return _prob() < core::generate{{ condition.x.cpp_call() }});
+        {% endif %}
+    }
 
-        /**
-         * @brief Evaluates whether the condition is fulfilled.
-         *
-         * A uniformly distributed value in the interval [0,1)
-         * is generated and compared against the configured probability.
-         *
-         * @param packet Pointer to the evaluated packet (unused).
-         * @return true with a given probability.
-         */
-        static inline bool fulfilled(const Packet* packet) noexcept {
-            {% if condition.not_generator_x() %}
-            return _prob() < _X;
-            {% else %}
-            return _prob() < core::generate{{ condition.x.cpp_call() }});
-            {% endif %}
-        }
+private:
+    {% if condition.not_generator_x() %}
+    ///> Condition `x` parameter.
+    static constexpr float _X = {{ condition.x }}f;
 
-        private:
-            {% if condition.not_generator_x() %}
+    {% endif %}
+    ///> Pseudo-random number generator.
+    inline static core::xoroshiro128plus _rng{ {{ condition.seed_value() }} };
 
-            static constexpr float _X = {{ condition.x }}f;
-            {% endif %}
+    /**
+     * @brief Uniform random float in interval [0, 1).
+     *
+     * Uses bit manipulation to construct a float in [1, 2)
+     * by setting exponent bits to 127 (0x3F800000),
+     * then subtracts 1.0f.
+     * 
+     * @return Float value in interval [0, 1).
+     */
+    inline static float _prob() noexcept {
+        uint32_t r = static_cast<uint32_t>(_rng.next() >> 40);
+        return std::bit_cast<float>(0x3F800000u | r) - 1.0f;
+    }
+    {% if not condition.not_generator_x() and condition.x.is_state() %}
 
-            ///> Pseudo-random number generator.
-            inline static core::xoroshiro128plus _rng{ {{ condition.seed_value() }} };
+    ///> Generator providing dynamic probability values.
+    inline static {{ condition.x.cpp_type() }} {{ condition.x.cpp_name() }};
+    {% endif %}
+};
 
-            /**
-             * @brief Uniform random float in interval [0, 1).
-             *
-             * Uses bit manipulation to construct a float in [1, 2)
-             * by setting exponent bits to 127 (0x3F800000),
-             * then subtracts 1.0f.
-             * 
-             * @return Float value in interval [0, 1).
-             */
-            inline static float _prob() noexcept {
-                uint32_t r = static_cast<uint32_t>(_rng.next() >> 40);
-                return std::bit_cast<float>(0x3F800000u | r) - 1.0f;
-            }
-            {% if not condition.not_generator_x() and condition.x.is_state() %}
-
-            ///> Generator providing dynamic probability values.
-            inline static {{ condition.x.cpp_type() }} {{ condition.x.cpp_name() }};
-            {% endif %}
-    };
-}
+}   // namespace eliot::generated
 
 #endif

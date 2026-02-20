@@ -19,148 +19,147 @@
 
 namespace eliot::generated {
 
+/**
+ * @brief Generic packet processor bound to backend traits.
+ *
+ * @tparam Traits Backend-specific implementation.
+ */
+template<core::BackendTraitsConcept Traits>
+class PacketProcessor {
+public:
+    ///> Backend queue type defined by traits.
+    using Queue = typename Traits::QueueType;
+
     /**
-     * @brief Generic packet processor bound to backend traits.
+     * @brief Constructs packet processor.
      *
-     * @tparam Traits Backend-specific implementation.
+     * Initializes backend queue.
+     *
+     * @param argc Number of command line arguments.
+     * @param argv Array of command line arguments.
      */
-    template<core::BackendTraitsConcept Traits>
-    struct PacketProcessor {
+    explicit PacketProcessor(int argc, char** argv)
+        : _queue(Traits::create_queue(argc, argv)) {}
 
-        ///> Backend queue type defined by traits.
-        using Queue = typename Traits::QueueType;
+    /**
+     * @brief Starts the main processing loop.
+     *
+     * The loop continues until stop() is called.
+     * Each iteration:
+    {% if require_time %}
+     *  - resets time cache,
+    {% endif %}
+     *  - processes new input packets,
+    {% if require_calendar %}
+     *  - processes delayed packets (if calendar is used).
+    {% endif %}
+     */
+    inline void run() {
+        std::cout << "Eliot running...\n";
 
-        /**
-         * @brief Constructs packet processor.
-         *
-         * Initializes backend queue.
-         *
-         * @param argc Number of command line arguments.
-         * @param argv Array of command line arguments.
-         */
-        explicit PacketProcessor(int argc, char** argv)
-            : _queue(Traits::create_queue(argc, argv))
-        {}
+        while (!_stop_flag) {
+            {% if require_time %}
+            // Reset time cache for current iteration
+            core::Time::reset();
 
-        /**
-         * @brief Starts the main processing loop.
-         *
-         * The loop continues until stop() is called.
-         * Each iteration:
-        {% if require_time %}
-         *  - resets time cache,
-        {% endif %}
-         *  - processes new input packets,
-        {% if require_calendar %}
-         *  - processes delayed packets (if calendar is used).
-        {% endif %}
-         */
-        inline void run() {
-            std::cout << "Eliot running...\n";
-
-            while (!_stop_flag) {
-                {% if require_time %}
-                // Reset time cache for current iteration
-                core::Time::reset();
-
-                {% endif %}
-                // Process incoming packets
-                _process_input();
-                {% if require_calendar %}
-
-                // Process scheduled packets.
-                _process_calendar();
-                {% endif %}
-            }
-
-            std::cout << "\nExiting\n";
-        }
-
-        /**
-         * @brief Requests graceful termination of processing loop.
-         */
-        static inline void stop() {
-            _stop_flag = true;
-        }
-
-        private:
-
-            ///> Backend queue instance.
-            Queue _queue;
-
-            ///> Generated fault model instance.
-            FaultModel _model;
-
-            ///> Stop flag.
-            inline static std::atomic_bool _stop_flag{false};
-
-            /**
-             * @brief Retrieves and processes a single incoming packet.
-             *
-             * If a packet is available:
-             *  - acquires internal Packet wrapper,
-             *  - evaluates fault model,
-             *  - handles resulting action.
-             */
-            inline void _process_input() {
-                if (auto maybe_packet = Traits::get_packet(_queue)) {
-
-                    // Wrap backend packet into internal Packet object
-                    auto packet = Packet::acquire(std::move(*maybe_packet));
-
-                    // Evaluate fault model
-                    _model.evaluate(packet);
-
-                    // Handle packet result
-                    _handle_result(packet);
-                }
-            }
+            {% endif %}
+            // Process incoming packets
+            _process_input();
             {% if require_calendar %}
 
-            /**
-             * @brief Processes delayed packets from calendar.
-             *
-             * If the calendar contains ready packets,
-             * they are re-evaluated by the fault model.
-             */
-            inline void _process_calendar() {
-                if (!_model.calendar_empty()) {
-                    if (auto packet = _model.get_scheduled()) {
-
-                        // Re-evaluate ready scheduled packet
-                        _model.evaluate(packet);
-
-                        // Handle packet result
-                        _handle_result(packet);
-                    }
-                }
-            }
+            // Process scheduled packets.
+            _process_calendar();
             {% endif %}
+        }
 
-            /**
-             * @brief Finalizes packet according to evaluation result.
-             *
-             * Packet memory is released after applying result.
-             *
-             * @param packet Pointer to evaluated packet.
-             */
-            inline void _handle_result(Packet* packet) {
-                switch (packet->result) {
-                    case PacketResult::Drop:
-                        Traits::drop_packet(_queue, packet->move_packet());
-                        Packet::release(packet);
-                        break;
+        std::cout << "\nExiting\n";
+    }
 
-                    case PacketResult::Finish:
-                        Traits::accept_packet(_queue, packet->move_packet());
-                        Packet::release(packet);
-                        break;
+    /**
+     * @brief Requests graceful termination of processing loop.
+     */
+    static inline void stop() {
+        _stop_flag = true;
+    }
 
-                    default:
-                        break;
-                }
+private:
+    ///> Backend queue instance.
+    Queue _queue;
+
+    ///> Generated fault model instance.
+    FaultModel _model;
+
+    ///> Stop flag.
+    inline static std::atomic_bool _stop_flag{false};
+
+    /**
+     * @brief Retrieves and processes a single incoming packet.
+     *
+     * If a packet is available:
+     *  - acquires internal Packet wrapper,
+     *  - evaluates fault model,
+     *  - handles resulting action.
+     */
+    inline void _process_input() {
+        if (auto maybe_packet = Traits::get_packet(_queue)) {
+
+            // Wrap backend packet into internal Packet object
+            auto packet = Packet::acquire(std::move(*maybe_packet));
+
+            // Evaluate fault model
+            _model.evaluate(packet);
+
+            // Handle packet result
+            _handle_result(packet);
+        }
+    }
+    {% if require_calendar %}
+
+    /**
+     * @brief Processes delayed packets from calendar.
+     *
+     * If the calendar contains ready packets,
+     * they are re-evaluated by the fault model.
+     */
+    inline void _process_calendar() {
+        if (!_model.calendar_empty()) {
+            if (auto packet = _model.get_scheduled()) {
+
+                // Re-evaluate ready scheduled packet
+                _model.evaluate(packet);
+
+                // Handle packet result
+                _handle_result(packet);
             }
-    };
-}
+        }
+    }
+    {% endif %}
+
+    /**
+     * @brief Finalizes packet according to evaluation result.
+     *
+     * Packet memory is released after applying result.
+     *
+     * @param packet Pointer to evaluated packet.
+     */
+    inline void _handle_result(Packet* packet) {
+        switch (packet->result) {
+            case Packet::Result::Drop:
+                Traits::drop_packet(_queue, packet->move_packet());
+                Packet::release(packet);
+                break;
+
+            case Packet::Result::Finish:
+                Traits::accept_packet(_queue, packet->move_packet());
+                Packet::release(packet);
+                break;
+
+            default:
+                break;
+        }
+    }
+};
+
+}   // namespace eliot::generated
 
 #endif

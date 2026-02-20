@@ -17,34 +17,34 @@
 
 namespace eliot::generated {
 
+/**
+ * @brief Stateless protocol-based condition.
+ *
+ * This condition is fulfilled only for packets whose protocol
+ * (IPv4 Protocol field or IPv6 Next Header field)
+ * matches the configured identifier.
+ */
+class {{ condition.cpp_type() }} {
+public:
     /**
-     * @brief Stateless protocol-based condition.
+     * @brief Evaluates whether the condition is fulfilled.
      *
-     * This condition is fulfilled only for packets whose protocol
-     * (IPv4 Protocol field or IPv6 Next Header field)
-     * matches the configured identifier.
+     * The condition queries the protocol field at the configured
+     * network-layer position and compares it against
+     * the expected protocol identifier.
+     *
+     * @param packet Pointer to the evaluated packet.
+     * @return true if the packet uses protocol '{{ condition.id }}'.
      */
-    struct {{ condition.cpp_type() }} {
+    static inline bool fulfilled(const Packet* packet) noexcept {
+        return packet->protocol({{ condition.get_nh() }}) == _PROTOCOL;
+    }
 
-        /**
-         * @brief Evaluates whether the condition is fulfilled.
-         *
-         * The condition queries the protocol field at the configured
-         * network-layer position and compares it against
-         * the expected protocol identifier.
-         *
-         * @param packet Pointer to the evaluated packet.
-         * @return true if the packet uses protocol '{{ condition.id }}'.
-         */
-        static inline bool fulfilled(const Packet* packet) noexcept {
-            return packet->protocol({{ condition.get_nh() }}) == _PROTOCOL;
-        }
+private:
+    ///> Protocol id to check.
+    static constexpr int _PROTOCOL = {{ condition.id }};
+};
 
-        private:
-
-            ///> Protocol id to check.
-            static constexpr int _PROTOCOL = {{ condition.id }};
-    };
-}
+}   // namespace eliot::generated
 
 #endif

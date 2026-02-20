@@ -14,33 +14,34 @@
 
 namespace eliot::generated {
 
-    void FaultModel::evaluate(Packet* packet) noexcept {
-        // Continue execution while packet is in processing state
-        while (packet->result == PacketResult::Processing) {
-            // Dispatch execution based on current FSM state
-            switch (packet->state) {
+void FaultModel::evaluate(Packet* packet) noexcept {
+    // Continue execution while packet is in processing state
+    while (packet->result == Packet::Result::Processing) {
+        // Dispatch execution based on current FSM state
+        switch (packet->state) {
 {% for node in cases %}
 
-                // PATH: {{ node.path | join(" -> ") }}
-                // NODE: {{ node.label }}
-                case {{ node.id }}:
-                    {% if node.type == "DecisionCase" %}
-                    packet->state = {{ '!' if node.condition.invert else '' }}core::evaluate_condition{{ node.condition.cpp_call() }}packet) ? {{ node.if_true.id }} : {{ node.if_false.id }};
-                    {% elif node.type == "StateCase" %}
-                    packet->state = core::get_next_state({{ node.state_node.cpp_name() }});
-                    {% else %}
-                    {% if not node.action.is_final() %}
-                    packet->state = {{ node.next.id }};
-                    {% endif %}
-                    core::execute_action{{ node.action.cpp_call() }}packet);
-                    {% endif %}
-                    continue;
+            // PATH: {{ node.path | join(" -> ") }}
+            // NODE: {{ node.label }}
+            case {{ node.id }}:
+                {% if node.type == "DecisionCase" %}
+                packet->state = {{ '!' if node.condition.invert else '' }}core::evaluate_condition{{ node.condition.cpp_call() }}packet) ? {{ node.if_true.id }} : {{ node.if_false.id }};
+                {% elif node.type == "StateCase" %}
+                packet->state = core::get_next_state({{ node.state_node.cpp_name() }});
+                {% else %}
+                {% if not node.action.is_final() %}
+                packet->state = {{ node.next.id }};
+                {% endif %}
+                core::execute_action{{ node.action.cpp_call() }}packet);
+                {% endif %}
+                continue;
 {% endfor %}
 
-                // Safety fallback: terminate evaluation
-                default:
-                    packet->result = PacketResult::Finish;
-            }
+            // Safety fallback: terminate evaluation
+            default:
+                packet->result = Packet::Result::Finish;
         }
     }
 }
+
+}   // namespace eliot::generated

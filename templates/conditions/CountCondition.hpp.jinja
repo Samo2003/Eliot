@@ -17,49 +17,49 @@
 
 namespace eliot::generated {
 
+/**
+ * @brief Counter-based condition.
+ *
+ * This condition becomes fulfilled after a specified number of
+ * packet evaluations. 
+{% if condition.duration is not none %}
+ * It remains active only for a limited duration (number of subsequent evaluations).
+{% endif %} 
+ */
+class {{ condition.cpp_type() }} {
+public:
     /**
-     * @brief Counter-based condition.
+     * @brief Evaluates whether the condition is fulfilled.
      *
-     * This condition becomes fulfilled after a specified number of
-     * packet evaluations. 
+     * The condition activates after {{ condition.after }} packet evaluations.
     {% if condition.duration is not none %}
-     * It remains active only for a limited duration (number of subsequent evaluations).
-    {% endif %} 
+     * The condition remains active only for {{ condition.duration }} subsequent evaluations.
+    {% endif %}
+     *
+     * @param packet Pointer to the evaluated packet (unused).
+     * @return true if the condition is satisfied.
      */
-    struct {{ condition.cpp_type() }} {
-
-        /**
-         * @brief Evaluates whether the condition is fulfilled.
-         *
-         * The condition activates after {{ condition.after }} packet evaluations.
-        {% if condition.duration is not none %}
-         * The condition remains active only for {{ condition.duration }} subsequent evaluations.
+    inline bool fulfilled(const Packet* /*packet*/) noexcept {
+        {% if condition.duration is none %}
+        return ++_counter > _AFTER;
+        {% else %}
+        return  ++_counter > _AFTER && _counter <= _AFTER + _DURATION;
         {% endif %}
-         *
-         * @param packet Pointer to the evaluated packet (unused).
-         * @return true if the condition is satisfied.
-         */
-        inline bool fulfilled(const Packet* /*packet*/) noexcept {
-            {% if condition.duration is none %}
-            return ++_counter > _AFTER;
-            {% else %}
-            return  ++_counter > _AFTER && _counter <= _AFTER + _DURATION;
-            {% endif %}
-        }
+    }
 
-        private:
+private:
+    ///> Packet evaluation counter.
+    size_t _counter = 0;
 
-            ///> Packet evaluation counter.
-            size_t _counter = 0;
+    ///> Condition after parameter.
+    static constexpr int _AFTER = {{ condition.after }};
+    {% if condition.duration is not none %}
 
-            ///> Condition after parameter.
-            static constexpr int _AFTER = {{ condition.after }};
-            {% if condition.duration is not none %}
+    ///> Condition duration parameter.
+    static constexpr int _DURATION = {{ condition.duration }};
+    {% endif %}
+};
 
-            ///> Condition duration parameter.
-            static constexpr int _DURATION = {{ condition.duration }};
-            {% endif %}
-    };
-}
+}   // namespace eliot::generated
 
 #endif

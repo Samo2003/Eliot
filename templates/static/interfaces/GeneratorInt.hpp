@@ -20,47 +20,48 @@
 
 namespace eliot::core {
 
-    /**
-     * @brief Concept defining valid integer generator.
-     *
-     * A generator must provide:
-     *  - int get()
-     *
-     * either as a member function or as a static function.
-     */
-    template<typename T>
-    concept GeneratorIntConcept = 
-        requires(T gen) {
-            { gen.get() } -> std::same_as<int>;
-        } || 
-        requires {
-            { T::get() } -> std::same_as<int>;
-        };
+/**
+ * @brief Concept defining valid integer generator.
+ *
+ * A generator must provide:
+ *  - int get()
+ *
+ * either as a member function or as a static function.
+ */
+template<typename T>
+concept GeneratorIntConcept = 
+    requires(T gen) {
+        { gen.get() } -> std::same_as<int>;
+    } || 
+    requires {
+        { T::get() } -> std::same_as<int>;
+    };
 
-    /**
-     * @brief Generates integer value from instance generator.
-     *
-     * @tparam G Generator type.
-     * @param gen Generator instance.
-     *
-     * @return Generated integer value.
-     */
-    template<GeneratorIntConcept G>
-    inline int generate(G& gen) noexcept {
-        return gen.get();
-    }
-
-    /**
-     * @brief Generates integer value from static generator.
-     *
-     * @tparam G Generator type.
-     *
-     * @return Generated integer value.
-     */
-    template<GeneratorIntConcept G>
-    inline int generate() noexcept {
-        return G::get();
-    }
+/**
+ * @brief Generates integer value from instance generator.
+ *
+ * @tparam G Generator type.
+ * @param gen Generator instance.
+ *
+ * @return Generated integer value.
+ */
+template<GeneratorIntConcept G>
+inline int generate(G& gen) noexcept {
+    return gen.get();
 }
+
+/**
+ * @brief Generates integer value from static generator.
+ *
+ * @tparam G Generator type.
+ *
+ * @return Generated integer value.
+ */
+template<GeneratorIntConcept G>
+inline int generate() noexcept {
+    return G::get();
+}
+
+}   // namespace eliot::core
 
 #endif

@@ -17,24 +17,25 @@
 
 namespace eliot::generated {
 
+/**
+ * @brief Fault injection action dropping a packet.
+ *
+ * This action immediately marks the packet as dropped.
+ */
+class {{ action.cpp_type() }} {
+public:
     /**
-     * @brief Fault injection action dropping a packet.
+     * @brief Drops the packet.
      *
-     * This action immediately marks the packet as dropped.
+     * Sets the packet result to Packet::Result::Drop.
+     *
+     * @param packet Pointer to the packet being processed.
      */
-    struct {{ action.cpp_type() }} {
+    static inline void execute(Packet* packet) noexcept {
+        packet->result = Packet::Result::Drop;
+    }
+};
 
-        /**
-         * @brief Drops the packet.
-         *
-         * Sets the packet result to PacketResult::Drop.
-         *
-         * @param packet Pointer to the packet being processed.
-         */
-        static inline void execute(Packet* packet) noexcept {
-            packet->result = PacketResult::Drop;
-        }
-    };
-}
+}   // namespace eliot::generated
 
 #endif

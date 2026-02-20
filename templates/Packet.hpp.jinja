@@ -24,277 +24,278 @@
 #include "static/interfaces/Traits.hpp"
 
 namespace eliot::generated {
-    // Validate BackendTrait against concept
-    static_assert(core::BackendTraitsConcept<backend::ActiveTraits>, "ActiveTraits does not satisfy BackendTraits concept");
+
+// Validate BackendTraits against concept
+static_assert(core::BackendTraitsConcept<backend::ActiveTraits>, "ActiveTraits does not satisfy BackendTraits concept");
+
+/**
+ * @brief Internal runtime packet representation.
+ *
+ * Wraps backend packet type and stores:
+ *  - evaluation state
+ *  - evaluation result
+ *  - cached L4 parsing results
+ *
+ * @tparam Traits Backend-specific implementation.
+ */
+template<core::BackendTraitsConcept Traits>
+class InternalPacket {
+public:
+    ///> Backend packet type.
+    using PacketType = typename Traits::PacketType;
+
+    ///> Used packet payload type
+    using PayloadType = std::vector<uint8_t>;
 
     /**
-     * @brief Result of packet evaluation.
+     * @brief Constructs internal packet wrapper.
      */
-    enum class PacketResult { 
+    explicit inline InternalPacket(PacketType&& packet) noexcept 
+        : _packet(std::move(packet)) {}
+
+    /**
+     * @brief Acquires packet from item pool.
+     */
+    static inline InternalPacket* acquire(PacketType&& packet) {
+        return _packet_pool().acquire(std::move(packet));
+    }
+
+    /**
+     * @brief Releases packet back to item pool.
+     */
+    static inline void release(InternalPacket *p) noexcept {
+        _packet_pool().release(p);
+    }
+
+    /**
+     * @brief Creates deep clone of packet.
+     */
+    inline InternalPacket* clone() {
+        auto new_packet = Traits::clone(_packet);
+        auto* p = acquire(std::move(new_packet));
+
+        // Copy local changes
+        if (_local_payload)
+            p->_local_payload = *_local_payload;
+
+        // Copy current packet state
+        p->state = state;
+        p->result = Result::Processing;
+
+        return p;
+    }
+
+    /**
+     * @brief Moves backend packet out of wrapper.
+     *
+     * Applies local payload changes if required.
+     */
+    inline PacketType move_packet() noexcept { 
+        if constexpr (!Traits::modifiable_payload) {
+            if (_local_payload) {
+                _packet = Traits::change_payload(
+                    std::move(_packet),
+                    std::move(*_local_payload)
+                );
+            }
+        }
+        return std::move(_packet);
+    }
+    
+    /**
+     * @brief Returns packet payload.
+     */
+    inline const PayloadType& payload() const noexcept { 
+        return Traits::payload(_packet); 
+    }
+
+    /**
+     * @brief Returns mutable packet payload.
+     *
+     * If backend does not support direct modification,
+     * a local payload copy is created.
+     */
+    inline PayloadType& mutable_payload() noexcept { 
+        _invalidate_cache();
+        if constexpr (Traits::modifiable_payload) {
+            return Traits::mutable_payload(_packet);
+        } else {
+            // Create local payload copy for modification
+            if (!_local_payload)
+                _local_payload = Traits::payload(_packet);
+            return *_local_payload;
+        }
+    }
+
+    /**
+     * @brief Returns payload size.
+     */
+    inline const size_t size() const noexcept { return payload().size(); }
+
+    /**
+     * @brief Returns IP version.
+     */
+    inline const int version() const noexcept { 
+        const PayloadType& p = payload();
+        return p.size() == 0 ? -1 : (p[0]) >> 4; 
+    }
+
+    /**
+     * @brief Returns L4 protocol.
+     *
+     * @param nh_only If true and IPv6, returns first next header value.
+     */
+    inline const int protocol(bool nh_only = false) const noexcept {
+        _ensure_l4_parsed();
+        return nh_only && version() == 6 ? _nh : _l4_protocol;
+    }
+
+    /**
+     * @brief Returns L4 header offset.
+     */
+    inline const int l4_offset() const noexcept {
+        _ensure_l4_parsed();
+        return _l4_offset;
+    }
+
+    /**
+    * @brief Result of packet evaluation.
+    */
+    enum class Result { 
         Drop,
         Finish,
         Calendar,
         Processing
     };
+    
+    ///> Current evaluation state.
+    unsigned state = 0;
+
+    ///> Current packet evaluation result.
+    Result result = Result::Processing;
+
+private:
+    ///> Backend packet instance.
+    PacketType _packet;
+
+    ///> Optional local payload copy.
+    std::optional<PayloadType> _local_payload;
+
+    ///> Cached L4 protocol.
+    mutable int _l4_protocol = -1;
+
+    ///> Cached L4 offset.
+    mutable int _l4_offset = -1;
+
+    ///> Cached IPv6 next header.
+    mutable int _nh = -1;
+
+    ///> Indicates whether L4 parsing was performed.
+    mutable bool _l4_parsed = false;
 
     /**
-     * @brief Internal runtime packet representation.
-     *
-     * Wraps backend packet type and stores:
-     *  - evaluation state
-     *  - evaluation result
-     *  - cached L4 parsing results
-     *
-     * @tparam Traits Backend-specific implementation.
+     * @brief Invalidates parsing cache.
      */
-    template<core::BackendTraitsConcept Traits>
-    struct InternalPacket {
+    inline void _invalidate_cache() noexcept {
+        _l4_parsed = false;
+        _l4_protocol = -1;
+        _l4_offset = -1;
+        _nh = -1;
+    }
 
-        ///> Backend packet type.
-        using PacketType = typename Traits::PacketType;
+    /**
+     * @brief Returns static item pool instance.
+     */
+    static inline core::ItemPool<InternalPacket<Traits>>& _packet_pool() {
+        static core::ItemPool<InternalPacket<Traits>, 4096> pool;
+        return pool;
+    }
 
-        ///> Used packet payload type
-        using PayloadType = std::vector<uint8_t>;
+    // Disable dynamic allocation.
+    static void* operator new(std::size_t) = delete;
+    static void  operator delete(void*) = delete;
+    static void* operator new[](std::size_t) = delete;
+    static void  operator delete[](void*) = delete;
 
-        /**
-         * @brief Constructs internal packet wrapper.
-         */
-        explicit inline InternalPacket(PacketType&& packet) noexcept 
-            : _packet(std::move(packet)) {}
+    /**
+     * @brief Parses L4 header information.
+     *
+     * Supports IPv4 and IPv6 including extension headers.
+     */
+    inline void _parse_l4() const noexcept {
+        const PayloadType& p = payload();
+        const size_t sz = p.size();
+        const int v = version();
 
-        /**
-         * @brief Acquires packet from item pool.
-         */
-        static inline InternalPacket* acquire(PacketType&& packet) {
-            return _packet_pool().acquire(std::move(packet));
-        }
+        if (v == 4) {
+            // IPv4 header size
+            if (sz < 20)
+                return;
 
-        /**
-         * @brief Releases packet back to item pool.
-         */
-        static inline void release(InternalPacket *p) noexcept {
-            _packet_pool().release(p);
-        }
+            // Read IHL IPv4 header field
+            int header_len = (p[0] & 0x0F) * 4;
+            if (header_len < 20 || (size_t)header_len > sz)
+                return;
 
-        /**
-         * @brief Creates deep clone of packet.
-         */
-        inline InternalPacket* clone() {
-            auto new_packet = Traits::clone(_packet);
-            auto* p = acquire(std::move(new_packet));
+            _l4_offset = header_len;
+            // Protocol field
+            _l4_protocol = p[9];
+        } else if (v == 6) {
+            if (sz < 40)
+                return;
 
-            // Copy local changes
-            if (_local_payload)
-                p->_local_payload = *_local_payload;
+            // Read Next Header field
+            uint8_t next = p[6];
+            _nh = next;
+            size_t offset = 40;
 
-            // Copy current packet state
-            p->state = state;
-            p->result = PacketResult::Processing;
-
-            return p;
-        }
-
-        /**
-         * @brief Moves backend packet out of wrapper.
-         *
-         * Applies local payload changes if required.
-         */
-        inline PacketType move_packet() noexcept { 
-            if constexpr (!Traits::modifiable_payload) {
-                if (_local_payload) {
-                    _packet = Traits::change_payload(
-                        std::move(_packet),
-                        std::move(*_local_payload)
-                    );
+            while (true) {
+                switch (next) {
+                    case 0:     // Hop-by-Hop option
+                    case 43:    // Routing
+                    case 44:    // Fragment
+                    case 50:    // ESP
+                    case 51:    // AH
+                    case 60:    // Destination options
+                        break;
+                    default:
+                        _l4_offset = static_cast<int>(offset);
+                        _l4_protocol = static_cast<int>(next);
+                        return;
                 }
-            }
-            return std::move(_packet);
-        }
-        
-        /**
-         * @brief Returns packet payload.
-         */
-        inline const PayloadType& payload() const noexcept { 
-            return Traits::payload(_packet); 
-        }
-
-        /**
-         * @brief Returns mutable packet payload.
-         *
-         * If backend does not support direct modification,
-         * a local payload copy is created.
-         */
-        inline PayloadType& mutable_payload() noexcept { 
-            _invalidate_cache();
-            if constexpr (Traits::modifiable_payload) {
-                return Traits::mutable_payload(_packet);
-            } else {
-                // Create local payload copy for modification
-                if (!_local_payload)
-                    _local_payload = Traits::payload(_packet);
-                return *_local_payload;
-            }
-        }
-
-        /**
-         * @brief Returns payload size.
-         */
-        inline const size_t size() const noexcept { return payload().size(); }
-
-        /**
-         * @brief Returns IP version.
-         */
-        inline const int version() const noexcept { 
-            const PayloadType& p = payload();
-            return p.size() == 0 ? -1 : (p[0]) >> 4; 
-        }
-
-        /**
-         * @brief Returns L4 protocol.
-         *
-         * @param nh_only If true and IPv6, returns first next header value.
-         */
-        inline const int protocol(bool nh_only = false) const noexcept {
-            _ensure_l4_parsed();
-            return nh_only && version() == 6 ? _nh : _l4_protocol;
-        }
-
-        /**
-         * @brief Returns L4 header offset.
-         */
-        inline const int l4_offset() const noexcept {
-            _ensure_l4_parsed();
-            return _l4_offset;
-        }
-        
-        ///> Current evaluation state.
-        unsigned state = 0;
-
-        ///> Current packet evaluation result.
-        PacketResult result = PacketResult::Processing;
-
-        private:
-
-            ///> Backend packet instance.
-            PacketType _packet;
-
-            ///> Optional local payload copy.
-            std::optional<PayloadType> _local_payload;
-
-            ///> Cached L4 protocol.
-            mutable int _l4_protocol = -1;
-
-            ///> Cached L4 offset.
-            mutable int _l4_offset = -1;
-
-            ///> Cached IPv6 next header.
-            mutable int _nh = -1;
-
-            ///> Indicates whether L4 parsing was performed.
-            mutable bool _l4_parsed = false;
-
-            /**
-             * @brief Invalidates parsing cache.
-             */
-            inline void _invalidate_cache() noexcept {
-                _l4_parsed = false;
-                _l4_protocol = -1;
-                _l4_offset = -1;
-                _nh = -1;
-            }
-
-            /**
-             * @brief Returns static item pool instance.
-             */
-            static inline core::ItemPool<InternalPacket<Traits>>& _packet_pool() {
-                static core::ItemPool<InternalPacket<Traits>, 4096> pool;
-                return pool;
-            }
-
-            // Disable dynamic allocation.
-            static void* operator new(std::size_t) = delete;
-            static void  operator delete(void*) = delete;
-            static void* operator new[](std::size_t) = delete;
-            static void  operator delete[](void*) = delete;
-
-            /**
-             * @brief Parses L4 header information.
-             *
-             * Supports IPv4 and IPv6 including extension headers.
-             */
-            inline void _parse_l4() const noexcept {
-                const PayloadType& p = payload();
-                const size_t sz = p.size();
-                const int v = version();
-
-                if (v == 4) {
-                    // IPv4 header size
-                    if (sz < 20)
-                        return;
-
-                    // Read IHL IPv4 header field
-                    int header_len = (p[0] & 0x0F) * 4;
-                    if (header_len < 20 || (size_t)header_len > sz)
-                        return;
-
-                    _l4_offset = header_len;
-                    // Protocol field
-                    _l4_protocol = p[9];
-                } else if (v == 6) {
-                    if (sz < 40)
-                        return;
-
-                    // Read Next Header field
-                    uint8_t next = p[6];
-                    _nh = next;
-                    size_t offset = 40;
-
-                    while (true) {
-                        switch (next) {
-                            case 0:     // Hop-by-Hop option
-                            case 43:    // Routing
-                            case 44:    // Fragment
-                            case 50:    // ESP
-                            case 51:    // AH
-                            case 60:    // Destination options
-                                break;
-                            default:
-                                _l4_offset = static_cast<int>(offset);
-                                _l4_protocol = static_cast<int>(next);
-                                return;
-                        }
-                        
-                        // Next-header first byte, header len second byte
-                        if (offset + 2 > sz)
-                            return;
-
-                        uint8_t len = p[offset + 1];
-                        // Len does not include first octet
-                        size_t header_size = (len + 1) * 8;
-
-                        if (offset + header_size > sz)
-                            return;
-
-                        next = p[offset];
-                        offset += header_size;
-                    }
-                }
-            }
-
-            /**
-             * @brief Ensures L4 parsing is performed once.
-             */
-            inline void _ensure_l4_parsed() const noexcept {
-                if (_l4_parsed)
+                
+                // Next-header first byte, header len second byte
+                if (offset + 2 > sz)
                     return;
 
-                _parse_l4();
-                _l4_parsed = true;
-            }
-    };
+                uint8_t len = p[offset + 1];
+                // Len does not include first octet
+                size_t header_size = (len + 1) * 8;
 
-    ///> Active packet type.
-    using Packet = InternalPacket<backend::ActiveTraits>;
-}
+                if (offset + header_size > sz)
+                    return;
+
+                next = p[offset];
+                offset += header_size;
+            }
+        }
+    }
+
+    /**
+     * @brief Ensures L4 parsing is performed once.
+     */
+    inline void _ensure_l4_parsed() const noexcept {
+        if (_l4_parsed)
+            return;
+
+        _parse_l4();
+        _l4_parsed = true;
+    }
+};
+
+///> Active packet type.
+using Packet = InternalPacket<backend::ActiveTraits>;
+
+}   // namespace eliot::generated
 
 #endif

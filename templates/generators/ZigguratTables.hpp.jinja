@@ -14,35 +14,37 @@
 #include <cstdint>
 
 namespace eliot::generated {
-    ///> Integer thresholds for fast acceptance test.
-    inline static constexpr uint32_t kn[128] = {
+
+///> Integer thresholds for fast acceptance test.
+inline static constexpr uint32_t kn[128] = {
 {% for row in kn|batch(8) %}
-    {%- for v in row %}
-        {{ v }}u,
-    {%- endfor %}
-    
-{% endfor %}
-    };
+{%- for v in row %}
+    {{ v }}u,
+{%- endfor %}
 
-    ///> Layer widths (scaling factors).
-    inline static constexpr float wn[128] = {
+{% endfor %}
+};
+
+///> Layer widths (scaling factors).
+inline static constexpr float wn[128] = {
 {% for row in wn|batch(8) %}
-    {%- for v in row %}
-        {{ "%.12e"|format(v) }}f,
-    {%- endfor %}
-    
-{% endfor %}
-    };
+{%- for v in row %}
+    {{ "%.12e"|format(v) }}f,
+{%- endfor %}
 
-    ///> Function values at layer boundaries.
-    inline static constexpr float fn[128] = {
-{% for row in fn|batch(8) %}
-    {%- for v in row %}
-        {{ "%.12e"|format(v) }}f,
-    {%- endfor %}
-    
 {% endfor %}
-    };
-}
+};
+
+///> Function values at layer boundaries.
+inline static constexpr float fn[128] = {
+{% for row in fn|batch(8) %}
+{%- for v in row %}
+    {{ "%.12e"|format(v) }}f,
+{%- endfor %}
+
+{% endfor %}
+};
+
+}   // namespace eliot::generated
 
 #endif

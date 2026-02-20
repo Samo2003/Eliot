@@ -22,45 +22,45 @@
 
 namespace eliot::generated {
 
+/**
+ * @brief Fault injection action scheduling packet processing.
+ *
+ * This action does not immediately modify the packet.
+ * Instead, it schedules the packet for delayed processing
+ * using the shared Calendar instance.
+ */
+class {{ action.cpp_type() }} {
+public:
     /**
-     * @brief Fault injection action scheduling packet processing.
+     * @brief Constructs the action with a reference to a calendar.
      *
-     * This action does not immediately modify the packet.
-     * Instead, it schedules the packet for delayed processing
-     * using the shared Calendar instance.
+     * @param calendar Reference to the calendar used for packet scheduling.
      */
-    struct {{ action.cpp_type() }} {
+    explicit {{ action.cpp_type() }}(core::Calendar& calendar) : _calendar(calendar) {}
 
-        /**
-         * @brief Constructs the action with a reference to a calendar.
-         *
-         * @param calendar Reference to the calendar used for packet scheduling.
-         */
-        explicit {{ action.cpp_type() }}(core::Calendar& calendar) : _calendar(calendar) {}
+    /**
+     * @brief Schedules the packet for future processing.
+     *
+     * @param packet Pointer to the packet being scheduled.
+     */
+    inline void execute(Packet* packet) noexcept {
+        {% if action.not_generator_n() %}
+        _calendar.schedule(packet, {{ action.n }});
+        {% else %}
+        _calendar.schedule(packet, core::generate{{ action.n.cpp_call() }}));
+        {% endif %}
+    }
 
-        /**
-         * @brief Schedules the packet for future processing.
-         *
-         * @param packet Pointer to the packet being scheduled.
-         */
-        inline void execute(Packet* packet) noexcept {
-            {% if action.not_generator_n() %}
-            _calendar.schedule(packet, {{ action.n }});
-            {% else %}
-            _calendar.schedule(packet, core::generate{{ action.n.cpp_call() }}));
-            {% endif %}
-        }
+private:
+    ///> Reference to the shared calendar instance.
+    core::Calendar& _calendar;
+    {% if not action.not_generator_n() and action.n.is_state() %}
 
-        private:
+    ///> Generator providing dynamic delay values.
+    inline static {{ action.n.cpp_type() }} {{ action.n.cpp_name() }};
+    {% endif %}
+};
 
-            ///> Reference to the shared calendar instance.
-            core::Calendar& _calendar;
-            {% if not action.not_generator_n() and action.n.is_state() %}
-
-            ///> Generator providing dynamic delay values.
-            inline static {{ action.n.cpp_type() }} {{ action.n.cpp_name() }};
-            {% endif %}
-    };
-}
+}   // namespace eliot::generated
 
 #endif

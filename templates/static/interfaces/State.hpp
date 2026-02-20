@@ -19,35 +19,36 @@
 
 namespace eliot::core {
 
-    /**
-     * @brief Concept defining a valid state node.
-     *
-     * State node must provide method:
-     *  - get_next_packet_state()
-     *
-     * returning next packet state identifier.
-     */
-    template<typename T>
-    concept StateConcept = 
-        requires(T state) {
-            { state.get_next_packet_state() } -> std::convertible_to<unsigned>;
-        };
+/**
+ * @brief Concept defining a valid state node.
+ *
+ * State node must provide method:
+ *  - get_next_packet_state()
+ *
+ * returning next packet state identifier.
+ */
+template<typename T>
+concept StateConcept = 
+    requires(T state) {
+        { state.get_next_packet_state() } -> std::convertible_to<unsigned>;
+    };
 
-    /**
-     * @brief Retrieves next packet state from state node.
-     *
-     * Provides uniform dispatch for all generated
-     * state node implementations.
-     *
-     * @tparam G Type satisfying StateConcept.
-     * @param state Reference to state node.
-     *
-     * @return Next packet state identifier.
-     */
-    template<StateConcept G>
-    inline unsigned get_next_state(G& state) noexcept {
-        return state.get_next_packet_state();
-    }
+/**
+ * @brief Retrieves next packet state from state node.
+ *
+ * Provides uniform dispatch for all generated
+ * state node implementations.
+ *
+ * @tparam G Type satisfying StateConcept.
+ * @param state Reference to state node.
+ *
+ * @return Next packet state identifier.
+ */
+template<StateConcept G>
+inline unsigned get_next_state(G& state) noexcept {
+    return state.get_next_packet_state();
 }
+
+}   // namespace eliot::core
 
 #endif

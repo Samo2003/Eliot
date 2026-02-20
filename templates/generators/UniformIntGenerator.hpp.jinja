@@ -17,66 +17,66 @@
 
 namespace eliot::generated {
 
+/**
+ * @brief Uniform integer value generator.
+ *
+ * Generates integer values uniformly distributed over a discrete interval
+ * defined by the configured minimum and maximum bounds.
+ *
+{% if generator.once %}
+ * The generator always returns a fixed constant value.
+{% else %}
+ * The generator returns dynamically generated values.
+{% endif %}
+ */
+class {{ generator.cpp_type() }} {
+public:
     /**
-     * @brief Uniform integer value generator.
-     *
-     * Generates integer values uniformly distributed over a discrete interval
-     * defined by the configured minimum and maximum bounds.
+     * @brief Returns a generated integer value.
      *
     {% if generator.once %}
-     * The generator always returns a fixed constant value.
+     * This method always returns the same value.
     {% else %}
-     * The generator returns dynamically generated values.
+     * Values are generated using a pseudo-random
+     * number generator and uniformly mapped
+     * to the configured integer interval.
     {% endif %}
+     *
+     * @return Generated integer value.
      */
-    struct {{ generator.cpp_type() }} {
-
-        /**
-         * @brief Returns a generated integer value.
-         *
+    static {{ 'constexpr ' if generator.once else '' }}inline int get() noexcept {
         {% if generator.once %}
-         * This method always returns the same value.
+        return {{ generator.value() }};
         {% else %}
-         * Values are generated using a pseudo-random
-         * number generator and uniformly mapped
-         * to the configured integer interval.
+        return _generate();
         {% endif %}
-         *
-         * @return Generated integer value.
-         */
-        static {{ 'constexpr ' if generator.once else '' }}inline int get() noexcept {
-            {% if generator.once %}
-            return {{ generator.value() }};
-            {% else %}
-            return _generate();
-            {% endif %}
-        }
+    }
 
-        {% if not generator.once %}
-        private:
+{% if not generator.once %}
+private:
+    ///> Minimal possible value the generator can generate.
+    static constexpr int _MIN = {{ generator.min }};
 
-            ///> Minimal possible value the generator can generate.
-            static constexpr int _MIN = {{ generator.min }};
+    ///> Maximal possible value the generator can generate.
+    static constexpr int _MAX = {{ generator.max }};
 
-            ///> Maximal possible value the generator can generate.
-            static constexpr int _MAX = {{ generator.max }};
+    ///> Pseudo-random number generator.
+    inline static core::xoroshiro128plus _rng{ {{ generator.seed_value() }} };
 
-            ///> Pseudo-random number generator.
-            inline static core::xoroshiro128plus _rng{ {{ generator.seed_value() }} };
+    /**
+     * @brief Generates a uniformly distributed integer value.
+     *
+     * The generated value lies within the closed interval [_MIN, _MAX].
+     *
+     * @return Uniformly distributed integer value.
+     */
+    inline static int _generate() noexcept {
+        uint64_t value = _rng.next_range(uint64_t(_MAX - _MIN + 1));
+        return static_cast<int>(value + _MIN);
+    }
+{% endif %}
+};
 
-            /**
-             * @brief Generates a uniformly distributed integer value.
-             *
-             * The generated value lies within the closed interval [_MIN, _MAX].
-             *
-             * @return Uniformly distributed integer value.
-             */
-            inline static int _generate() noexcept {
-                uint64_t value = _rng.next_range(uint64_t(_MAX - _MIN + 1));
-                return static_cast<int>(value + _MIN);
-            }
-        {% endif %}
-    };
-}
+}   // namespace eliot::generated
 
 #endif

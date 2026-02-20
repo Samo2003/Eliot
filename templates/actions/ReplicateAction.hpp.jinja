@@ -22,57 +22,57 @@
 
 namespace eliot::generated {
 
+/**
+ * @brief Fault injection action performing packet replication.
+ *
+ * This action creates N clones of the current packet and schedules
+ * them for immediate execution using the shared Calendar instance.
+ * Cloned packets continue from the current packet state.
+ *
+ * The original packet continues its normal evaluation.
+ */
+class {{ action.cpp_type() }} {
+public:
     /**
-     * @brief Fault injection action performing packet replication.
+     * @brief Constructs the action with a reference to a calendar.
      *
-     * This action creates N clones of the current packet and schedules
-     * them for immediate execution using the shared Calendar instance.
-     * Cloned packets continue from the current packet state.
-     *
-     * The original packet continues its normal evaluation.
+     * @param calendar Reference to the calendar used for packet scheduling.
      */
-    struct {{ action.cpp_type() }} {
+    explicit {{ action.cpp_type() }}(core::Calendar& calendar) : _calendar(calendar) {}
 
-        /**
-         * @brief Constructs the action with a reference to a calendar.
-         *
-         * @param calendar Reference to the calendar used for packet scheduling.
-         */
-        explicit {{ action.cpp_type() }}(core::Calendar& calendar) : _calendar(calendar) {}
+    /**
+     * @brief Creates packet replicas and schedules them.
+     *
+     * @param packet Pointer to the currently processed packet.
+     */
+    inline void execute(Packet* packet) noexcept {
+        {% if action.not_generator_n() %}
+        for (int i = 0; i < _N; i++) {
+        {% else %}
+        const int n = core::generate{{ action.n.cpp_call() }});
 
-        /**
-         * @brief Creates packet replicas and schedules them.
-         *
-         * @param packet Pointer to the currently processed packet.
-         */
-        inline void execute(Packet* packet) noexcept {
-            {% if action.not_generator_n() %}
-            for (int i = 0; i < _N; i++) {
-            {% else %}
-            const int n = core::generate{{ action.n.cpp_call() }});
-
-            for (int i = 0; i < n; i++) {
-            {% endif %}
-                Packet* copy = packet->clone();
-                _calendar.schedule(copy, 0);
-            }
+        for (int i = 0; i < n; i++) {
+        {% endif %}
+            Packet* copy = packet->clone();
+            _calendar.schedule(copy, 0);
         }
+    }
 
-        private:
-            {% if action.not_generator_n() %}
+private:
+    {% if action.not_generator_n() %}
+    ///> Fixed replication count.
+    static constexpr int _N = {{ action.n }};
 
-            ///> Fixed replication count.
-            static constexpr int _N = {{ action.n }};
-            {% endif %}
+    {% endif %}
+    ///> Reference to the shared calendar instance.
+    core::Calendar& _calendar;
+    {% if not action.not_generator_n() and action.n.is_state() %}
 
-            ///> Reference to the shared calendar instance.
-            core::Calendar& _calendar;
-            {% if not action.not_generator_n() and action.n.is_state() %}
+    ///> Generator providing dynamic delay values.
+    inline static {{ action.n.cpp_type() }} {{ action.n.cpp_name() }};
+    {% endif %}
+};
 
-            ///> Generator providing dynamic delay values.
-            inline static {{ action.n.cpp_type() }} {{ action.n.cpp_name() }};
-            {% endif %}
-    };
-}
+}   // namespace eliot::generated
 
 #endif

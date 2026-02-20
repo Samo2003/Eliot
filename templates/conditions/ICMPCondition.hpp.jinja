@@ -17,72 +17,72 @@
 
 namespace eliot::generated {
 
+/**
+ * @brief Stateless ICMP-based condition.
+ *
+ * This condition is fulfilled only for packets using the ICMP protocol
+ * (IPv4 or IPv6). It filters based on ICMP type '{{ condition.type }}'{% if condition.code is not none %} and code '{{ condition.code }}'{% endif %}.
+ */
+class {{ condition.cpp_type() }} {
+public:
     /**
-     * @brief Stateless ICMP-based condition.
+     * @brief Evaluates whether the condition is fulfilled.
      *
-     * This condition is fulfilled only for packets using the ICMP protocol
-     * (IPv4 or IPv6). It filters based on ICMP type '{{ condition.type }}'{% if condition.code is not none %} and code '{{ condition.code }}'{% endif %}.
+     * The condition checks:
+     *  - IP version (IPv4 or IPv6)
+     *  - protocol identifier (ICMPv4 or ICMPv6) according to version
+     *  - ICMP type
+    {% if condition.code is not none %}j
+     *  - ICMP code
+    {% endif %}
+     *
+     * @param packet Pointer to the evaluated packet.
+     * @return true if the packet matches the configured ICMP criteria.
      */
-    struct {{ condition.cpp_type() }} {
+    static inline bool fulfilled(const Packet *packet) noexcept {
+        const std::vector<uint8_t>& p = packet->payload();
+        size_t size = packet->size();
+        int ver = packet->version();
+        int prot = packet->protocol();
+        
+        // Only ICMPv4 or ICMPv6 packets are considered
+        if (!(ver == 4 && prot == ICMPv4) && 
+            !(ver == 6 && prot == ICMPv6))
+            return false;
 
-        /**
-         * @brief Evaluates whether the condition is fulfilled.
-         *
-         * The condition checks:
-         *  - IP version (IPv4 or IPv6)
-         *  - protocol identifier (ICMPv4 or ICMPv6) according to version
-         *  - ICMP type
-        {% if condition.code is not none %}j
-         *  - ICMP code
+        int offset = packet->l4_offset();
+        if (offset < 0 || size < offset + 2)
+            return false;
+
+        // Check ICMP type field
+        if (p[offset] != _TYPE)
+            return false;
+
+        {% if condition.code is not none %}
+        // Check ICMP code field
+        if (p[offset + 1] != _CODE)
+            return false;
+
         {% endif %}
-         *
-         * @param packet Pointer to the evaluated packet.
-         * @return true if the packet matches the configured ICMP criteria.
-         */
-        static inline bool fulfilled(const Packet *packet) noexcept {
-            const std::vector<uint8_t>& p = packet->payload();
-            size_t size = packet->size();
-            int ver = packet->version();
-            int prot = packet->protocol();
-            
-            // Only ICMPv4 or ICMPv6 packets are considered
-            if (!(ver == 4 && prot == ICMPv4) && 
-                !(ver == 6 && prot == ICMPv6))
-                return false;
+        return true;
+    }
 
-            int offset = packet->l4_offset();
-            if (offset < 0 || size < offset + 2)
-                return false;
+private:
+    ///> Protocol number for ICMPv4.
+    static constexpr int ICMPv4 = 1;
 
-            // Check ICMP type field
-            if (p[offset] != _TYPE)
-                return false;
+    ///> Protocol number for ICMPv6.
+    static constexpr int ICMPv6 = 58;
 
-            {% if condition.code is not none %}
-            // Check ICMP code field
-            if (p[offset + 1] != _CODE)
-                return false;
+    ///> ICMP type to check.
+    static constexpr uint8_t _TYPE = {{ condition.type }};
+    {% if condition.code is not none %}
 
-            {% endif %}
-            return true;
-        }
+    ///> ICMP code to check.
+    static constexpr uint8_t _CODE = {{ condition.code }};
+    {% endif %}
+};
 
-        private:
-
-            ///> Protocol number for ICMPv4.
-            static constexpr int ICMPv4 = 1;
-
-            ///> Protocol number for ICMPv6.
-            static constexpr int ICMPv6 = 58;
-
-            ///> ICMP type to check.
-            static constexpr uint8_t _TYPE = {{ condition.type }};
-            {% if condition.code is not none %}
-
-            ///> ICMP code to check.
-            static constexpr uint8_t _CODE = {{ condition.code }};
-            {% endif %}
-    };
-}
+}   // namespace eliot::generated
 
 #endif

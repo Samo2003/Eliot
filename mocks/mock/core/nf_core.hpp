@@ -12,40 +12,42 @@
 #include "nf_packet.hpp"
 
 namespace nf_queue_mock {
-    class NFCore {
-        public:
-            explicit NFCore(const Config& config) 
-                : _receive_socket(_make_recv_socket(config.listen_ip, config.listen_port)),
-                _send_socket(_make_send_socket()) {
-                    _translate_address(config.client_ip, config.client_port, _client_addr);
-                    _translate_address(config.server_ip, config.server_port, _server_addr);  
-                }
 
-            void accept_packets(void) noexcept;
+class NFCore {
+public:
+    explicit NFCore(const Config& config) 
+        : _receive_socket(_make_recv_socket(config.listen_ip, config.listen_port)),
+        _send_socket(_make_send_socket()) {
+            _translate_address(config.client_ip, config.client_port, _client_addr);
+            _translate_address(config.server_ip, config.server_port, _server_addr);  
+        }
 
-            inline const bool send_to_client(const std::vector<uint8_t>& data) const noexcept {
-                ssize_t n = sendto(_send_socket.get(), data.data(), data.size(), 0, reinterpret_cast<const sockaddr*>(&_client_addr), sizeof(_client_addr));
-                return n == data.size();
-            }
+    void accept_packets(void) noexcept;
 
-            inline const bool send_to_server(const std::vector<uint8_t>& data) const noexcept {
-                ssize_t n = sendto(_send_socket.get(), data.data(), data.size(), 0, reinterpret_cast<const sockaddr*>(&_server_addr), sizeof(_server_addr));
-                return n == data.size();
-            }
-            
-            std::optional<NFQueuePacket> queue_pop(void) noexcept;
+    inline const bool send_to_client(const std::vector<uint8_t>& data) const noexcept {
+        ssize_t n = sendto(_send_socket.get(), data.data(), data.size(), 0, reinterpret_cast<const sockaddr*>(&_client_addr), sizeof(_client_addr));
+        return n == data.size();
+    }
 
-        private:
-            Socket _receive_socket;
-            Socket _send_socket;
-            sockaddr_in _client_addr{};
-            sockaddr_in _server_addr{};
-            std::queue<NFQueuePacket> _queue;
+    inline const bool send_to_server(const std::vector<uint8_t>& data) const noexcept {
+        ssize_t n = sendto(_send_socket.get(), data.data(), data.size(), 0, reinterpret_cast<const sockaddr*>(&_server_addr), sizeof(_server_addr));
+        return n == data.size();
+    }
+    
+    std::optional<NFQueuePacket> queue_pop(void) noexcept;
 
-            static Socket _make_recv_socket(const std::string& bind_addr, uint16_t port);
-            static Socket _make_send_socket(void);
-            static void _translate_address(const std::string& ip, uint16_t port, sockaddr_in& addr);
-    };
-}
+private:
+    Socket _receive_socket;
+    Socket _send_socket;
+    sockaddr_in _client_addr{};
+    sockaddr_in _server_addr{};
+    std::queue<NFQueuePacket> _queue;
+
+    static Socket _make_recv_socket(const std::string& bind_addr, uint16_t port);
+    static Socket _make_send_socket(void);
+    static void _translate_address(const std::string& ip, uint16_t port, sockaddr_in& addr);
+};
+
+}   // namespace nf_queue_mock
 
 #endif

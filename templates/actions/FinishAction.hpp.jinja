@@ -17,24 +17,25 @@
 
 namespace eliot::generated {
 
+/**
+ * @brief Fault injection action finishing packet processing.
+ *
+ * This action marks the packet as successfully processed.
+ */
+class {{ action.cpp_type() }} {
+public:
     /**
-     * @brief Fault injection action finishing packet processing.
+     * @brief Finishes packet processing.
      *
-     * This action marks the packet as successfully processed.
+     * Sets the packet result to Packet::Result::Finish.
+     *
+     * @param packet Pointer to the packet being processed.
      */
-    struct {{ action.cpp_type() }} {
+    static inline void execute(Packet* packet) noexcept {
+        packet->result = Packet::Result::Finish;
+    }
+};
 
-        /**
-         * @brief Finishes packet processing.
-         *
-         * Sets the packet result to PacketResult::Finish.
-         *
-         * @param packet Pointer to the packet being processed.
-         */
-        static inline void execute(Packet* packet) noexcept {
-            packet->result = PacketResult::Finish;
-        }
-    };
-}
+}   // namespace eliot::generated
 
 #endif

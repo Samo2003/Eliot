@@ -15,120 +15,120 @@
 
 namespace eliot::generated {
 
+/**
+ * @brief Sequential floating-point value generator.
+ *
+ * Generates values by repeatedly advancing the current value
+ * by a fixed step after a specified number of calls.
+ */
+class {{ generator.cpp_type() }} {
+public:
     /**
-     * @brief Sequential floating-point value generator.
+     * @brief Returns the current generated value.
      *
-     * Generates values by repeatedly advancing the current value
-     * by a fixed step after a specified number of calls.
+    {% if generator.once %}
+     * This method always returns the same value.
+    {% else %}
+     * The internal value is advanced every {{ generator.T }} calls
+     * according to the {{ generator.mode }} stepping mode.
+    {% endif %}
+     *
+     * @return Generated floating-point value.
      */
-    struct {{ generator.cpp_type() }} {
-
-        /**
-         * @brief Returns the current generated value.
-         *
+    {{ 'static constexpr ' if generator.once else '' }}inline float get() noexcept {
         {% if generator.once %}
-         * This method always returns the same value.
+        return {{ generator.value() }};
         {% else %}
-         * The internal value is advanced every {{ generator.T }} calls
-         * according to the {{ generator.mode }} stepping mode.
-        {% endif %}
-         *
-         * @return Generated floating-point value.
-         */
-        {{ 'static constexpr ' if generator.once else '' }}inline float get() noexcept {
-            {% if generator.once %}
-            return {{ generator.value() }};
-            {% else %}
-            float current = _value;
-            if (--_wait == 0) {
-                _wait = _CALLS_TO_ADVANCE;
-                _advance();
-            }
-            return current;
-            {% endif %}
+        float current = _value;
+        if (--_wait == 0) {
+            _wait = _CALLS_TO_ADVANCE;
+            _advance();
         }
-
-        {% if not generator.once %}
-        private:
-
-            ///> Minimal possible value the generator can generate.
-            static constexpr float _MIN = {{ generator.min }}f;
-
-            ///> Maximal possible value the generator can generate.
-            static constexpr float _MAX = {{ generator.max if generator.max is not none else 0 }}f;
-
-            ///> Number of calls required to advance.
-            static constexpr int _CALLS_TO_ADVANCE = {{ generator.T }};
-
-            ///> Current generated value.
-            float _value = {{ generator.value() }}f;
-
-            ///> Countdown until the next value update.
-            int _wait = _CALLS_TO_ADVANCE;
-
-            ///> Step applied when advancing the value.
-            static constexpr float _step = {{ generator.step }}f;
-            {% if generator.mode == "reverse" %}
-
-            ///> Current stepping direction.
-            int _direction = 1;
-            {% endif %}
-
-            /**
-             * @brief Advances the internal value according to the {{ generator.mode }} mode.
-             *
-            {% if generator.mode == "repeat" %}
-             *  Wraps to the initial value after reaching a bound.
-            {% elif generator.mode == "keep" %}
-             *  Stops advancing after reaching a bound.
-            {% else %}
-             *  Changes stepping direction after reaching a bound.
-            {% endif %}
-             */
-            inline void _advance() noexcept {
-                {% if generator.mode == "repeat" %}
-                // Advance value
-                _value += _step;
-
-                // Check for bound
-                {% if generator.step < 0 %}
-                if (_value < _MIN)
-                {% else %}
-                if (_value > _MAX)
-                {% endif %}
-                    _value = {{ generator.value() }};
-
-                {% elif generator.mode == "keep" %}
-                // Compute next value
-                float next = _value + _step;
-
-                // Advance only when next value in bound
-                {% if generator.step < 0 %}
-                if (next >= _MIN)
-                {% else %}
-                if (next <= _MAX)
-                {% endif %}
-                    _value = next;
-
-                {% else %}
-                // Compute next value
-                float next = _value + _step * _direction;
-                
-                // Change stepping direction when bound is reached
-                {% if generator.step < 0 %}
-                if (next < _MIN || next > _MAX)
-                {% else %}
-                if (next > _MAX || next < _MIN)
-                {% endif %}
-                    _direction = - _direction;
-
-                // Advance value
-                _value += _step * _direction;
-                
-                {% endif %}
-            }
+        return current;
         {% endif %}
-    };
-}
+    }
+
+{% if not generator.once %}
+private:
+    ///> Minimal possible value the generator can generate.
+    static constexpr float _MIN = {{ generator.min }}f;
+
+    ///> Maximal possible value the generator can generate.
+    static constexpr float _MAX = {{ generator.max if generator.max is not none else 0 }}f;
+
+    ///> Number of calls required to advance.
+    static constexpr int _CALLS_TO_ADVANCE = {{ generator.T }};
+
+    ///> Current generated value.
+    float _value = {{ generator.value() }}f;
+
+    ///> Countdown until the next value update.
+    int _wait = _CALLS_TO_ADVANCE;
+
+    ///> Step applied when advancing the value.
+    static constexpr float _step = {{ generator.step }}f;
+    {% if generator.mode == "reverse" %}
+
+    ///> Current stepping direction.
+    int _direction = 1;
+    {% endif %}
+
+    /**
+     * @brief Advances the internal value according to the {{ generator.mode }} mode.
+     *
+    {% if generator.mode == "repeat" %}
+     *  Wraps to the initial value after reaching a bound.
+    {% elif generator.mode == "keep" %}
+     *  Stops advancing after reaching a bound.
+    {% else %}
+     *  Changes stepping direction after reaching a bound.
+    {% endif %}
+     */
+    inline void _advance() noexcept {
+        {% if generator.mode == "repeat" %}
+        // Advance value
+        _value += _step;
+
+        // Check for bound
+        {% if generator.step < 0 %}
+        if (_value < _MIN)
+        {% else %}
+        if (_value > _MAX)
+        {% endif %}
+            _value = {{ generator.value() }};
+
+        {% elif generator.mode == "keep" %}
+        // Compute next value
+        float next = _value + _step;
+
+        // Advance only when next value in bound
+        {% if generator.step < 0 %}
+        if (next >= _MIN)
+        {% else %}
+        if (next <= _MAX)
+        {% endif %}
+            _value = next;
+
+        {% else %}
+        // Compute next value
+        float next = _value + _step * _direction;
+        
+        // Change stepping direction when bound is reached
+        {% if generator.step < 0 %}
+        if (next < _MIN || next > _MAX)
+        {% else %}
+        if (next > _MAX || next < _MIN)
+        {% endif %}
+            _direction = - _direction;
+
+        // Advance value
+        _value += _step * _direction;
+        
+        {% endif %}
+    }
+{% endif %}
+};
+
+}   // namespace eliot::generated
 
 #endif

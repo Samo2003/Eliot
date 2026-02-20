@@ -21,47 +21,48 @@
 
 namespace eliot::core {
 
-    /**
-     * @brief Concept defining valid floating-point generator.
-     *
-     * A generator must provide:
-     *  - float get()
-     *
-     * either as a member function or as a static function.
-     */
-    template<typename T>
-    concept GeneratorFloatConcept = 
-        requires(T gen) {
-            { gen.get() } -> std::same_as<float>;
-        } || 
-        requires {
-            { T::get() } -> std::same_as<float>;
-        };
+/**
+ * @brief Concept defining valid floating-point generator.
+ *
+ * A generator must provide:
+ *  - float get()
+ *
+ * either as a member function or as a static function.
+ */
+template<typename T>
+concept GeneratorFloatConcept = 
+    requires(T gen) {
+        { gen.get() } -> std::same_as<float>;
+    } || 
+    requires {
+        { T::get() } -> std::same_as<float>;
+    };
 
-    /**
-     * @brief Generates floating-point value from instance generator.
-     *
-     * @tparam G Generator type.
-     * @param gen Generator instance.
-     *
-     * @return Generated floating-point value.
-     */
-    template<GeneratorFloatConcept G>
-    inline float generate(G& gen) noexcept {
-        return gen.get();
-    }
-
-    /**
-     * @brief Generates floating-point value from static generator.
-     *
-     * @tparam G Generator type.
-     *
-     * @return Generated floating-point value.
-     */
-    template<GeneratorFloatConcept G>
-    inline float generate() noexcept {
-        return G::get();
-    }
+/**
+ * @brief Generates floating-point value from instance generator.
+ *
+ * @tparam G Generator type.
+ * @param gen Generator instance.
+ *
+ * @return Generated floating-point value.
+ */
+template<GeneratorFloatConcept G>
+inline float generate(G& gen) noexcept {
+    return gen.get();
 }
+
+/**
+ * @brief Generates floating-point value from static generator.
+ *
+ * @tparam G Generator type.
+ *
+ * @return Generated floating-point value.
+ */
+template<GeneratorFloatConcept G>
+inline float generate() noexcept {
+    return G::get();
+}
+
+}   // namespace eliot::core
 
 #endif

@@ -26,103 +26,103 @@
 
 namespace eliot::generated {
 
+/**
+ * @brief Periodic state-switching condition.
+ *
+ * This condition alternates between active and inactive states.
+ * Each state remains active for a configurable number of
+ * packet evaluations.
+ *
+ * The duration of the active state is defined by parameter `t`,
+ * and the duration of the inactive state by parameter `f`.
+ */
+class {{ condition.cpp_type() }} {
+public:
+    {% if not condition.not_generator_t() %}
     /**
-     * @brief Periodic state-switching condition.
-     *
-     * This condition alternates between active and inactive states.
-     * Each state remains active for a configurable number of
-     * packet evaluations.
-     *
-     * The duration of the active state is defined by parameter `t`,
-     * and the duration of the inactive state by parameter `f`.
+     * @brief Constructs the condition and initializes `_threshold`. 
      */
-    struct {{ condition.cpp_type() }} {
-        {% if not condition.not_generator_t() %}
+    explicit {{ condition.cpp_type() }}() 
+        : _threshold(core::generate{{ condition.t.cpp_call() }})) 
+    {}
 
-        /**
-         * @brief Constructs the condition and initializes `_threshold`. 
-         */
-        explicit {{ condition.cpp_type() }}() 
-            : _threshold(core::generate{{ condition.t.cpp_call() }})) 
-        {}
-        {% endif %}
+    {% endif %}
+    /**
+     * @brief Evaluates whether the condition is fulfilled.
+     *
+     * The condition maintains an internal counter. When the counter
+     * reaches the current threshold, the condition toggles its state
+     * and updates the next threshold value.
+     *
+     * @param packet Pointer to the evaluated packet (unused).
+     * @return true if the condition is currently in active state.
+     */
+    inline bool fulfilled(const Packet* /*packet*/) noexcept {
+        if (_counter == 0) {
+            {% if condition.not_generator_t() and condition.not_generator_f() %}
+            _threshold = _state ? _T : _F;
+            {% elif condition.not_generator_t() %}
+            _threshold =  _state 
+                ? _T 
+                : core::generate{{ condition.f.cpp_call() }}); 
+            {% elif condition.not_generator_f() %}
+            _threshold = _state 
+                ? core::generate{{ condition.t.cpp_call() }}) 
+                : _F;
+            {% else %}
+            _threshold = _state 
+                ? core::generate{{ condition.t.cpp_call() }}) 
+                : core::generate{{ condition.f.cpp_call() }});
+            {% endif %}
+        }
+        bool result = _state;
 
-        /**
-         * @brief Evaluates whether the condition is fulfilled.
-         *
-         * The condition maintains an internal counter. When the counter
-         * reaches the current threshold, the condition toggles its state
-         * and updates the next threshold value.
-         *
-         * @param packet Pointer to the evaluated packet (unused).
-         * @return true if the condition is currently in active state.
-         */
-        inline bool fulfilled(const Packet* /*packet*/) noexcept {
-            if (_counter == 0) {
-                {% if condition.not_generator_t() and condition.not_generator_f() %}
-                _threshold = _state ? _T : _F;
-                {% elif condition.not_generator_t() %}
-                _threshold =  _state 
-                    ? _T 
-                    : core::generate{{ condition.f.cpp_call() }}); 
-                {% elif condition.not_generator_f() %}
-                _threshold = _state 
-                    ? core::generate{{ condition.t.cpp_call() }}) 
-                    : _F;
-                {% else %}
-                _threshold = _state 
-                    ? core::generate{{ condition.t.cpp_call() }}) 
-                    : core::generate{{ condition.f.cpp_call() }});
-                {% endif %}
-            }
-            bool result = _state;
+        _counter++;
 
-            _counter++;
-
-            if (_counter >= _threshold) {
-                _counter = 0;
-                _state = !_state;
-            }
-
-            return result;
+        if (_counter >= _threshold) {
+            _counter = 0;
+            _state = !_state;
         }
 
-        private:
+        return result;
+    }
 
-            ///> Packet evaluation counter.
-            size_t _counter = 0;
+private:
+    ///> Packet evaluation counter.
+    size_t _counter = 0;
 
-            ///> Current condition state.
-            bool _state = true;
-            {% if condition.not_generator_t() %}
+    ///> Current condition state.
+    bool _state = true;
+    {% if condition.not_generator_t() %}
 
-            ///> Condition `t` parameter.
-            static constexpr size_t _T = {{ condition.t }};
-            {% endif %}
+    ///> Condition `t` parameter.
+    static constexpr size_t _T = {{ condition.t }};
+    {% endif %}
 
-            {% if condition.not_generator_f() %}
+    {% if condition.not_generator_f() %}
 
-            ///> Condition `f` parameter.
-            static constexpr size_t _F = {{ condition.f }};
-            {% endif %}
-            {% if not condition.not_generator_t() and condition.t.is_state() %}
+    ///> Condition `f` parameter.
+    static constexpr size_t _F = {{ condition.f }};
+    {% endif %}
+    {% if not condition.not_generator_t() and condition.t.is_state() %}
 
-            ///> Generator providing dynamic values for active-phase duration.
-            inline static {{ condition.t.cpp_type() }} {{ condition.t.cpp_name() }};
-            {% endif %}
-            {% if not condition.not_generator_f() and condition.f.is_state() %}
+    ///> Generator providing dynamic values for active-phase duration.
+    inline static {{ condition.t.cpp_type() }} {{ condition.t.cpp_name() }};
+    {% endif %}
+    {% if not condition.not_generator_f() and condition.f.is_state() %}
 
-            ///> Generator providing dynamic values for inactive-phase duration.
-            inline static {{ condition.f.cpp_type() }} {{ condition.f.cpp_name() }};
-            {% endif %}
+    ///> Generator providing dynamic values for inactive-phase duration.
+    inline static {{ condition.f.cpp_type() }} {{ condition.f.cpp_name() }};
+    {% endif %}
 
-            ///> Current threshold defining the duration of the active/inactive phase.
-            {% if condition.not_generator_t() %}
-            size_t _threshold = {{ condition.t }};
-            {% else %}
-            size_t _threshold;
-            {% endif %}
-    };
-}
+    ///> Current threshold defining the duration of the active/inactive phase.
+    {% if condition.not_generator_t() %}
+    size_t _threshold = {{ condition.t }};
+    {% else %}
+    size_t _threshold;
+    {% endif %}
+};
+
+}   // namespace eliot::generated
 
 #endif

@@ -35,64 +35,63 @@
 
 namespace eliot::generated {
 
+/**
+ * @brief Generated fault model.
+ */
+class FaultModel {
+public:
     /**
-     * @brief Generated fault model.
+     * @brief Evaluates the fault model for a packet.
+     *
+     * Executes the generated state-machine logic and
+     * applies corresponding actions until the packet
+     * reaches a terminal result.
+     *
+     * @param packet Pointer to the packet being processed.
      */
-    struct FaultModel {
+    void evaluate(Packet* packet) noexcept;
+    {% if require_calendar %}
 
-        /**
-         * @brief Evaluates the fault model for a packet.
-         *
-         * Executes the generated state-machine logic and
-         * applies corresponding actions until the packet
-         * reaches a terminal result.
-         *
-         * @param packet Pointer to the packet being processed.
-         */
-        void evaluate(Packet* packet) noexcept;
-        {% if require_calendar %}
+    /**
+     * @brief Returns next scheduled packet ready for processing.
+     *
+     * @return Pointer to a packet ready for execution or nullptr.
+     */
+    inline Packet* get_scheduled() noexcept {
+        return _calendar.get_ready();
+    }
 
-        /**
-         * @brief Returns next scheduled packet ready for processing.
-         *
-         * @return Pointer to a packet ready for execution or nullptr.
-         */
-        inline Packet* get_scheduled() noexcept {
-            return _calendar.get_ready();
-        }
+    /**
+     * @brief Checks whether the calendar is empty.
+     *
+     * @return True if no packets are scheduled.
+     */
+    inline bool calendar_empty() const noexcept {
+        return _calendar.empty();
+    }
+    {% endif %}
 
-        /**
-         * @brief Checks whether the calendar is empty.
-         *
-         * @return True if no packets are scheduled.
-         */
-        inline bool calendar_empty() const noexcept {
-            return _calendar.empty();
-        }
-        {% endif %}
+private:
+    {% if require_calendar %}
+    ///> Shared calendar instance.
+    core::Calendar _calendar;
 
-        private:
-            {% if require_calendar %}
-
-            ///> Shared calendar instance.
-            core::Calendar _calendar;
-            {% endif %}
-
+    {% endif %}
 {% for state in states %}
-            {{ state.cpp_type() }} {{ state.cpp_name() }};
+    {{ state.cpp_type() }} {{ state.cpp_name() }};
 {% endfor %}
 {% for condition in conditions %}
-            {% if condition.is_state() %}
-            {{ condition.cpp_type() }} {{ condition.cpp_name() }}{{ condition.init() }};
-            {% endif %}
+    {% if condition.is_state() %}
+    {{ condition.cpp_type() }} {{ condition.cpp_name() }}{{ condition.init() }};
+    {% endif %}
 {% endfor %}
 {% for action in actions %}
-            {% if action.is_state() %}
-            {{ action.cpp_type() }} {{ action.cpp_name() }}{{ action.init() }};
-            {% endif %}
+    {% if action.is_state() %}
+    {{ action.cpp_type() }} {{ action.cpp_name() }}{{ action.init() }};
+    {% endif %}
 {% endfor %}
-    };
+};
 
-}
+}   // namespace eliot::generated
 
 #endif

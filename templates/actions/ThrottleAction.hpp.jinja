@@ -22,98 +22,98 @@
 
 namespace eliot::generated {
 
+/**
+ * @brief Fault injection action implementing rate limiting.
+ *
+ * The action limits packet transmission rate using a token-based mechanism.
+ * When the rate limit is exceeded packets are {{ 'delayed' if action.mode == "shaping" else 'dropped'}}.
+ */
+class {{ action.cpp_type() }} {
+public:
+    {% if action.mode == "shaping"%}
     /**
-     * @brief Fault injection action implementing rate limiting.
+     * @brief Constructs the shaping action with a calendar reference.
      *
-     * The action limits packet transmission rate using a token-based mechanism.
-     * When the rate limit is exceeded packets are {{ 'delayed' if action.mode == "shaping" else 'dropped'}}.
+     * @param calendar Reference to the calendar used for delayed packet scheduling.
      */
-    struct {{ action.cpp_type() }} {
+    explicit {{ action.cpp_type() }}(core::Calendar& calendar) : _calendar(calendar) {}
 
+    {% endif %}
+    /**
+     * @brief Applies rate limiting to a packet.
+     *
+    {% if action.mode == "shaping" %}
+     * Packets exceeding the available token budget
+     * are delayed and scheduled for future processing.
+    {% else %}
+     * Packets exceeding the allowed rate
+     * are immediately dropped.
+    {% endif %}
+     *
+     * @param packet Pointer to the packet being processed.
+     */
+    inline void execute(Packet* packet) noexcept {
+        const uint64_t now = core::Time::now();
         {% if action.mode == "shaping"%}
-        /**
-         * @brief Constructs the shaping action with a calendar reference.
-         *
-         * @param calendar Reference to the calendar used for delayed packet scheduling.
-         */
-        explicit {{ action.cpp_type() }}(core::Calendar& calendar) : _calendar(calendar) {}
 
-        {% endif %}
-        /**
-         * @brief Applies rate limiting to a packet.
-         *
-        {% if action.mode == "shaping" %}
-         * Packets exceeding the available token budget
-         * are delayed and scheduled for future processing.
-        {% else %}
-         * Packets exceeding the allowed rate
-         * are immediately dropped.
-        {% endif %}
-         *
-         * @param packet Pointer to the packet being processed.
-         */
-        inline void execute(Packet* packet) noexcept {
-            const uint64_t now = core::Time::now();
-            {% if action.mode == "shaping"%}
-
-            // Refill tokens based on elapsed time
-            if (now > _last) {
-                _tokens += (now - _last) * _RATE;
-                if (_tokens > _MAX_SIZE)
-                    _tokens = _MAX_SIZE;
-                _last = now;
-            }
-
-            const double packet_size = static_cast<double>(packet->size());
-
-            // If enough tokens are available, transmit immediately
-            if (packet_size <= _tokens) {
-                _tokens -= packet_size;
-                return;
-            }
-
-            // Otherwise, delay packet until enough tokens are accumulated
-            const double missing = packet_size - _tokens;
-            const uint64_t delay = static_cast<uint64_t>(std::ceil(missing / _RATE));
-            _tokens = 0.0;
-            _last += delay;
-            _calendar.schedule(packet, _last - now);
-            {% else %}
-
-            // Drop packet if it arrives before the next allowed transmission time
-            if (now < _next_allowed_time) {
-                packet->result = PacketResult::Drop;
-                return;
-            }
-
-            // Compute next allowed transmission time
-            const uint64_t delay = static_cast<uint64_t>(std::ceil(packet->size() / _RATE));
-            _next_allowed_time = now + delay;
-            {% endif %}
+        // Refill tokens based on elapsed time
+        if (now > _last) {
+            _tokens += (now - _last) * _RATE;
+            if (_tokens > _MAX_SIZE)
+                _tokens = _MAX_SIZE;
+            _last = now;
         }
 
-        private:
+        const double packet_size = static_cast<double>(packet->size());
 
-            ///> Configured transmission rate. (bytes per millisecond)
-            static constexpr double _RATE = {{ action.rate }} / 1000.0;
+        // If enough tokens are available, transmit immediately
+        if (packet_size <= _tokens) {
+            _tokens -= packet_size;
+            return;
+        }
 
-            {% if action.mode == "shaping"%}
-            ///> Reference to the calendar used for delayed scheduling.
-            core::Calendar& _calendar;
+        // Otherwise, delay packet until enough tokens are accumulated
+        const double missing = packet_size - _tokens;
+        const uint64_t delay = static_cast<uint64_t>(std::ceil(missing / _RATE));
+        _tokens = 0.0;
+        _last += delay;
+        _calendar.schedule(packet, _last - now);
+        {% else %}
 
-            ///> Maximum token bucket size (burst size).
-            static constexpr double _MAX_SIZE = {{ action.burst }};
+        // Drop packet if it arrives before the next allowed transmission time
+        if (now < _next_allowed_time) {
+            packet->result = Packet::Result::Drop;
+            return;
+        }
 
-            ///> Current number of available tokens.
-            double _tokens = _MAX_SIZE;
+        // Compute next allowed transmission time
+        const uint64_t delay = static_cast<uint64_t>(std::ceil(packet->size() / _RATE));
+        _next_allowed_time = now + delay;
+        {% endif %}
+    }
 
-            ///> Timestamp of the last token update.
-            uint64_t _last = core::Time::now();
-            {% else %}
-            ///> Timestamp when the next packet transmission is allowed.
-            uint64_t _next_allowed_time = core::Time::now();
-            {% endif %}
-    };
-}
+private:
+    ///> Configured transmission rate. (bytes per millisecond)
+    static constexpr double _RATE = {{ action.rate }} / 1000.0;
+
+    {% if action.mode == "shaping"%}
+    ///> Reference to the calendar used for delayed scheduling.
+    core::Calendar& _calendar;
+
+    ///> Maximum token bucket size (burst size).
+    static constexpr double _MAX_SIZE = {{ action.burst }};
+
+    ///> Current number of available tokens.
+    double _tokens = _MAX_SIZE;
+
+    ///> Timestamp of the last token update.
+    uint64_t _last = core::Time::now();
+    {% else %}
+    ///> Timestamp when the next packet transmission is allowed.
+    uint64_t _next_allowed_time = core::Time::now();
+    {% endif %}
+};
+
+}   // namespace eliot::generated
 
 #endif

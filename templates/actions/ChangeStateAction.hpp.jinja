@@ -18,38 +18,38 @@
 
 namespace eliot::generated {
 
+/**
+ * @brief Fault injection action performing a state transition.
+ *
+ * This action does not modify the packet payload directly.
+ * Instead, it updates the state of a referenced {{ action.get_state_cpp_type() }} node.
+ */
+class {{ action.cpp_type() }} {
+public:
     /**
-     * @brief Fault injection action performing a state transition.
+     * @brief Constructs the action with a reference to a {{ action.get_state_cpp_type() }} node.
      *
-     * This action does not modify the packet payload directly.
-     * Instead, it updates the state of a referenced {{ action.get_state_cpp_type() }} node.
+     * @param node Reference to the node whose state will be modified.
      */
-    struct {{ action.cpp_type() }} {
+    explicit {{ action.cpp_type() }}({{ action.get_state_cpp_type() }}& node) : _node(node) {}
 
-        /**
-         * @brief Constructs the action with a reference to a {{ action.get_state_cpp_type() }} node.
-         *
-         * @param node Reference to the node whose state will be modified.
-         */
-        explicit {{ action.cpp_type() }}({{ action.get_state_cpp_type() }}& node) : _node(node) {}
+    /**
+     * @brief Executes the state transition.
+     *
+     * Sets the state of the referenced node to State::{{ action.state }}.
+     * The packet itself is not modified.
+     *
+     * @param packet Pointer to the processed packet (unused).
+     */
+    inline void execute(Packet* /*packet*/) noexcept {
+        _node.set_state({{ action.get_state_cpp_type() }}::State::{{ action.state }});
+    }
 
-        /**
-         * @brief Executes the state transition.
-         *
-         * Sets the state of the referenced node to State::{{ action.state }}.
-         * The packet itself is not modified.
-         *
-         * @param packet Pointer to the processed packet (unused).
-         */
-        inline void execute(Packet* /*packet*/) noexcept {
-            _node.set_state({{ action.get_state_cpp_type() }}::State::{{ action.state }});
-        }
+private:
+    ///> Reference to the {{ action.get_state_cpp_type() }} node.
+    {{ action.get_state_cpp_type() }}& _node;
+};
 
-        private:
-
-            ///> Reference to the {{ action.get_state_cpp_type() }} node.
-            {{ action.get_state_cpp_type() }}& _node;
-    };
-}
+}   // namespace eliot::generated
 
 #endif

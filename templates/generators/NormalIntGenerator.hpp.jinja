@@ -20,140 +20,140 @@
 
 namespace eliot::generated {
 
+/**
+ * @brief Integer value generator.
+ *
+ * Generates integer values derived from normal (Gaussian) distribution.
+{% if not generator.once %}
+ * Sampled floating-point values are rounded to the nearest integer.
+{% endif %}
+ */
+class {{ generator.cpp_type() }} {
+public:
     /**
-     * @brief Integer value generator.
+     * @brief Returns a generated integer value.
      *
-     * Generates integer values derived from normal (Gaussian) distribution.
-    {% if not generator.once %}
-     * Sampled floating-point values are rounded to the nearest integer.
+    {% if generator.once %}
+     * This method always returns the same value.
+    {% else %}
+     * Values are sampled from a normal distribution then rounded
+     * to the nearest integer and clamped to the configured bounds.
     {% endif %}
+     *
+     * @return Generated integer value.
      */
-    struct {{ generator.cpp_type() }} {
-
-        /**
-         * @brief Returns a generated integer value.
-         *
+    static {{ 'constexpr ' if generator.once else '' }}inline int get() noexcept {
         {% if generator.once %}
-         * This method always returns the same value.
+        return {{ generator.value() }};
         {% else %}
-         * Values are sampled from a normal distribution then rounded
-         * to the nearest integer and clamped to the configured bounds.
+        // Transform standard normal sample to N(m, s)
+        float x = {{ generator.m }}f + {{ generator.s }}f * rnor();
+
+        // Round value to the nearest integer
+        int xi = static_cast<int>(std::round(x));
+
+        // Check minimum bound
+        if (xi < _MIN) return _MIN;
+
+        {% if generator.max is not none %}
+        // Check maximum bound
+        if (xi > _MAX) return _MAX;
+
         {% endif %}
-         *
-         * @return Generated integer value.
-         */
-        static {{ 'constexpr ' if generator.once else '' }}inline int get() noexcept {
-            {% if generator.once %}
-            return {{ generator.value() }};
-            {% else %}
-            // Transform standard normal sample to N(m, s)
-            float x = {{ generator.m }}f + {{ generator.s }}f * rnor();
+        return xi;
+        {% endif %}
+    }
 
-            // Round value to the nearest integer
-            int xi = static_cast<int>(std::round(x));
+{% if not generator.once %}
+private:
+    ///> Minimal possible value the generator can generate.
+    static constexpr int _MIN = {{ generator.min }};
+    {% if generator.max is not none %}
 
-            // Check minimum bound
-            if (xi < _MIN) return _MIN;
+    ///> Maximal possible value the generator can generate.
+    static constexpr int _MAX = {{ generator.max }};
+    {% endif %}
 
-            {% if generator.max is not none %}
-            // Check maximum bound
-            if (xi > _MAX) return _MAX;
+    ///> Pseudo-random number generator.
+    inline static core::xoroshiro128plus _rng{ {{ generator.seed_value() }} };
 
-            {% endif %}
-            return xi;
-            {% endif %}
+    /**
+     * @brief Uniform random float in interval [0, 1).
+     *
+     * Uses bit manipulation to construct a float in [1, 2)
+     * by setting exponent bits to 127 (0x3F800000),
+     * then subtracts 1.0f.
+     * 
+     * @return Float value in interval [0, 1).
+     */
+    inline static float _uni() noexcept {
+        uint32_t r = static_cast<uint32_t>(_rng.next() >> 40);
+        return std::bit_cast<float>(0x3F800000u | r) - 1.0f;
+    }
+
+    /**
+     * @brief Generates a standard normal random value (mean=0, var=1).
+     *
+     * Implements the Ziggurat algorithm:
+     *
+     * 1. Fast path:
+     *      Most samples fall inside precomputed rectangles.
+     *      Accepted without expensive math.
+     *
+     * 2. Slow path:
+     *      If outside rectangle, perform rejection sampling.
+     *
+     * The arrays:
+     *      kn[]  – integer thresholds
+     *      wn[]  – rectangle widths
+     *      fn[]  – function values at rectangle edges.
+     *
+     * @return Standard normal random value (mean=0, var=1).
+     */
+    inline static float rnor() noexcept {
+        // Right tail boundary
+        constexpr float r = 3.442620f;
+        constexpr float invr = 1.0f / r;
+        while (true) {
+            // Generate 32 random bits
+            uint32_t hz_u = static_cast<uint32_t>(_rng.next());
+            int32_t  hz   = static_cast<int32_t>(hz_u);
+
+            // Select Ziggurat layer (0–127)
+            uint32_t iz   = hz_u & 127u;
+
+            // Absolute value without branch
+            uint32_t ahz = hz_u & 0x7FFFFFFFu;
+
+            // Fast path
+            if (ahz < kn[iz]) {
+                return hz * wn[iz];
+            }
+
+            float x = hz * wn[iz];
+
+            // Tail handling
+            if (iz == 0u) {
+                float xx, yy;
+
+                // Exponential sampling for tail
+                do {
+                    xx = -std::log(_uni()) * invr;
+                    yy = -std::log(_uni());
+                } while (yy + yy < xx * xx);
+
+                return (hz > 0) ? (r + xx) : (-r - xx);
+            }
+
+            // Rejection test
+            if (fn[iz] + _uni() * (fn[iz - 1u] - fn[iz]) < std::exp(-0.5f * x * x)) {
+                return x;
+            }
         }
+    }
+{% endif %}
+};
 
-        {% if not generator.once %}
-        private:
-
-            ///> Minimal possible value the generator can generate.
-            static constexpr int _MIN = {{ generator.min }};
-            {% if generator.max is not none %}
-
-            ///> Maximal possible value the generator can generate.
-            static constexpr int _MAX = {{ generator.max }};
-            {% endif %}
-
-            ///> Pseudo-random number generator.
-            inline static core::xoroshiro128plus _rng{ {{ generator.seed_value() }} };
-
-            /**
-             * @brief Uniform random float in interval [0, 1).
-             *
-             * Uses bit manipulation to construct a float in [1, 2)
-             * by setting exponent bits to 127 (0x3F800000),
-             * then subtracts 1.0f.
-             * 
-             * @return Float value in interval [0, 1).
-             */
-            inline static float _uni() noexcept {
-                uint32_t r = static_cast<uint32_t>(_rng.next() >> 40);
-                return std::bit_cast<float>(0x3F800000u | r) - 1.0f;
-            }
-
-            /**
-             * @brief Generates a standard normal random value (mean=0, var=1).
-             *
-             * Implements the Ziggurat algorithm:
-             *
-             * 1. Fast path:
-             *      Most samples fall inside precomputed rectangles.
-             *      Accepted without expensive math.
-             *
-             * 2. Slow path:
-             *      If outside rectangle, perform rejection sampling.
-             *
-             * The arrays:
-             *      kn[]  – integer thresholds
-             *      wn[]  – rectangle widths
-             *      fn[]  – function values at rectangle edges.
-             *
-             * @return Standard normal random value (mean=0, var=1).
-             */
-            inline static float rnor() noexcept {
-                // Right tail boundary
-                constexpr float r = 3.442620f;
-                constexpr float invr = 1.0f / r;
-                while (true) {
-                    // Generate 32 random bits
-                    uint32_t hz_u = static_cast<uint32_t>(_rng.next());
-                    int32_t  hz   = static_cast<int32_t>(hz_u);
-
-                    // Select Ziggurat layer (0–127)
-                    uint32_t iz   = hz_u & 127u;
-
-                    // Absolute value without branch
-                    uint32_t ahz = hz_u & 0x7FFFFFFFu;
-
-                    // Fast path
-                    if (ahz < kn[iz]) {
-                        return hz * wn[iz];
-                    }
-
-                    float x = hz * wn[iz];
-
-                    // Tail handling
-                    if (iz == 0u) {
-                        float xx, yy;
-
-                        // Exponential sampling for tail
-                        do {
-                            xx = -std::log(_uni()) * invr;
-                            yy = -std::log(_uni());
-                        } while (yy + yy < xx * xx);
-
-                        return (hz > 0) ? (r + xx) : (-r - xx);
-                    }
-
-                    // Rejection test
-                    if (fn[iz] + _uni() * (fn[iz - 1u] - fn[iz]) < std::exp(-0.5f * x * x)) {
-                        return x;
-                    }
-                }
-            }
-        {% endif %}
-    };
-}
+}   // namespace eliot::generated
 
 #endif

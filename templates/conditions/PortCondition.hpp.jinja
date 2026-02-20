@@ -17,89 +17,88 @@
 
 namespace eliot::generated {
 
+/**
+ * @brief Transport-layer port-based condition.
+ *
+ * This condition is fulfilled if the source and/or destination
+ * port in the transport-layer header matches the configured value.
+ */
+class {{ condition.cpp_type() }} {
+public:
     /**
-     * @brief Transport-layer port-based condition.
+     * @brief Evaluates whether the condition is fulfilled.
      *
-     * This condition is fulfilled if the source and/or destination
-     * port in the transport-layer header matches the configured value.
+     * The condition:
+     *  - obtains the L4 header offset,
+    {% if condition.port is not none %}
+     *  - extracts source and destination ports,
+     *  - compares them with configured criteria.
+    {% else %}
+    {% if condition.src is not none %}
+     *  - extracts source port and compares it
+    {% endif %}
+    {% if condition.dst is not none %}
+     *  - extracts destination port and compares it
+    {% endif %}
+    {% endif %}
+     *
+     * @param packet Pointer to the evaluated packet.
+     * @return true if the port condition is satisfied.
      */
-    struct {{ condition.cpp_type() }} {
+    static inline bool fulfilled(const Packet *packet) noexcept {
+        // Access packet payload
+        const std::vector<uint8_t>& p = packet->payload();
+        size_t size = packet->size();
 
-        /**
-         * @brief Evaluates whether the condition is fulfilled.
-         *
-         * The condition:
-         *  - obtains the L4 header offset,
+        // Determine start of transport-layer header
+        int offset = packet->l4_offset();
+
+        // Ensure enough bytes for src and dst port fields
+        if (offset < 0 || size < offset + 4)
+            return false;
+
         {% if condition.port is not none %}
-         *  - extracts source and destination ports,
-         *  - compares them with configured criteria.
+        // Extract source and destination ports (network byte order)
+        uint16_t src_port = (uint16_t(p[offset]) << 8) | p[offset + 1];
+        uint16_t dst_port = (uint16_t(p[offset + 2]) << 8) | p[offset + 3];
+
+        // Match either source or destination port
+        return src_port == _PORT || dst_port == _PORT;
         {% else %}
         {% if condition.src is not none %}
-         *  - extracts source port and compares it
+        // Extract and check source port
+        uint16_t src_port = (uint16_t(p[offset]) << 8) | p[offset + 1];
+        if (src_port != _SRC)
+            return false;
+
         {% endif %}
         {% if condition.dst is not none %}
-         *  - extracts destination port and compares it
+        // Extract and check destination port
+        uint16_t dst_port = (uint16_t(p[offset + 2]) << 8) | p[offset + 3];
+        if (dst_port != _DST)
+            return false;
+
         {% endif %}
+        return true;
         {% endif %}
-         *
-         * @param packet Pointer to the evaluated packet.
-         * @return true if the port condition is satisfied.
-         */
-        static inline bool fulfilled(const Packet *packet) noexcept {
-            // Access packet payload
-            const std::vector<uint8_t>& p = packet->payload();
-            size_t size = packet->size();
+    }
 
-            // Determine start of transport-layer header
-            int offset = packet->l4_offset();
+private:
+    {% if condition.port is not none %}
+    ///> Condition port to check.
+    static constexpr uint16_t _PORT = {{ condition.port }};
+    {% endif %}
+    {% if condition.src is not none %}
+    ///> Condition source port to check.
+    static constexpr uint16_t _SRC = {{ condition.src }};
 
-            // Ensure enough bytes for src and dst port fields
-            if (offset < 0 || size < offset + 4)
-                return false;
+    {% endif %}
+    {% if condition.dst is not none %}
+    ///> Condition destination port to check.
+    static constexpr uint16_t _DST = {{ condition.dst }};
+    {% endif %}
+};
 
-            {% if condition.port is not none %}
-            // Extract source and destination ports (network byte order)
-            uint16_t src_port = (uint16_t(p[offset]) << 8) | p[offset + 1];
-            uint16_t dst_port = (uint16_t(p[offset + 2]) << 8) | p[offset + 3];
-
-            // Match either source or destination port
-            return src_port == _PORT || dst_port == _PORT;
-            {% else %}
-            {% if condition.src is not none %}
-            // Extract and check source port
-            uint16_t src_port = (uint16_t(p[offset]) << 8) | p[offset + 1];
-            if (src_port != _SRC)
-                return false;
-
-            {% endif %}
-            {% if condition.dst is not none %}
-            // Extract and check destination port
-            uint16_t dst_port = (uint16_t(p[offset + 2]) << 8) | p[offset + 3];
-            if (dst_port != _DST)
-                return false;
-
-            {% endif %}
-            return true;
-            {% endif %}
-        }
-
-        private:
-            {% if condition.port is not none %}
-
-            ///> Condition port to check.
-            static constexpr uint16_t _PORT = {{ condition.port }};
-            {% endif %}
-            {% if condition.src is not none %}
-
-            ///> Condition source port to check.
-            static constexpr uint16_t _SRC = {{ condition.src }};
-            {% endif %}
-            {% if condition.dst is not none %}
-
-            ///> Condition destination port to check.
-            static constexpr uint16_t _DST = {{ condition.dst }};
-            {% endif %}
-    };
-}
+}   // namespace eliot::generated
 
 #endif

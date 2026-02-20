@@ -16,54 +16,58 @@
 #ifndef ELIOT_CONDITION_H
 #define ELIOT_CONDITION_H
 
-#include "../../Packet.hpp"
 #include <concepts>
 
 namespace eliot::core {
 
-    /**
-     * @brief Concept defining a valid condition.
-     *
-     * A condition must provide:
-     *  - bool fulfilled(const Packet*)
-     *
-     * either as a member function or as a static function.
-     */
-    template<typename T>
-    concept ConditionConcept = 
-        requires(T condition, const generated::Packet* packet) {
-            { condition.fulfilled(packet) } -> std::convertible_to<bool>;
-        } || 
-        requires(const generated::Packet* packet) {
-            { T::fulfilled(packet) } -> std::convertible_to<bool>;
-        };
+/**
+ * @brief Concept defining a valid condition.
+ *
+ * A condition must provide:
+ *  - bool fulfilled(const Packet*)
+ *
+ * either as a member function or as a static function.
+ */
+template<typename T, typename Packet>
+concept ConditionConcept = 
+    requires(T condition, const Packet* packet) {
+        { condition.fulfilled(packet) } -> std::convertible_to<bool>;
+    } || 
+    requires(const Packet* packet) {
+        { T::fulfilled(packet) } -> std::convertible_to<bool>;
+    };
 
-    /**
-     * @brief Evaluates instance-based condition.
-     *
-     * @tparam C Condition type.
-     * @param condition Condition instance.
-     * @param packet Pointer to packet.
-     *
-     * @return True if condition is satisfied.
-     */
-    template<ConditionConcept C>
-    inline bool evaluate_condition(C& condition, const generated::Packet* packet) noexcept {
-        return condition.fulfilled(packet);
-    }
-
-    /**
-     * @brief Evaluates static condition.
-     *
-     * @tparam C Condition type.
-     * @param packet Pointer to packet.
-     *
-     * @return True if condition is satisfied.
-     */
-    template<ConditionConcept C>
-    inline bool evaluate_condition(const generated::Packet* packet) noexcept {
-        return C::fulfilled(packet);
-    }
+/**
+ * @brief Evaluates instance-based condition.
+ *
+ * @tparam C Condition type.
+ * @tparam Packet Packet type.
+ * @param condition Condition instance.
+ * @param packet Pointer to packet.
+ *
+ * @return True if condition is satisfied.
+ */
+template<typename C, typename Packet>
+requires ConditionConcept<C, Packet>
+inline bool evaluate_condition(C& condition, const Packet* packet) noexcept {
+    return condition.fulfilled(packet);
 }
+
+/**
+ * @brief Evaluates static condition.
+ *
+ * @tparam C Condition type.
+ * @tparam Packet Packet type.
+ * @param packet Pointer to packet.
+ *
+ * @return True if condition is satisfied.
+ */
+template<typename C, typename Packet>
+requires ConditionConcept<C, Packet>
+inline bool evaluate_condition(const Packet* packet) noexcept {
+    return C::fulfilled(packet);
+}
+
+}   // namespace eliot::core
 
 #endif

@@ -15,55 +15,55 @@
 
 namespace eliot::generated {
 
+/**
+ * @brief State node definition.
+ *
+ * Each state is mapped to a next packet state.
+ */
+class {{ state.cpp_type() }} {
+public:
     /**
-     * @brief State node definition.
-     *
-     * Each state is mapped to a next packet state.
+     * @brief Enumeration of all possible node states.
      */
-    struct {{ state.cpp_type() }} {
-
-        /**
-         * @brief Enumeration of all possible node states.
-         */
-        enum class State {
-            {{ state.states() | join(",\n\t\t\t") }}
-        };
-
-        /**
-         * @brief Returns the transition identifier for the current state.
-         *
-         * The returned value corresponds to the next packet-processing
-         * branch associated with the current state.
-         *
-         * @return Identifier of the next transition.
-         */
-        inline unsigned get_next_packet_state(void) const noexcept {
-            // Determine transition based on current state
-            switch (_state) {
-{% for t in state.transitions %}
-                case State::{{ t.state }}:
-                    return {{ t.get_id() }};
-{% endfor %}
-            }
-
-            // Should never be reached
-            __builtin_unreachable();
-        }
-
-        /**
-         * @brief Updates the current node state.
-         *
-         * @param s New state to assign.
-         */
-        inline void set_state(State s) noexcept {
-            _state = s;
-        }
-
-        private:
-
-            ///> Current state of the node.
-            State _state = State::{{state.initial }};
+    enum class State {
+        {{ state.states() | join(",\n\t\t\t") }}
     };
-}
+
+    /**
+     * @brief Returns the transition identifier for the current state.
+     *
+     * The returned value corresponds to the next packet-processing
+     * branch associated with the current state.
+     *
+     * @return Identifier of the next transition.
+     */
+    inline unsigned get_next_packet_state(void) const noexcept {
+        // Determine transition based on current state
+        switch (_state) {
+{% for t in state.transitions %}
+            case State::{{ t.state }}:
+                return {{ t.get_id() }};
+{% endfor %}
+        }
+
+        // Should never be reached
+        __builtin_unreachable();
+    }
+
+    /**
+     * @brief Updates the current node state.
+     *
+     * @param s New state to assign.
+     */
+    inline void set_state(State s) noexcept {
+        _state = s;
+    }
+
+private:
+    ///> Current state of the node.
+    State _state = State::{{state.initial }};
+};
+
+}   // namespace eliot::generated
 
 #endif

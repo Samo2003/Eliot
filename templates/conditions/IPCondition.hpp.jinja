@@ -17,113 +17,114 @@
 
 namespace eliot::generated {
 
+/**
+ * @brief Stateless IP address-based condition.
+ *
+ * This condition is fulfilled only for packets matching
+ * specified IPv4 or IPv6 address criteria.
+ *
+{% if condition.ip is not none %}
+ * It checks whether either source or destination address
+ * matches '{{ condition.ip }}'.
+{% else %}
+{% if condition.src is not none %}
+ * It checks the source address matches '{{ condition.src }}'.
+{% endif %}
+{% if condition.dst is not none %}
+ * It checks the destination address matches '{{ condition.dst }}'.
+{% endif %}
+{% endif %}
+ */
+class {{ condition.cpp_type() }} {
+public:
     /**
-     * @brief Stateless IP address-based condition.
+     * @brief Evaluates whether the condition is fulfilled.
      *
-     * This condition is fulfilled only for packets matching
-     * specified IPv4 or IPv6 address criteria.
+     * The condition:
+     *  - verifies the IP version,
+     *  - validates minimal header length,
+    {% if condition.ip is not none %}
+     *  - compares source and destination address fields.
+    {% else %}
+    {% if condition.src is not none %}
+     *  - compares source address field.
+    {% endif %}
+    {% if condition.dst is not none %}
+     *  - compares destination address field.
+    {% endif %}
+    {% endif %}
      *
-     * {% if condition.ip is not none %}
-     * It checks whether either source or destination address
-     * matches '{{ condition.ip }}'.
-     * {% else %}
-     * {% if condition.src is not none %}
-     * It checks the source address matches '{{ condition.src }}'.
-     * {% endif %}
-     * {% if condition.dst is not none %}
-     * It checks the destination address matches '{{ condition.dst }}'.
-     * {% endif %}
-     * {% endif %}
+     * @param packet Pointer to the evaluated packet.
+     * @return true if the packet matches configured IP criteria.
      */
-    struct {{ condition.cpp_type() }} {
-
-        /**
-         * @brief Evaluates whether the condition is fulfilled.
-         *
-         * The condition:
-         *  - verifies the IP version,
-         *  - validates minimal header length,
-         * {% if condition.ip is not none %}
-         *  - compares source and destination address fields.
-         * {% else %}
-         * {% if condition.src is not none %}
-         *  - compares source address field.
-         * {% endif %}
-         * {% if condition.dst is not none %}
-         *  - compares destination address field.
-         * {% endif %}
-         * {% endif %}
-         *
-         * @param packet Pointer to the evaluated packet.
-         * @return true if the packet matches configured IP criteria.
-         */
-        static inline bool fulfilled(const Packet *packet) noexcept {
-            const std::vector<uint8_t>& p = packet->payload();
-            size_t size = packet->size();
-            {% set ip_bytes = condition.convert(condition.ip) if condition.ip is not none else none %}
-            {% set src_bytes = condition.convert(condition.src) if condition.src is not none else none %}                
-            {% set dst_bytes = condition.convert(condition.dst) if condition.dst is not none else none %}
-            {% if condition.ipv4() %}
-            if (packet->version() == 4) {
-                // IPv4 header size
-                if (size < 20)
-                    return false;
-                
-                static constexpr size_t IPv4_ADDR_LEN = 4;
-                {% if ip_bytes %}
-                static constexpr uint8_t IP[] = { {{ ip_bytes | map('int') | join(', ') }} };
-                // Check SRC or DST IP
-                return memcmp(&p[12], IP, IPv4_ADDR_LEN) == 0 || memcmp(&p[16], IP, IPv4_ADDR_LEN) == 0;
-                {% else %}
-                {% if src_bytes %}
-                static constexpr uint8_t SRC_IP[] = { {{ src_bytes | map('int') | join(', ') }} };
-                // SRC IP offset
-                if (memcmp(&p[12], SRC_IP, IPv4_ADDR_LEN) != 0)
-                    return false;
-                {% endif %}
-
-                {% if dst_bytes %}
-                static constexpr uint8_t DST_IP[] = { {{ dst_bytes | map('int') | join(', ') }} };
-                // DST IP offset
-                if (memcmp(&p[16], DST_IP, IPv4_ADDR_LEN) != 0)
-                    return false;
-                {% endif %}
-                return true;
-                {% endif %}
-            } 
+    static inline bool fulfilled(const Packet *packet) noexcept {
+        const std::vector<uint8_t>& p = packet->payload();
+        size_t size = packet->size();
+        {% set ip_bytes = condition.convert(condition.ip) if condition.ip is not none else none %}
+        {% set src_bytes = condition.convert(condition.src) if condition.src is not none else none %}                
+        {% set dst_bytes = condition.convert(condition.dst) if condition.dst is not none else none %}
+        {% if condition.ipv4() %}
+        if (packet->version() == 4) {
+            // IPv4 header size
+            if (size < 20)
+                return false;
+            
+            static constexpr size_t IPv4_ADDR_LEN = 4;
+            {% if ip_bytes %}
+            static constexpr uint8_t IP[] = { {{ ip_bytes | map('int') | join(', ') }} };
+            // Check SRC or DST IP
+            return memcmp(&p[12], IP, IPv4_ADDR_LEN) == 0 || memcmp(&p[16], IP, IPv4_ADDR_LEN) == 0;
             {% else %}
-            if (packet->version() == 6) {
-                // IPv6 header size
-                if (size < 40)
-                    return false;
-
-                static constexpr size_t IPv6_ADDR_LEN = 16;
-                {% if ip_bytes %}
-                static constexpr uint8_t IP[] = { {{ ip_bytes | map('int') | join(', ') }} };
-                // Check SRC or DST IP
-                return memcmp(&p[8], IP, IPv6_ADDR_LEN) == 0 || memcmp(&p[24], IP, IPv6_ADDR_LEN) == 0;
-                {% else %}
-                {% if src_bytes %}
-                static constexpr uint8_t SRC_IP[] = { {{ src_bytes | map('int') | join(', ') }} };
-                // SRC IP offset
-                if (memcmp(&p[8], SRC_IP, IPv6_ADDR_LEN) != 0)
-                    return false;
-                {% endif %}
-
-                {% if dst_bytes %}
-                static constexpr uint8_t DST_IP[] = { {{ dst_bytes | map('int') | join(', ') }} };
-                // DST IP offset
-                if (memcmp(&p[24], DST_IP, IPv6_ADDR_LEN) != 0)
-                    return false;
-                {% endif %}
-                return true;
-                {% endif %}
-            }
+            {% if src_bytes %}
+            static constexpr uint8_t SRC_IP[] = { {{ src_bytes | map('int') | join(', ') }} };
+            // SRC IP offset
+            if (memcmp(&p[12], SRC_IP, IPv4_ADDR_LEN) != 0)
+                return false;
             {% endif %}
 
-            return false;
+            {% if dst_bytes %}
+            static constexpr uint8_t DST_IP[] = { {{ dst_bytes | map('int') | join(', ') }} };
+            // DST IP offset
+            if (memcmp(&p[16], DST_IP, IPv4_ADDR_LEN) != 0)
+                return false;
+            {% endif %}
+            return true;
+            {% endif %}
+        } 
+        {% else %}
+        if (packet->version() == 6) {
+            // IPv6 header size
+            if (size < 40)
+                return false;
+
+            static constexpr size_t IPv6_ADDR_LEN = 16;
+            {% if ip_bytes %}
+            static constexpr uint8_t IP[] = { {{ ip_bytes | map('int') | join(', ') }} };
+            // Check SRC or DST IP
+            return memcmp(&p[8], IP, IPv6_ADDR_LEN) == 0 || memcmp(&p[24], IP, IPv6_ADDR_LEN) == 0;
+            {% else %}
+            {% if src_bytes %}
+            static constexpr uint8_t SRC_IP[] = { {{ src_bytes | map('int') | join(', ') }} };
+            // SRC IP offset
+            if (memcmp(&p[8], SRC_IP, IPv6_ADDR_LEN) != 0)
+                return false;
+            {% endif %}
+
+            {% if dst_bytes %}
+            static constexpr uint8_t DST_IP[] = { {{ dst_bytes | map('int') | join(', ') }} };
+            // DST IP offset
+            if (memcmp(&p[24], DST_IP, IPv6_ADDR_LEN) != 0)
+                return false;
+            {% endif %}
+            return true;
+            {% endif %}
         }
-    };
-}
+        {% endif %}
+
+        return false;
+    }
+};
+
+}   // namespace eliot::generated
 
 #endif

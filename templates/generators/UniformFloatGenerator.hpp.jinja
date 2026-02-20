@@ -17,67 +17,67 @@
 
 namespace eliot::generated {
 
+/**
+ * @brief Uniform floating-point value generator.
+ *
+ * Generates values uniformly distributed over a closed interval
+ * defined by the configured minimum and maximum bounds.
+ *
+{% if generator.once %}
+ * The generator always returns a fixed constant value.
+{% else %}
+ * The generator returns dynamically generated values.
+{% endif %}
+ */
+class {{ generator.cpp_type() }} {
+public:
     /**
-     * @brief Uniform floating-point value generator.
-     *
-     * Generates values uniformly distributed over a closed interval
-     * defined by the configured minimum and maximum bounds.
+     * @brief Returns a generated floating-point value.
      *
     {% if generator.once %}
-     * The generator always returns a fixed constant value.
+     * This method always returns the same value.
     {% else %}
-     * The generator returns dynamically generated values.
+     * Values are generated using a pseudo-random
+     * number generator and linearly mapped
+     * to the configured interval.
     {% endif %}
+     *
+     * @return Generated floating-point value.
      */
-    struct {{ generator.cpp_type() }} {
-
-        /**
-         * @brief Returns a generated floating-point value.
-         *
+    static {{ 'constexpr ' if generator.once else '' }}inline float get() noexcept {
         {% if generator.once %}
-         * This method always returns the same value.
+        return {{ generator.value() }};
         {% else %}
-         * Values are generated using a pseudo-random
-         * number generator and linearly mapped
-         * to the configured interval.
+        return _generate();
         {% endif %}
-         *
-         * @return Generated floating-point value.
-         */
-        static {{ 'constexpr ' if generator.once else '' }}inline float get() noexcept {
-            {% if generator.once %}
-            return {{ generator.value() }};
-            {% else %}
-            return _generate();
-            {% endif %}
-        }
+    }
 
-        {% if not generator.once %}
-        private:
+{% if not generator.once %}
+private:
+    ///> Minimal possible value the generator can generate.
+    static constexpr float _MIN = {{ generator.min }}f;
 
-            ///> Minimal possible value the generator can generate.
-            static constexpr float _MIN = {{ generator.min }}f;
+    ///> Maximal possible value the generator can generate.
+    static constexpr float _MAX = {{ generator.max }}f;
 
-            ///> Maximal possible value the generator can generate.
-            static constexpr float _MAX = {{ generator.max }}f;
+    ///> Pseudo-random number generator.
+    inline static core::xoroshiro128plus _rng{ {{ generator.seed_value() }} };
 
-            ///> Pseudo-random number generator.
-            inline static core::xoroshiro128plus _rng{ {{ generator.seed_value() }} };
+    /**
+     * @brief Generates a uniformly distributed value.
+     *
+     * The generated value lies within the interval [_MIN, _MAX].
+     *
+     * @return Uniformly distributed floating-point value.
+     */
+    inline static float _generate() noexcept {
+        uint32_t r = static_cast<uint32_t>(_rng.next() >> 40);
+        float f = std::bit_cast<float>(0x3F800000u | r) - 1.0f;
+        return _MIN + f * (_MAX - _MIN);
+    }
+{% endif %}
+};
 
-            /**
-             * @brief Generates a uniformly distributed value.
-             *
-             * The generated value lies within the interval [_MIN, _MAX].
-             *
-             * @return Uniformly distributed floating-point value.
-             */
-            inline static float _generate() noexcept {
-                uint32_t r = static_cast<uint32_t>(_rng.next() >> 40);
-                float f = std::bit_cast<float>(0x3F800000u | r) - 1.0f;
-                return _MIN + f * (_MAX - _MIN);
-            }
-        {% endif %}
-    };
-}
+}   // namespace eliot::generated
 
 #endif

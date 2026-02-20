@@ -23,126 +23,127 @@
 
 namespace eliot::core {
 
+/**
+ * @brief Fixed-size object pool.
+ *
+ * Provides fast allocation and deallocation of objects
+ * of type T without calling global new/delete for each
+ * instance.
+ *
+ * Memory is allocated in chunks of CHUNK_SIZE objects.
+ *
+ * @tparam T Object type.
+ * @tparam CHUNK_SIZE Number of objects per chunk.
+ */
+template <typename T, size_t CHUNK_SIZE = 4096>
+class ItemPool {
+public:
+    ItemPool() = default;
+
+    ///> Disable copy construction.
+    ItemPool(const ItemPool&) = delete;
+
+    ///> Disable copy assignment.
+    ItemPool& operator=(const ItemPool&) = delete;
+
     /**
-     * @brief Fixed-size object pool.
-     *
-     * Provides fast allocation and deallocation of objects
-     * of type T without calling global new/delete for each
-     * instance.
-     *
-     * Memory is allocated in chunks of CHUNK_SIZE objects.
-     *
-     * @tparam T Object type.
-     * @tparam CHUNK_SIZE Number of objects per chunk.
+     * @brief Destroys pool and frees allocated memory chunks.
      */
-    template <typename T, size_t CHUNK_SIZE = 4096>
-    struct ItemPool {
-        ItemPool() = default;
-
-        ///> Disable copy construction.
-        ItemPool(const ItemPool&) = delete;
-
-        ///> Disable copy assignment.
-        ItemPool& operator=(const ItemPool&) = delete;
-
-        /**
-         * @brief Destroys pool and frees allocated memory chunks.
-         */
-        ~ItemPool() {
-            while(_chunks) {
-                Chunk* c = _chunks;
-                _chunks = _chunks->next;
-                ::operator delete(c);
-            }
+    ~ItemPool() {
+        while(_chunks) {
+            Chunk* c = _chunks;
+            _chunks = _chunks->next;
+            ::operator delete(c);
         }
+    }
 
-        /**
-         * @brief Acquires object from pool.
-         *
-         * If no free objects are available, a new chunk
-         * is allocated.
-         *
-         * @param args Constructor arguments.
-         * @return Pointer to constructed object.
-         */
-        template<typename... Args>
-        inline T* acquire(Args&&... args) {
-            if (!_free) 
-                _allocate_chunk();
+    /**
+     * @brief Acquires object from pool.
+     *
+     * If no free objects are available, a new chunk
+     * is allocated.
+     *
+     * @param args Constructor arguments.
+     * @return Pointer to constructed object.
+     */
+    template<typename... Args>
+    inline T* acquire(Args&&... args) {
+        if (!_free) 
+            _allocate_chunk();
 
-            Node* n = _free;
-            _free = n->next;
+        Node* n = _free;
+        _free = n->next;
 
-            T* item = reinterpret_cast<T*>(n);
+        T* item = reinterpret_cast<T*>(n);
 
-            // Create new object at address item
-            return ::new (item) T(std::forward<Args>(args)...);
-        }
+        // Create new object at address item
+        return ::new (item) T(std::forward<Args>(args)...);
+    }
 
-        /**
-         * @brief Releases object back to pool.
-         *
-         * Destructor is explicitly invoked and memory
-         * is returned to free list.
-         *
-         * @param item Pointer to object.
-         */
-        inline void release(T* item) noexcept {
-            if (!item)
-                return;
+    /**
+     * @brief Releases object back to pool.
+     *
+     * Destructor is explicitly invoked and memory
+     * is returned to free list.
+     *
+     * @param item Pointer to object.
+     */
+    inline void release(T* item) noexcept {
+        if (!item)
+            return;
 
-            // Explicit destructor call
-            item->~T();
+        // Explicit destructor call
+        item->~T();
 
-            Node* n = reinterpret_cast<Node*>(item);
+        Node* n = reinterpret_cast<Node*>(item);
 
+        n->next = _free;
+        _free = n;
+    }
+
+private:
+    /**
+     * @brief Free list node.
+     */
+    struct Node {
+        Node* next;
+    };
+
+    /**
+     * @brief Memory chunk containing multiple objects.
+     */
+    struct Chunk {
+        Chunk* next;
+
+        ///> Raw storage for `CHUNK_SIZE` objects.
+        alignas(T) uint8_t storage[sizeof(T) * CHUNK_SIZE];
+    };
+
+    ///> Head of free list.
+    Node* _free = nullptr;
+
+    ///> Linked list of allocated chunks.
+    Chunk* _chunks = nullptr;
+
+    /**
+     * @brief Allocates new chunk and populates free list.
+     */
+    inline void _allocate_chunk() {
+        Chunk* c = static_cast<Chunk*>(::operator new(sizeof(Chunk)));
+
+        c->next = _chunks;
+        _chunks = c;
+
+        for (size_t i = 0; i < CHUNK_SIZE; i++) {
+            uint8_t *ptr = c->storage + i * sizeof(T);
+
+            Node* n = reinterpret_cast<Node*>(ptr);
             n->next = _free;
             _free = n;
         }
+    }
+};
 
-        private:
-
-            /**
-             * @brief Free list node.
-             */
-            struct Node {
-                Node* next;
-            };
-
-            /**
-             * @brief Memory chunk containing multiple objects.
-             */
-            struct Chunk {
-                Chunk* next;
-
-                ///> Raw storage for `CHUNK_SIZE` objects.
-                alignas(T) uint8_t storage[sizeof(T) * CHUNK_SIZE];
-            };
-
-            ///> Head of free list.
-            Node* _free = nullptr;
-
-            ///> Linked list of allocated chunks.
-            Chunk* _chunks = nullptr;
-
-            /**
-             * @brief Allocates new chunk and populates free list.
-             */
-            inline void _allocate_chunk() {
-                Chunk* c = static_cast<Chunk*>(::operator new(sizeof(Chunk)));
-
-                c->next = _chunks;
-                _chunks = c;
-
-                for (size_t i = 0; i < CHUNK_SIZE; i++) {
-                    uint8_t *ptr = c->storage + i * sizeof(T);
-
-                    Node* n = reinterpret_cast<Node*>(ptr);
-                    n->next = _free;
-                    _free = n;
-                }
-            }
-    };
-}
+}   // namespace eliot::core
 
 #endif
