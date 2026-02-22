@@ -10,6 +10,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 option(PROFILING "Enable profiling mode" OFF)
+option(TESTING "Enable testing mode" OFF)
 
 set(GENERATED_DIR "generated" CACHE STRING "Generated sources directory")
 set(BACKEND_DIR "" CACHE PATH "Path to backend directory")
@@ -34,7 +35,9 @@ if(CCACHE_PROGRAM)
     set(CMAKE_CXX_COMPILER_LAUNCHER ${CCACHE_PROGRAM})
 endif()
 
-if(PROFILING)
+if(TESTING)
+    add_compile_options(-O0)
+elseif(PROFILING)
     add_compile_options(-O1 -g -fno-inline -fno-omit-frame-pointer)
 else()
     add_compile_options(-O3)

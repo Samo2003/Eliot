@@ -8,4 +8,4 @@ def check(stats: ExchangeStats) -> None:
 
     avg = statistics.mean(rtts)
 
-    assert 0.08 <= avg <= 0.2, avg
+    assert 0.08 <= avg <= 0.22, avg

@@ -69,7 +69,8 @@ class CaseRunner:
             *build_args,
             "-o", str(workspace_rel),
             "--backend", str((Path(generator_root) / "mocks/echo").resolve()),
-            "--traits", str((Path(generator_root) / "traits/EchoTraits.hpp").resolve())
+            "--traits", str((Path(generator_root) / "traits/EchoTraits.hpp").resolve()),
+            "--testing"
         ]
 
         generator = subprocess.run(generator_args, cwd=generator_root, text=True, capture_output=True)

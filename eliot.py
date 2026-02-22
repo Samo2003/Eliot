@@ -38,13 +38,14 @@ def clear_output_dir(path: str) -> None:
         shutil.rmtree(path, ignore_errors=True)
     os.makedirs(path, exist_ok=True)
 
-def run_build(clear_build: bool, profiling: bool, output: str, generated_dir: str, traits: str, backend: str) -> None:
+def run_build(clear_build: bool, profiling: bool, testing: bool, output: str, generated_dir: str, traits: str, backend: str) -> None:
     """Compiles binary file and moves it to current working directory"""
     build_dir = os.path.join(output, "build")
     os.makedirs(build_dir, exist_ok=True)
     source_root = os.path.abspath(os.path.dirname(__file__))
     cmake_args = [
         "cmake",
+        "-G", "Ninja",
         "-S", source_root,
         "-B", build_dir,
         f"-DGENERATED_DIR={generated_dir}",
@@ -55,9 +56,20 @@ def run_build(clear_build: bool, profiling: bool, output: str, generated_dir: st
     if profiling:
         cmake_args.append("-DPROFILING=ON")
 
-    if not os.path.exists(os.path.join(build_dir, "CMakeCache.txt")):
+    if testing:
+        cmake_args.append("-DTESTING=ON")
+
+    if not testing or not os.path.exists(os.path.join(build_dir, "CMakeCache.txt")):
         subprocess.run(cmake_args, check=True)
-    subprocess.run(["cmake", "--build", build_dir, "--parallel"], check=True)
+    
+    build_args = [
+        "cmake",
+        "--build", build_dir
+    ]
+
+    if not testing:
+        build_args.append("--parallel")
+    subprocess.run(build_args, check=True)
 
     binary = os.path.join(build_dir, BINARY_NAME)
     if not os.path.exists(binary):
@@ -76,8 +88,9 @@ def run_build(clear_build: bool, profiling: bool, output: str, generated_dir: st
 @click.option("--traits", type=click.Path(exists=True), help="Path to trait file for backed")
 @click.option("--backend", type=click.Path(exists=True), help="Path to directory containing CMakeLists.txt for backend")
 @click.option("--profiling", '-p', is_flag=True, help="Build generated for profiling")
+@click.option("--testing", is_flag=True, help="Build generated for testing")
 @click.option("--clear_build", "-c", is_flag=True, help="If set CMake build directory is deleted")
-def main(dag: str | None, test_case: str | None, output: str, dag_schema: bool, traits: str, backend: str, profiling: bool, clear_build: bool):
+def main(dag: str | None, test_case: str | None, output: str, dag_schema: bool, traits: str, backend: str, profiling: bool, testing: bool, clear_build: bool):
     """Main entry point for generator"""
 
     if dag_schema:
@@ -95,7 +108,7 @@ def main(dag: str | None, test_case: str | None, output: str, dag_schema: bool, 
         
         generate(dag_model, TEMPLATE_DIR, generated_dir, os.path.basename(traits))
 
-        run_build(clear_build, profiling, output, generated_dir, traits, backend)
+        run_build(clear_build, profiling, testing, output, generated_dir, traits, backend)
     except RuntimeError as e:
         print(e)
         sys.exit(1)
