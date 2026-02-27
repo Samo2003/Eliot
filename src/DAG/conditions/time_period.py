@@ -1,8 +1,8 @@
 from typing import Literal
 from pydantic import model_validator
-from ..generators import ValueGeneratorInt
+from src.DAG.generators import ValueGeneratorInt
+from src.DAG.dag_base_model import FACTORS
 from .base import ConditionBase
-from ..dag_base_model import FACTORS
 
 class TimePeriod(ConditionBase[Literal["TimePeriod"]]):
     """Condition that check time-periods"""

@@ -1,20 +1,22 @@
-from jinja2 import Environment
-from typing import Set
-import os
-from ...DAG import *
-from ..utils import generate_to_file
+from src.generator.config import GeneratorContext
+from .base import GeneratorBase
 
-def generate_conditions(env: Environment, output_dir: str, conditions: Set[Condition]) -> None:
-    """Generate required conditions"""
+class ConditionGenerator(GeneratorBase):
+    def generate(self, context: GeneratorContext) -> None:
+        """Generates required conditions"""
+        # Configure output directory
+        conditions_dir = context.generated_dir / "conditions"
+        
+        for condition in context.conditions:
+            # Configure file paths
+            template_name = f"conditions/{condition.conditionType}Condition.hpp.jinja"
+            output_name = f"{condition.cpp_type()}.hpp"
+            output_path = conditions_dir / output_name
 
-    # Configure output directory
-    conditions_dir = os.path.join(output_dir, "conditions")
-
-    for condition in conditions:
-        # Configure file paths
-        template_name = f"conditions/{condition.conditionType}Condition.hpp.jinja"
-        output_name = f"{condition.cpp_type()}.hpp"
-        output_path = os.path.join(conditions_dir, output_name)
-
-        # Generate file with given context
-        generate_to_file(env, template_name, output_path, { "condition": condition })
+            self._generate_to_file(
+                template_name,
+                output_path,
+                {
+                    "condition": condition
+                }
+            )

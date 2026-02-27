@@ -1,6 +1,6 @@
 from typing import Literal
-from .base import ActionBase
 from pydantic import model_validator
+from .base import ActionBase
 
 class Throttle(ActionBase[Literal["Throttle"]]):
     """Throttles the communication to a certain limit using token bucket or leaking bucket based on mode"""

@@ -1,7 +1,7 @@
 from typing import Literal
 from pydantic import model_validator
+from src.DAG.generators import ValueGeneratorInt
 from .base import ConditionBase
-from ..generators import ValueGeneratorInt
 
 class CountPeriod(ConditionBase[Literal["CountPeriod"]]):
     """Condition that checks count-based condition"""

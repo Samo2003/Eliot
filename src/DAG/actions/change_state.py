@@ -1,5 +1,4 @@
-from typing import Literal, Optional
-
+from typing import Literal
 from pydantic import model_validator
 from .base import ActionBase
 
@@ -13,7 +12,7 @@ class ChangeState(ActionBase[Literal["ChangeState"]]):
     state: str
 
     # `StateNode` cpp_type assigned during generating
-    state_cpp_type: Optional[str] = None
+    state_cpp_type: str | None = None
 
     @model_validator(mode="after")
     def upper_state(self):

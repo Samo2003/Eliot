@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import TypeVar, Generic, final
 from pydantic import model_validator
-from ..dag_base_model import DAGBaseModel
+from src.DAG.dag_base_model import DAGBaseModel
 
 # Generic type parameter for generator identifier
 T = TypeVar("T", bound=str)

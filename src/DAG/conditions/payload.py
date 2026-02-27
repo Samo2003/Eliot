@@ -1,7 +1,7 @@
+import hashlib
 from typing import Literal, cast
 from pydantic import model_validator
 from .base import ConditionBase
-import hashlib
 
 class Payload(ConditionBase[Literal["Payload"]]):
     """Check packets payload"""

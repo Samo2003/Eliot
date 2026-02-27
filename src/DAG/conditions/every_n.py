@@ -1,8 +1,7 @@
 from typing import Literal
-
 from pydantic import model_validator
+from src.DAG.generators import ValueGeneratorInt
 from .base import ConditionBase
-from ..generators import ValueGeneratorInt
 
 class EveryN(ConditionBase[Literal["EveryN"]]):
     """Condition that is fulfilled every nth packet"""

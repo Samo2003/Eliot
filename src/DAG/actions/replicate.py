@@ -1,7 +1,7 @@
 from typing import Literal
 from pydantic import model_validator
+from src.DAG.generators import ValueGeneratorInt, ValueGeneratorBase
 from .base import ActionBase
-from ..generators import ValueGeneratorInt, ValueGeneratorBase
 
 class Replicate(ActionBase[Literal["Replicate"]]):
     """Replicates packet given amount of times"""

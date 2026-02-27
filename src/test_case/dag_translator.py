@@ -1,7 +1,7 @@
 from typing import List, cast
-from ..DAG.dag import DAG, ActionNode, DecisionNode
+from src.DAG.dag import DAG, ActionNode, DecisionNode, Action
+from src.DAG.actions import Drop, Finish
 from .test_case import TestCase, Rule
-from ..DAG.actions import Action, Drop, Finish
 
 def build_action_chain(actions: List[Action], default_node: ActionNode | DecisionNode) -> ActionNode:
     """Creates a list of Action nodes in DAG"""

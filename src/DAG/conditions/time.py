@@ -1,7 +1,7 @@
 from typing import Literal
 from pydantic import model_validator
+from src.DAG.dag_base_model import FACTORS
 from .base import ConditionBase
-from ..dag_base_model import FACTORS
 
 class Time(ConditionBase[Literal["Time"]]):
     """Condition that measures time"""

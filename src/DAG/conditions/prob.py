@@ -1,8 +1,7 @@
 from typing import Literal
 from pydantic import model_validator
-from ..generators.base import ValueGeneratorBase
+from src.DAG.generators import ValueGeneratorBase, ValueGeneratorFloat
 from .base import ConditionBase
-from ..generators import ValueGeneratorFloat
 
 class Prob(ConditionBase[Literal["Prob"]]):
     """Fulfils based on probability"""

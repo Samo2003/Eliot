@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from typing import Dict, List, Set
-from tests.comm import ReceivedPacket, SentPacket
+from .comm import ReceivedPacket, SentPacket
 
 @dataclass
 class PacketExchange:

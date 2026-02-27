@@ -1,9 +1,9 @@
+import math
+import random
 from abc import ABC
 from typing import Literal, final
 from pydantic import model_validator
 from .base import ValueGeneratorBase, T, N
-import random
-import math
 
 class ExponentialBase(ValueGeneratorBase[T, N], ABC):
     """Abstract exponential generator base"""

@@ -2,14 +2,13 @@ import socket
 import struct
 import time
 from typing import List, cast
-from tests.loader import Step
 import os
 from scapy.layers.inet import TCP, UDP, ICMP, IP
 from scapy.packet import Packet, Raw
 from scapy.layers.inet6 import IPv6
-import ipaddress
+from ipaddress import ip_address
 from dataclasses import dataclass
-from typing import Optional
+from .loader import Step
 
 @dataclass
 class SentPacket:
@@ -25,8 +24,8 @@ class ReceivedPacket:
     ip_proto: int
     src: str
     dst: str
-    sport: Optional[int]
-    dport: Optional[int]
+    sport: int | None
+    dport: int | None
     seq: int | None
 
 def build_packet(step: Step, seq: int) -> bytes:
@@ -56,12 +55,12 @@ def build_packet(step: Step, seq: int) -> bytes:
         header = ICMP(type=step.icmp_type, code=step.icmp_code)
     else:
         # Only IP header with random payload when raw protocol provided
-        if ipaddress.ip_address(step.dst).version == 6:
-            if ipaddress.ip_address(step.src).version != 6:
+        if ip_address(step.dst).version == 6:
+            if ip_address(step.src).version != 6:
                 step.src = step.dst
             datagram = cast(Packet, IPv6(src=step.src, dst=step.dst) / payload)
-        elif ipaddress.ip_address(step.src).version == 6:
-            if ipaddress.ip_address(step.dst).version != 6:
+        elif ip_address(step.src).version == 6:
+            if ip_address(step.dst).version != 6:
                 step.dst = step.src
             datagram = cast(Packet, IPv6(src=step.src, dst=step.dst) / payload)
         else:
@@ -69,12 +68,12 @@ def build_packet(step: Step, seq: int) -> bytes:
         return bytes(datagram)
 
     # Combines packet headers together with payload
-    if ipaddress.ip_address(step.dst).version == 6:
-        if ipaddress.ip_address(step.src).version != 6:
+    if ip_address(step.dst).version == 6:
+        if ip_address(step.src).version != 6:
             step.src = step.dst
         datagram = cast(Packet, IPv6(src=step.src, dst=step.dst) / header /  payload)
-    elif ipaddress.ip_address(step.src).version == 6:
-        if ipaddress.ip_address(step.dst).version != 6:
+    elif ip_address(step.src).version == 6:
+        if ip_address(step.dst).version != 6:
             step.dst = step.src
         datagram = cast(Packet, IPv6(src=step.src, dst=step.dst) / header / payload)
     else:

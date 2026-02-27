@@ -1,8 +1,8 @@
 from abc import ABC
+import random
 from typing import Literal, Tuple, cast, final
 from pydantic import model_validator
 from .base import ValueGeneratorBase, T, N
-import random
 
 class UniformBase(ValueGeneratorBase[T, N], ABC):
     """Abstract uniform generator base"""

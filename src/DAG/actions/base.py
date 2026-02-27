@@ -1,6 +1,6 @@
 from abc import ABC
 from typing import TypeVar, Generic, final
-from ..dag_base_model import DAGBaseModel
+from src.DAG.dag_base_model import DAGBaseModel
 
 # Generic type parameter for action identifier
 T = TypeVar("T", bound=str)

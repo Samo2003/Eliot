@@ -1,10 +1,9 @@
-from typing import List, Literal
-from pydantic import BaseModel
-from ..DAG.conditions import Condition
-from ..DAG.actions import Action
-import os
 import yaml
 import json
+from pathlib import Path
+from typing import List, Literal
+from pydantic import BaseModel
+from src.DAG import Condition, Action
 
 __test__ = False
 
@@ -21,11 +20,11 @@ class TestCase(BaseModel):
     defaultAction: Literal["Finish", "Drop"]
     rules: List[Rule]
 
-def load_test_case(file_path: str) -> TestCase:
+def load_test_case(file_path: Path) -> TestCase:
     """Load test case from `file_path`, support JSON and YAML format"""
 
     # Get file extension to determine type
-    ext = os.path.splitext(file_path)[1].lower()
+    ext = file_path.suffix.lower()
 
     with open(file_path, "r", encoding="utf-8") as file:
         if ext == ".yaml":

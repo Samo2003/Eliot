@@ -2,7 +2,7 @@ from pathlib import Path
 from pydantic import BaseModel, model_validator
 import yaml
 from typing import Any, Dict, List, Literal, cast
-from src.DAG.dag import DAG
+from src.DAG import DAG
 from src.test_case.test_case import TestCase
 
 class Payload(BaseModel):

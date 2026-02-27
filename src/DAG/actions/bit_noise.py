@@ -1,6 +1,6 @@
 from typing import Literal
 from pydantic import model_validator
-from ..generators import ValueGeneratorInt, ValueGeneratorFloat, ValueGeneratorBase
+from src.DAG.generators import ValueGeneratorInt, ValueGeneratorFloat, ValueGeneratorBase
 from .base import ActionBase
 
 class BitNoise(ActionBase[Literal["BitNoise"]]):

@@ -1,40 +1,40 @@
-from jinja2 import Environment
-from typing import List, Set
-from ...DAG import *
-import os
-from ..utils import generate_to_file, Case
+from src.generator.config import GeneratorContext
+from .base import GeneratorBase
 
-def generate_fault_model_header(
-    env: Environment, 
-    output_dir: str, 
-    conditions: Set[Condition], 
-    actions: Set[Action],
-    state_nodes: Set[StateNode],
-    require_calendar: bool
-) -> None:
-    """Generates fault model header"""
+class FaultModelGenerator(GeneratorBase):
+    def generate(self, context: GeneratorContext) -> None:
+        self._generate_header(context)
+        self._generate_cpp(context)
 
-    # COnfigure file paths
-    template_name = "FaultModel.hpp.jinja"
-    output_path = os.path.join(output_dir, "FaultModel.hpp")
+    def _generate_header(self, context: GeneratorContext) -> None:
+        """Generates fault model header"""
+        
+        # Configure file paths
+        template_name = "FaultModel.hpp.jinja"
+        output_path = context.generated_dir / "FaultModel.hpp"
 
-    # Generate file with given context
-    generate_to_file(
-        env, template_name, output_path, 
-        {
-            "conditions": conditions, 
-            "actions": actions,
-            "states": state_nodes,
-            "require_calendar": require_calendar 
-        }
-    )
+        self._generate_to_file(
+            template_name,
+            output_path,
+            {
+                "conditions": context.conditions, 
+                "actions": context.actions,
+                "states": context.state_nodes,
+                "require_calendar": context.require_calendar
+            }
+        )
 
-def generate_fault_model(env: Environment, output_dir: str, cases: List[Case]) -> None:
-    """Generates fault model"""
+    def _generate_cpp(self, context: GeneratorContext) -> None:
+        """Generates fault model"""
 
-    # Configure file paths
-    template_name = "FaultModel.cpp.jinja"
-    output_path = os.path.join(output_dir, "FaultModel.cpp")
+        # Configure file paths
+        template_name = "FaultModel.cpp.jinja"
+        output_path = context.generated_dir / "FaultModel.cpp"
 
-    # Generate file with given context
-    generate_to_file(env, template_name, output_path, { "cases": cases })
+        self._generate_to_file(
+            template_name,
+            output_path,
+            {
+                "cases": context.cases
+            }
+        )

@@ -1,13 +1,18 @@
-from jinja2 import Environment
-import os
-from ..utils import generate_to_file
+from src.generator.config import GeneratorContext
+from .base import GeneratorBase
 
-def generate_packet(env: Environment, output_dir: str, traits: str) -> None:
-    """Generate packet wrapper"""
+class PacketGenerator(GeneratorBase):
+    def generate(self, context: GeneratorContext) -> None:
+        """Generate packet wrapper"""
 
-    # Configure file paths
-    template_name = "Packet.hpp.jinja"
-    output_path = os.path.join(output_dir, "Packet.hpp")
+        # Configure file paths
+        template_name = "Packet.hpp.jinja"
+        output_path = context.generated_dir / "Packet.hpp"
 
-    # Generate file with given context
-    generate_to_file(env, template_name, output_path, { "traits": traits })
+        self._generate_to_file(
+            template_name,
+            output_path,
+            {
+                "traits": context.traits
+            }
+        )

@@ -1,8 +1,8 @@
 from typing import Literal
 from pydantic import model_validator
-from ..generators import ValueGeneratorInt
+from src.DAG.generators import ValueGeneratorInt
+from src.DAG.dag_base_model import FACTORS
 from .base import ActionBase
-from ..dag_base_model import FACTORS
 
 # Calendar max delay in ms
 MAX_DELAY = 16777215

@@ -2,7 +2,7 @@ import pytest
 from _pytest.config import Config
 from _pytest.config.argparsing import Parser
 from pathlib import Path
-from tests.runner import CaseRunner
+from .runner import CaseRunner
 
 @pytest.fixture(scope="session")
 def output_dir() -> Path:

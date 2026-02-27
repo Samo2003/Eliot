@@ -1,8 +1,6 @@
 from typing import Literal
-
 from pydantic import model_validator
-from ..generators.base import ValueGeneratorBase
-from ..generators import ValueGeneratorInt
+from src.DAG.generators import ValueGeneratorBase, ValueGeneratorInt
 from .base import ConditionBase
 
 class Size(ConditionBase[Literal["Size"]]):

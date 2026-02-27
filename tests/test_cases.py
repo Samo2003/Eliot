@@ -1,6 +1,6 @@
 from pathlib import Path
 import pytest
-from tests.runner import CaseRunner
+from .runner import CaseRunner
 
 CASES_DIR = Path(__file__).parent / "cases"
 

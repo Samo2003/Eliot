@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Dict, List, Set
 from pydantic import BaseModel, model_validator
 from .dag_base_model import DAGBaseModel
 from .conditions import Condition
@@ -45,7 +45,7 @@ class Transition(BaseModel):
     next: DAGNode
 
     # ID of target case assigned during generation
-    id: Optional[int] = None
+    id: int | None = None
 
     @model_validator(mode="after")
     def upper_state(self):

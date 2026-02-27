@@ -1,5 +1,5 @@
-from typing import Literal
 import ipaddress
+from typing import Literal
 from pydantic import model_validator
 from .base import ConditionBase
 

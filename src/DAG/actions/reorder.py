@@ -1,6 +1,6 @@
 from typing import Literal
 from pydantic import model_validator
-from ..generators import ValueGeneratorInt
+from src.DAG.generators import ValueGeneratorInt
 from .base import ActionBase
 
 # Minimal allowed n value

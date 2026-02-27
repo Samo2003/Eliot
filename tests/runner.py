@@ -1,10 +1,15 @@
-import os, yaml, sys, socket, subprocess, time
+import os
+import yaml
+import sys
+import socket
+import subprocess
+import time
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Tuple, cast
 from src.test_case.test_case import TestCase
-from tests.comm import ReceivedPacket, SentPacket, receive_packets, send_packets
-from tests.loader import Case, load_case
-from tests.stats import ExchangeStats
+from .comm import ReceivedPacket, SentPacket, receive_packets, send_packets
+from .loader import Case, load_case
+from .stats import ExchangeStats
 
 BINARY_NAME = "eliot"
 BUFFER_SIZE = 4 * 1024 * 1024
