@@ -1,0 +1,17 @@
+# Duplicates all UDP packets
+
+root:
+  condition:
+    conditionType: Protocol
+    id: 17    # UDP
+  if_true:
+    action:
+      actionType: Replicate
+      n: 2
+    next:
+      action:
+        actionType: Finish
+  if_false:
+    action:
+      actionType: Finish
+  

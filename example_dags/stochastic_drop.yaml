@@ -1,0 +1,12 @@
+# Stochastically drops approximately 30% of all packets
+
+root:
+  condition:
+    conditionType: Prob
+    x: 0.3
+  if_true:
+    action:
+      actionType: Drop
+  if_false:
+    action:
+      actionType: Finish

@@ -1,0 +1,81 @@
+# Control FSM for dynamic packet handling.
+#
+# Special payload commands ("DELAY", "ACTIVE", "DROP") change the internal
+# state of the system. After a state change command is received, the packet
+# is dropped to prevent forwarding control messages.
+#
+# States:
+# - ACTIVE: packets are forwarded normally.
+# - DELAY: packets are delayed using a normally distributed delay.
+# - DROP: packets are discarded.
+#
+# If no control command is detected, packet processing follows
+# the behavior of the current state.
+
+root:
+  condition:
+    conditionType: Payload
+    pattern: DELAY
+    encoding: ascii
+    l4: true
+  if_true:
+    action:
+      actionType: ChangeState
+      target: control                       # State node reference
+      state: DELAY
+    next:
+      action:
+        actionType: Drop
+  if_false:
+    condition:
+      conditionType: Payload
+      pattern: ACTIVE
+      encoding: ascii
+      l4: true
+    if_true:
+      action:
+        actionType: ChangeState
+        target: control                     # State node reference
+        state: ACTIVE
+      next:
+        action:
+          actionType: Drop
+    if_false:
+      condition:
+        conditionType: Payload
+        pattern: DROP
+        encoding: ascii
+        l4: true
+      if_true:
+        action:
+          actionType: ChangeState
+          target: control                   # State node reference
+          state: DROP
+        next:
+          action:
+            actionType: Drop
+      if_false:
+        id: control                         # State node identifier
+        initial: ACTIVE
+        transitions:
+          - state: ACTIVE
+            next:
+              action:
+                actionType: Finish
+          
+          - state: DELAY
+            next:
+              action:
+                actionType: Delay
+                n:
+                  generatorType: NormalInt
+                  m: 200
+                  s: 25
+              next:
+                action:
+                  actionType: Finish
+          
+          - state: DROP
+            next:
+              action:
+                actionType: Drop
