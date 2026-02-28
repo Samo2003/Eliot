@@ -1,4 +1,3 @@
-import os
 import yaml
 import sys
 import socket
@@ -6,22 +5,30 @@ import subprocess
 import time
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Tuple, cast
+from src.generator.config import BINARY_NAME
 from src.test_case.test_case import TestCase
 from .comm import ReceivedPacket, SentPacket, receive_packets, send_packets
 from .loader import Case, load_case
 from .stats import ExchangeStats
 
-BINARY_NAME = "eliot"
 BUFFER_SIZE = 4 * 1024 * 1024
 AssertFn = Callable[[ExchangeStats], None]
 
 class CaseRunner:
+    """
+    Responsible for executing a single test case end-to-end.
+    """
+
     def __init__(self, output_dir: Path, debug: bool):
         self.output_dir = output_dir
         self.debug = debug
         self.workspace: Path
 
     def run(self, case_path: Path):
+        """
+        Execute one test case defined by config.yaml.
+        """
+
         case = load_case(case_path)
 
         self.workspace = self._workspace(case_path)
@@ -45,6 +52,10 @@ class CaseRunner:
                 self._stop_binary(proc)
 
     def _workspace(self, case_path: Path) -> Path:
+        """
+        Create isolated workspace directory for given test case.
+        """
+
         cases_root = (Path(__file__).resolve().parent / "cases").resolve()
         rel = case_path.parent.resolve().relative_to(cases_root)
         workspace = self.output_dir / rel
@@ -52,6 +63,10 @@ class CaseRunner:
         return workspace
     
     def _write_test_case(self, case: Case) -> List[str]:
+        """
+        Serialize test case configuration for generator.
+        """
+
         if isinstance(case.build, TestCase):
             path = self.workspace / "test_case.yaml"
             with open(path, "w", encoding="utf-8") as f:
@@ -63,18 +78,22 @@ class CaseRunner:
                 f.write(case.build.model_dump_json(indent=4))
             return ["-d", str(path)]
     
-    def _generate_and_build(self, case: Case) -> str:
+    def _generate_and_build(self, case: Case) -> Path:
+        """
+        Run generator and build resulting binary.
+        """
+
         build_args = self._write_test_case(case)
-        generator_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-        workspace_rel = os.path.relpath(self.workspace, generator_root)
+        generator_root = Path(__file__).resolve().parents[1]
+        workspace_rel = self.workspace.relative_to(generator_root)
 
         generator_args = [
             sys.executable,
             "eliot.py",
             *build_args,
             "-o", str(workspace_rel),
-            "--backend", str((Path(generator_root) / "mocks/echo").resolve()),
-            "--traits", str((Path(generator_root) / "traits/EchoTraits.hpp").resolve()),
+            "--backend", str((generator_root / "mocks/echo").resolve()),
+            "--traits", str((generator_root / "traits/EchoTraits.hpp").resolve()),
             "--testing"
         ]
 
@@ -84,11 +103,16 @@ class CaseRunner:
             f"stdout:\n{generator.stdout}\n"
             f"stderr:\n{generator.stderr}"
         )
-        binary = os.path.join(self.workspace, BINARY_NAME)
-        assert os.path.exists(binary)
+
+        binary = self.workspace / BINARY_NAME
+        assert binary.exists()
         return binary
 
-    def _run_binary(self, binary: str) -> subprocess.Popen[str]:
+    def _run_binary(self, binary: Path) -> subprocess.Popen[str]:
+        """
+        Launch compiled binary in workspace.
+        """
+
         proc = subprocess.Popen(
             [binary],
             cwd=self.workspace,
@@ -97,17 +121,26 @@ class CaseRunner:
             text=True,
         )
 
+        # Give binary time to initialize and print listen port
         time.sleep(0.2)
 
         return proc
     
     def _read_listen_port(self, proc: subprocess.Popen[str]) -> int:
+        """
+        Read LISTEN_PORT from binary stdout.
+        """
+    
         assert proc.stdout is not None
         line = proc.stdout.readline().strip()
         assert line.startswith("LISTEN_PORT=")
         return int(line.split("=")[1])
 
     def _send_packets(self, case: Case, port: int) -> Tuple[List[SentPacket], List[ReceivedPacket]]:
+        """
+        Send packets to running binary and collect responses.
+        """
+
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
             sock.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, BUFFER_SIZE)
             sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, BUFFER_SIZE)
@@ -119,6 +152,10 @@ class CaseRunner:
         return sent, received
  
     def _assert(self, case_path: Path, stats: ExchangeStats):
+        """
+        Execute custom assertion logic defined in assert.py.
+        """
+
         assert_file = case_path.parent / "assert.py"
 
         if not assert_file.exists():
@@ -128,7 +165,9 @@ class CaseRunner:
         exec(assert_file.read_text(), namespace)
 
         if "check" not in namespace:
-            raise RuntimeError("assert.py must define check(stats: ExchangeStats)")
+            raise RuntimeError(
+                "assert.py must define check(stats: ExchangeStats)"
+            )
 
         check = cast(AssertFn, namespace["check"])
         check(stats)
@@ -136,15 +175,23 @@ class CaseRunner:
     def _dump_output(self, proc: subprocess.Popen[str]):
         try:
             out, err = proc.communicate(timeout=1)
+
             print("\n====== STDOUT ======")
             print(out)
+
             print("\n====== STDERR ======")
             print(err)
+
             print("\n====================\n")
+
         except Exception as e:
             print(f"Failed to dump process output: {e}")
 
     def _stop_binary(self, proc: subprocess.Popen[str]):
+        """
+        Gracefully terminate binary process.
+        """
+
         proc.terminate()
         try:
             proc.wait(timeout=1)

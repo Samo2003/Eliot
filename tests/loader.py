@@ -6,11 +6,19 @@ from src.DAG import DAG
 from src.test_case.test_case import TestCase
 
 class Payload(BaseModel):
+    """
+    Represents payload definition in test configuration.
+    """
+
     value: bytes | str
     encoding: Literal["raw", "ascii", "hex"] = "raw"
 
     @model_validator(mode="after")
     def normalize_pattern(self):
+        """
+        Normalize payload into bytes representation after validation.
+        """
+
         if isinstance(self.value, (bytes, bytearray)):
             self.value = bytes(self.value)
             return self
@@ -34,23 +42,36 @@ class Payload(BaseModel):
         return self
 
 class Step(BaseModel):
-    """Packet step configuration representation"""
+    """
+    Defines a single packet transmission step.
+
+    Each step represents a logical packet configuration.
+    """
+
     protocol: Literal["udp", "tcp", "icmp", "raw"] = "raw"
     protocol_id: int = 99
+
     src: str = "10.10.10.1"
     dst: str = "10.10.10.2"
+
     count: int = 1
     payload_size: int = 256
     payload: Payload | None = None
+
     sport: int = 12345
     dport: int = 54321
+
     icmp_type: int = 8
     icmp_code: int = 0
+
     delay: float | None = None
     interval: float = 0
 
 class Case(BaseModel):
-    """Test case representation"""
+    """
+    Test case representation.
+    """
+
     name: str
     timeout: float = 1
     send: List[Step]
@@ -59,6 +80,10 @@ class Case(BaseModel):
     @model_validator(mode="before")
     @classmethod
     def resolve_build(cls, data: Any):
+        """
+        Dynamically resolve build configuration type.
+        """
+
         if not isinstance(data, dict):
             return data
         
@@ -79,6 +104,10 @@ class Case(BaseModel):
         raise ValueError("Unknown build format, expected TestCase or DAG")
 
 def load_case(path: Path):
+    """
+    Load and validate test case from YAML file.
+    """
+
     with open(path) as f:
         data = yaml.safe_load(f)
     return Case.model_validate(data)

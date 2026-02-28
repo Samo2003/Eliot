@@ -1,8 +1,8 @@
 import socket
 import struct
 import time
-from typing import List, cast
 import os
+from typing import List, cast
 from scapy.layers.inet import TCP, UDP, ICMP, IP
 from scapy.packet import Packet, Raw
 from scapy.layers.inet6 import IPv6
@@ -12,6 +12,10 @@ from .loader import Step
 
 @dataclass
 class SentPacket:
+    """
+    Represents a packet that was transmitted.
+    """
+
     seq: int
     protocol: str
     send_time: float
@@ -19,6 +23,10 @@ class SentPacket:
 
 @dataclass
 class ReceivedPacket:
+    """
+    Represents a packet captured as a response.
+    """
+
     recv_time: float
     raw: bytes
     ip_proto: int
@@ -30,14 +38,15 @@ class ReceivedPacket:
 
 def build_packet(step: Step, seq: int) -> bytes:
     """
-    Constructs an IP packet based on the given step
+    Construct an IP packet based on step configuration.
 
-    Payload is randomly filled with specified size
-    
-    Packet is returned in raw bytes form
+    A 4-byte sequence number is appended to payload.
+    The resulting packet is returned as raw bytes.
     """
 
     seq_bytes = struct.pack("!I", seq)
+
+    # Build payload
     if step.payload:
         payload_bytes = cast(bytes, step.payload.value) + seq_bytes
     else:
@@ -47,6 +56,7 @@ def build_packet(step: Step, seq: int) -> bytes:
 
     header: Packet
 
+    # Transport layer header selection
     if step.protocol == "udp":
         header = UDP(sport=step.sport, dport=step.dport)
     elif step.protocol == "tcp":
@@ -81,10 +91,15 @@ def build_packet(step: Step, seq: int) -> bytes:
     return bytes(datagram)
 
 def send_packets(steps: List[Step], sock: socket.socket) -> List[SentPacket]:
+    """
+    Send packets defined in test steps.
+    """
+
     sent_packets: List[SentPacket] = []
     seq = 0
 
     for step in steps:
+        # Optional delay before sending this step
         if step.delay:
             time.sleep(step.delay / 1000.0)
         else:
@@ -108,12 +123,17 @@ def send_packets(steps: List[Step], sock: socket.socket) -> List[SentPacket]:
                 except Exception as e:
                     raise RuntimeError(f"Send failed: {e}")
                 
+                # Inter-packet interval (ms)
                 if i < step.count - 1 and step.interval > 0:
                     time.sleep(step.interval / 1000.0)
 
     return sent_packets
 
 def receive_packets(sock: socket.socket, timeout: float) -> List[ReceivedPacket]:
+    """
+    Receive packets until timeout expires.
+    """
+
     packets: List[ReceivedPacket] = []
     sock.settimeout(0.1)
 
@@ -126,6 +146,8 @@ def receive_packets(sock: socket.socket, timeout: float) -> List[ReceivedPacket]
             continue
 
         recv_time = time.time()
+
+        # Parse IPv4 / IPv6
         try:
             ip: Packet = IP(data)
             ip_proto = ip.proto
@@ -140,6 +162,7 @@ def receive_packets(sock: socket.socket, timeout: float) -> List[ReceivedPacket]
         dst = ip.dst
         sport = dport = None
 
+        # Extract transport-level payload
         if TCP in ip:
             sport, dport = ip[TCP].sport, ip[TCP].dport
             payload = bytes(ip[TCP].payload)
@@ -149,6 +172,7 @@ def receive_packets(sock: socket.socket, timeout: float) -> List[ReceivedPacket]
         else:
             payload = bytes(ip.payload)
 
+        # Extract appended sequence number
         seq = None
         if len(payload) >= 4:
             try:
