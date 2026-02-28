@@ -1,0 +1,32 @@
+name: Drops all TCP packets to or from port 80
+
+build:
+  root:
+    condition:
+      conditionType: Protocol
+      id: 6             # TCP protocol number
+    if_true:
+      condition:
+        conditionType: Port
+        port: 80
+      if_true:
+        action:
+          actionType: Drop
+      if_false:
+        action:
+          actionType: Finish
+    if_false:
+      action:
+        actionType: Finish
+
+send:
+  - protocol: tcp
+  - protocol: udp
+    sport: 80
+  - protocol: udp
+    dport: 80
+  - protocol: tcp
+    sport: 80 
+  - protocol: tcp
+    dport: 80
+  

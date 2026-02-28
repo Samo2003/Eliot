@@ -1,0 +1,23 @@
+name: Duplicates all UDP packets
+
+build:
+  root:
+    condition:
+      conditionType: Protocol
+      id: 17    # UDP
+    if_true:
+      action:
+        actionType: Replicate
+        n: 1
+      next:
+        action:
+          actionType: Finish
+    if_false:
+      action:
+        actionType: Finish
+
+send:
+  - protocol_id: 17   # UDP
+    count: 5
+  - protocol_id: 6    # TCP
+    count: 5

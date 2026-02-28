@@ -7,7 +7,7 @@ root:
   if_true:
     action:
       actionType: Replicate
-      n: 2
+      n: 1
     next:
       action:
         actionType: Finish

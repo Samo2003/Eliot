@@ -1,0 +1,92 @@
+name: Line controlling with special control packets DELAY, ACTIVE, DROP
+
+build:
+  root:
+    condition:
+      conditionType: Payload
+      pattern: DELAY
+      encoding: ascii
+      l4: true
+    if_true:
+      action:
+        actionType: ChangeState
+        target: control                       # State node reference
+        state: DELAY
+      next:
+        action:
+          actionType: Drop
+    if_false:
+      condition:
+        conditionType: Payload
+        pattern: ACTIVE
+        encoding: ascii
+        l4: true
+      if_true:
+        action:
+          actionType: ChangeState
+          target: control                     # State node reference
+          state: ACTIVE
+        next:
+          action:
+            actionType: Drop
+      if_false:
+        condition:
+          conditionType: Payload
+          pattern: DROP
+          encoding: ascii
+          l4: true
+        if_true:
+          action:
+            actionType: ChangeState
+            target: control                   # State node reference
+            state: DROP
+          next:
+            action:
+              actionType: Drop
+        if_false:
+          id: control                         # State node identifier
+          initial: ACTIVE
+          transitions:
+            - state: ACTIVE
+              next:
+                action:
+                  actionType: Finish
+            
+            - state: DELAY
+              next:
+                action:
+                  actionType: Delay
+                  n:
+                    generatorType: NormalInt
+                    m: 200
+                    s: 25
+                    seed: 123456
+                next:
+                  action:
+                    actionType: Finish
+            
+            - state: DROP
+              next:
+                action:
+                  actionType: Drop
+
+timeout: 2
+
+send:
+  - count: 10
+  - payload:
+      value: ACTIVE
+      encoding: ascii
+  - count: 10
+  - payload:
+      value: DROP
+      encoding: ascii
+  - count: 10
+  - payload:
+      value: ACTIVE
+      encoding: ascii
+  - count: 10
+  - payload:
+      value: DELAY
+      encoding: ascii
+  - count: 10  
