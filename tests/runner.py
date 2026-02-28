@@ -56,7 +56,7 @@ class CaseRunner:
             path = self.workspace / "test_case.yaml"
             with open(path, "w", encoding="utf-8") as f:
                 yaml.safe_dump(case.build.model_dump(), f)
-            return ["-t", str(path)]
+            return ["--test_case", str(path)]
         else:
             path = self.workspace / "dag.json"
             with open(path, "w", encoding="utf-8") as f:

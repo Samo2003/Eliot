@@ -8,18 +8,37 @@ from .cases import get_cases
 from .states import process_state_nodes
 
 @dataclass(frozen=True)
-class DAGProcessor():
+class DAGProcessor:
+    """
+    Responsible for transforming a validated DAG model into an
+    intermediate representation (GeneratorContext) used for
+    code generation.
+    """
+
     generated_dir: Path
     traits_name: str
 
     def process(self, dag: DAG) -> GeneratorContext:
-        # Collect nodes from DAG that need to be generated
+        """
+        Convert DAG into GeneratorContext.
+
+        This method performs semantic analysis and prepares all
+        information required by the generation phase.
+
+        Args:
+            dag: Parsed and validated DAG specification
+
+        Returns:
+            Prepared GeneratorContext
+        """
+
+        # Collect all unique nodes required for generation
         collected_conditions, collected_actions, state_nodes, collected_generators = collect_nodes(dag.root)
 
-        # Only generate calendar if at least one action requires it
+        # Collect all unique nodes required for generation
         require_calendar = any(action.calendar() for action in collected_actions)
 
-        # Only include time if at least one node requires it
+        # Determine whether time support is required
         require_time = require_calendar or any(
             action.time() 
             for action in collected_actions
@@ -28,10 +47,10 @@ class DAGProcessor():
             for condition in collected_conditions
         )
 
-        # Get context list of cases
+        # Flatten DAG into execution cases
         cases = get_cases(dag)
 
-        # Verify state nodes, ChangeState actions and attach references for generating
+        # Perform semantic validation and state linking
         process_state_nodes(
             state_nodes, 
             [
@@ -42,6 +61,7 @@ class DAGProcessor():
             cases
         )
 
+        # Perform semantic validation and state linking
         return GeneratorContext(
             generated_dir=self.generated_dir,
             conditions=collected_conditions,

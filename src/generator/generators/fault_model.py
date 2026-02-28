@@ -2,14 +2,25 @@ from src.generator.config import GeneratorContext
 from .base import GeneratorBase
 
 class FaultModelGenerator(GeneratorBase):
+    """
+    Generator module responsible for producing the FaultModel
+    implementation.
+    """
+
     def generate(self, context: GeneratorContext) -> None:
+        """
+        Generate both header and implementation files
+        for the fault model.
+        """
+
         self._generate_header(context)
         self._generate_cpp(context)
 
     def _generate_header(self, context: GeneratorContext) -> None:
-        """Generates fault model header"""
+        """
+        Generate FaultModel.hpp.
+        """
         
-        # Configure file paths
         template_name = "FaultModel.hpp.jinja"
         output_path = context.generated_dir / "FaultModel.hpp"
 
@@ -25,9 +36,10 @@ class FaultModelGenerator(GeneratorBase):
         )
 
     def _generate_cpp(self, context: GeneratorContext) -> None:
-        """Generates fault model"""
+        """
+        Generate FaultModel.cpp.
+        """
 
-        # Configure file paths
         template_name = "FaultModel.cpp.jinja"
         output_path = context.generated_dir / "FaultModel.cpp"
 

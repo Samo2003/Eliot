@@ -2,36 +2,47 @@ from __future__ import annotations
 from typing import List, Literal, Tuple, TypedDict
 from src.DAG import StateNode, Condition, Action
 
-class DecisionCase(TypedDict):
-    """Class representing Decision context for generating"""
+class CaseBase(TypedDict):
+    """
+    Base structure for all execution cases in the intermediate
+    representation derived from the DAG.
+    """
+    
+    id: int                             # Unique identifier of this case
+    path: List[str]                     # Logical path in DAG for generating comments
+    label: str                          # Node label for generating comments
 
-    id: int
-    type: Literal["DecisionCase"]
-    condition: Condition
-    if_true: Case
-    if_false: Case
-    path: List[str]
-    label: str
+class DecisionCase(CaseBase):
+    """
+    Represents a decision node in the flattened execution model.
+    """
 
-class ActionCase(TypedDict):
-    """Class representing Action context for generating"""
+    type: Literal["DecisionCase"]       # Discriminator for runtime/code generation
+    condition: Condition                # Condition being evaluated
+    if_true: Case                       # Case executed if condition evaluates to true
+    if_false: Case                      # Case executed if condition evaluates to false
 
-    id: int
-    type: Literal["ActionCase"]
-    action: Action
-    final: bool
-    next: Case | None
-    path: List[str]
-    label: str
+class ActionCase(CaseBase):
+    """
+    Represents an executable action in the flattened execution model.
+    """
 
-class StateCase(TypedDict):
-    """Class representing State context for generating"""
+    type: Literal["ActionCase"]         # Discriminator for runtime/code generation
+    action: Action                      # Action to be executed
+    final: bool                         # Indicates whether execution terminates here
+    next: Case | None                   # Optional continuation case
 
-    id: int
-    type: Literal["StateCase"]
-    state_node: StateNode
-    transitions: List[Tuple[str, Case]]
-    path: List[str]
-    label: str
+class StateCase(CaseBase):
+    """
+    Represents a state machine node in the flattened execution model.
 
+    Each StateCase encapsulates state transitions and
+    links them to corresponding cases.
+    """
+
+    type: Literal["StateCase"]          # Discriminator for runtime/code generation
+    state_node: StateNode               # Associated state definition
+    transitions: List[Tuple[str, Case]] # Each transition maps a state name to the next case
+
+# Unified type used throughout generation pipeline
 Case = DecisionCase | ActionCase | StateCase

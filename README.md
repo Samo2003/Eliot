@@ -36,7 +36,7 @@ To define the network target behavior you need to create a `DAG` specification f
 
 
 ### Traits Setup
-You need to specify a traits file defining a linking layer between your backend and the generated code. The file `traits/TraitsTemplate.hpp` contains required methods together with their explanations. Other files in the `traits/` directory can serve you as examples.
+You need to specify a traits file defining a linking layer between your backend and the generated code. The file `traits/TraitsTemplate.hpp` contains required methods together with their explanations. Other files in the `traits/` directory serve as examples.
 
 
 ### Code generation
@@ -47,7 +47,7 @@ python eliot.py \
     --traits <path_to_traits_file> \
     --backend <path_to_backend_directory>
 ```
-The generated code will be placed by default in the current directory in the `generated/` folder. You can change the output directory by adding the `--output <path_to_output_directory>` argument to the command above. The result is a generated `C++` code and a build binary file `eliot`.
+The generated code will be placed by default in the current directory in the `generated/` folder. You can change the output directory by adding the `--output <path_to_output_directory>` argument to the command above. The result is a generated `C++` code and a compiled binary file `eliot`.
 
 Example of the command:
 ```bash

@@ -1,37 +1,46 @@
 import yaml
-import json
 from pathlib import Path
 from typing import List, Literal
 from pydantic import BaseModel
 from src.DAG import Condition, Action
 
+# Prevent pytest from treating this module as a test file
 __test__ = False
 
 class Rule(BaseModel):
-    """Represent rule in test case"""
+    """
+    Represents a single rule in a test case specification.
+    """
 
-    type: Literal["all", "any"]
-    conditions: List[Condition]
-    actions: List[Action]
+    type: Literal["all", "any"]                     # Logical operator defining how conditions are evaluated.
+    conditions: List[Condition]                     # List of Conditions.
+    actions: List[Action]                           # List of Actions
 
 class TestCase(BaseModel):
-    """Represents test case"""
+    """
+    Represents a test case specification.
 
-    defaultAction: Literal["Finish", "Drop"]
-    rules: List[Rule]
+    This structure serves as an alternative input format
+    that can be translated into a DAG representation.
+    """
+
+    defaultAction: Literal["Finish", "Drop"]        # Default action applied to packets
+    rules: List[Rule]                               # List of rules for evaluation
 
 def load_test_case(file_path: Path) -> TestCase:
-    """Load test case from `file_path`, support JSON and YAML format"""
+    """
+    Load and validate a test case specification from a file.
 
-    # Get file extension to determine type
-    ext = file_path.suffix.lower()
+    The file content is validated against the TestCase model.
+
+    Args:
+        file_path: Path to file containing TestCase
+    
+    Returns:
+        Validated TestCase object
+    """
 
     with open(file_path, "r", encoding="utf-8") as file:
-        if ext == ".yaml":
-            data = yaml.safe_load(file)
-        elif ext == ".json":
-            data = json.load(file)
-        else:
-            raise ValueError(f"Unsupported file type: {ext}")
+        data = yaml.safe_load(file)
 
     return TestCase.model_validate(data)

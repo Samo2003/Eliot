@@ -3,8 +3,23 @@ from src.DAG.dag import DAG, ActionNode, DecisionNode, Action
 from src.DAG.actions import Drop, Finish
 from .test_case import TestCase, Rule
 
-def build_action_chain(actions: List[Action], default_node: ActionNode | DecisionNode) -> ActionNode:
-    """Creates a list of Action nodes in DAG"""
+def build_action_chain(
+    actions: List[Action],
+    default_node: ActionNode | DecisionNode
+) -> ActionNode:
+    """
+    Construct a sequential chain of ActionNode objects.
+
+    Actions are linked in reverse order so that the first
+    action in the list becomes the first executed node.
+
+    Args:
+        actions: List of actions
+        default_node: Node which is attached to first action
+
+    Return:
+        Action node with chained action nodes
+    """
 
     if not actions:
         raise ValueError("Rule must contain at least one action")
@@ -13,21 +28,29 @@ def build_action_chain(actions: List[Action], default_node: ActionNode | Decisio
     next_node: ActionNode | DecisionNode = default_node
 
     # Iterates in reversed to build list from bottom
-    for i, action in enumerate(reversed(actions)):
-        # First action is final if it is one of final action nodes
-        final = i == 0 and action.is_final()
-
+    for action in reversed(actions):
         next_node = ActionNode(
             action=action, 
-            next=None if final else next_node           # Final actions dont have next
+            next=None if action.is_final() else next_node        # Final actions dont have next
         )
 
-    # Cast only to satisfy Pylance because rule must contain at least one action 
-    # so next node is always action node
+    # Build chain bottom-up
     return cast(ActionNode, next_node)
 
-def build_rule_tree(rule: Rule, default_node: ActionNode | DecisionNode) -> DecisionNode | ActionNode:
-    """Builds tree from given rule"""
+def build_rule_tree(
+    rule: Rule,
+    default_node: ActionNode | DecisionNode
+) -> ActionNode | DecisionNode:
+    """
+    Convert a single Rule into a DecisionNode tree.
+
+    Args:
+        rule: Rule to convert
+        default_node: Default node to use as List node
+
+    Returns:
+        Built tree
+    """
 
     actions_chain = build_action_chain(rule.actions, default_node)
 
@@ -35,7 +58,7 @@ def build_rule_tree(rule: Rule, default_node: ActionNode | DecisionNode) -> Deci
     conditions = list(reversed(rule.conditions))
 
     # Action chain follows after last condition
-    next_node: DecisionNode | ActionNode = actions_chain
+    next_node: ActionNode | DecisionNode = actions_chain
 
     for i, condition in enumerate(conditions):
         if rule.type == "all":
@@ -56,10 +79,22 @@ def build_rule_tree(rule: Rule, default_node: ActionNode | DecisionNode) -> Deci
     return next_node
 
 def translate_to_DAG(test_case: TestCase) -> DAG:
-    """Translates test case to DAG"""
+    """
+    Translate TestCase into a DAG structure.
+
+    Args:
+        test_case: TestCase to translate.
+    
+    Returns:
+        Translated DAG object.
+    """
 
     # Creates default action based on value from test case
-    default_action = Drop(actionType="Drop") if test_case.defaultAction == "Drop" else Finish(actionType="Finish")
+    default_action = (
+        Drop(actionType="Drop") 
+        if test_case.defaultAction == "Drop" 
+        else Finish(actionType="Finish")
+    )
 
     # Creates default ActionNode to add to the bottom of the tree
     default_node = ActionNode(action=default_action, next=None)
