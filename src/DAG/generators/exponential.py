@@ -6,26 +6,41 @@ from pydantic import model_validator
 from .base import ValueGeneratorBase, T, N
 
 class ExponentialBase(ValueGeneratorBase[T, N], ABC):
-    """Abstract exponential generator base"""
+    """
+    Abstract base class for exponential distribution generators.
+    """
 
-    # Mean distribution value
+    # Mean of exponential distribution
     mean: float | None = None
 
-    # Rate distribution value
+    # Rate parameter
     rate: float | None = None
 
     @model_validator(mode="after")
-    def validate_mean(self):
+    def validate_parameters(self):
+        """
+        Validate parameters.
+        """
         if self.mean is None and self.rate is None:
-            raise ValueError("Either mean or rate must be specified")
+            raise ValueError(
+                "Either mean or rate must be specified"
+            )
         if self.mean is not None and self.rate is not None:
-            raise ValueError("Specify either mean or rate, not both")
+            raise ValueError(
+                "Specify either mean or rate, not both"
+            )
         if self.mean is not None and self.mean <= 0:
-            raise ValueError("Mean value for exponential distribution has to be positive")
+            raise ValueError(
+                "Mean value for exponential distribution has to be positive"
+            )
         if self.rate is not None and self.rate <= 0:
-            raise ValueError("Mean value for exponential distribution has to be positive")
+            raise ValueError(
+                "Mean value for exponential distribution has to be positive"
+            )
         if self.max is not None and self.max < 0:
-            raise ValueError("Exponential distribution cannot generate negative values")
+            raise ValueError(
+                "Exponential distribution cannot generate negative values"
+            )
         return self
     
     @final
@@ -33,11 +48,15 @@ class ExponentialBase(ValueGeneratorBase[T, N], ABC):
         if self.mean is not None:
             self.mean *= factor
         if self.rate is not None:
-            self.rate *= factor
+            self.rate /= factor
     
     @final
     def cpp_type(self) -> str:
-        return f"{self.cpp_type_base()}_{self.N_to_str(self.mean)}_{self.N_to_str(self.rate)}"
+        return (
+            f"{self.cpp_type_base()}_"
+            f"{self.N_to_str(self.mean)}_"
+            f"{self.N_to_str(self.rate)}"
+        )
     
 class ExponentialFloat(ExponentialBase[Literal["ExponentialFloat"], float]):
     """Exponential Float value generator"""

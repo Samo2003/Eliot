@@ -5,21 +5,32 @@ from pydantic import model_validator
 from .base import ValueGeneratorBase, T, N
 
 class NormalBase(ValueGeneratorBase[T, N], ABC):
-    """Abstract normal generator base"""
+    """
+    Abstract base class for normal distribution generators.
+    """
 
-    # Mean value
+    # Mean of normal distribution
     m: float
 
     # Standard deviation
     s: float
 
     @model_validator(mode="after")
-    def check_params(self):
-        """Check generator parameters"""
+    def validate_parameters(self):
+        """
+        Validate parameters.
+        """
         if self.s < 0 or self.m < 0:
-            raise ValueError("Standard deviation s and m must be greater than 0")
-        if (self.min is not None and self.min > self.m + 3 * self.s) or (self.max is not None and self.max < self.m - 3 * self.s):
-            raise ValueError("Unreachable interval in normal generator")
+            raise ValueError(
+                "Standard deviation s and m must be greater than 0"
+            )
+        if (
+            (self.min > self.m + 3 * self.s) 
+            or (self.max is not None and self.max < self.m - 3 * self.s)
+        ):
+            raise ValueError(
+                "Unreachable interval in normal generator"
+            )
         return self
     
     @final
@@ -29,7 +40,11 @@ class NormalBase(ValueGeneratorBase[T, N], ABC):
     
     @final
     def cpp_type(self) -> str:
-        return f"{self.cpp_type_base()}_{self.N_to_str(self.m)}_{self.N_to_str(self.s)}"
+        return (
+            f"{self.cpp_type_base()}_"
+            f"{self.N_to_str(self.m)}_"
+            f"{self.N_to_str(self.s)}"
+        )
 
 class NormalFloat(NormalBase[Literal["NormalFloat"], float]):
     """Normal Float value generator"""

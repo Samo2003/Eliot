@@ -3,7 +3,9 @@ from pydantic import model_validator
 from .base import ConditionBase
 
 class ICMP(ConditionBase[Literal["ICMP"]]):
-    """Check ICMP packets"""
+    """
+    Check ICMP packet parameters.
+    """
 
     # ICMP type to check
     type: int

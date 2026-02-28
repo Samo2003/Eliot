@@ -4,12 +4,16 @@ from src.DAG.generators import ValueGeneratorInt
 from .base import ConditionBase
 
 class CountPeriod(ConditionBase[Literal["CountPeriod"]]):
-    """Condition that checks count-based condition"""
+    """
+    Periodic count-based condition.
 
-    # Number of packets for which the condition is fulfilled
+    The condition alternates between two states.
+    """
+
+    # Number of packets where condition is fulfilled
     t: int | ValueGeneratorInt
 
-    # Number of packets for which the condition is false
+    # Number of packets where condition is false
     f: int | ValueGeneratorInt | None = None
 
     @model_validator(mode="after")
@@ -21,14 +25,14 @@ class CountPeriod(ConditionBase[Literal["CountPeriod"]]):
             if self.t <= 0:
                 raise ValueError("t must be greater than zero")
         else:
-            if self.t.min is not None and self.t.min <= 0:
+            if self.t.min <= 0:
                 raise ValueError("t must be greater than zero")
             
         if isinstance(self.f, int):
             if self.f <= 0:
                 raise ValueError("f must be greater than zero")
         else: 
-            if self.f.min is not None and self.f.min <= 0:
+            if self.f.min <= 0:
                 raise ValueError("f must be greater than zero")
         return self
 

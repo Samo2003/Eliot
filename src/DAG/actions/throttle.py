@@ -3,7 +3,10 @@ from pydantic import model_validator
 from .base import ActionBase
 
 class Throttle(ActionBase[Literal["Throttle"]]):
-    """Throttles the communication to a certain limit using token bucket or leaking bucket based on mode"""
+    """
+    Throttles the communication to a certain limit using 
+    token bucket or leaking bucket based on mode.
+    """
 
     # Throttle value in B/s
     rate: float
@@ -34,4 +37,9 @@ class Throttle(ActionBase[Literal["Throttle"]]):
         return True
     
     def cpp_type(self) -> str:
-        return f"{self.cpp_type_base()}_{self.rate}_{self.burst}_{id(self)}".replace(".", "_")
+        return (
+            f"{self.cpp_type_base()}_"
+            f"{self.rate}_"
+            f"{self.burst}_"
+            f"{id(self)}"
+        ).replace(".", "_")

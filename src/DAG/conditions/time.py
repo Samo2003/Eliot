@@ -4,7 +4,9 @@ from src.DAG.dag_base_model import FACTORS
 from .base import ConditionBase
 
 class Time(ConditionBase[Literal["Time"]]):
-    """Condition that measures time"""
+    """
+    Condition that measures time
+    """
 
     # Time after which the condition is fulfilled
     after: int = 0

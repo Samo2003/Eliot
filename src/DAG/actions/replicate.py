@@ -4,7 +4,9 @@ from src.DAG.generators import ValueGeneratorInt, ValueGeneratorBase
 from .base import ActionBase
 
 class Replicate(ActionBase[Literal["Replicate"]]):
-    """Replicates packet given amount of times"""
+    """
+    Replicates packet given amount of times.
+    """
 
     # Number of times to replicate the packet
     n: int | ValueGeneratorInt
@@ -15,12 +17,16 @@ class Replicate(ActionBase[Literal["Replicate"]]):
             if self.n <= 0:
                 raise ValueError("n must be a positive number")
         else:
-            if self.n.min is not None and self.n.min <= 0:
+            if self.n.min <= 0:
                 raise ValueError("n must be a positive number")
         return self
     
     def cpp_type(self) -> str:
-        return f"{self.cpp_type_base()}_{self.n}{'_' + str(id(self)) if isinstance(self.n, ValueGeneratorBase) and self.n.is_state() else ''}"
+        return (
+            f"{self.cpp_type_base()}_"
+            f"{self.n}"
+            f"{'_' + str(id(self)) if isinstance(self.n, ValueGeneratorBase) and self.n.is_state() else ''}"
+        )
     
     def is_state(self) -> bool:
         return True

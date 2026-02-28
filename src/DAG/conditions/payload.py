@@ -4,7 +4,9 @@ from pydantic import model_validator
 from .base import ConditionBase
 
 class Payload(ConditionBase[Literal["Payload"]]):
-    """Check packets payload"""
+    """
+    Check packets payload
+    """
 
     # Pattern to match
     pattern: bytes | str
@@ -60,4 +62,11 @@ class Payload(ConditionBase[Literal["Payload"]]):
         return self
     
     def cpp_type(self) -> str:
-        return f"{super().cpp_type_base()}_{hashlib.sha1(cast(bytes, self.pattern)).hexdigest()[:8]}_{self.encoding.upper()}_{self.end}_{self.start}_{self.l4}".replace('.', '_').replace('-', 'neg')
+        return (
+            f"{super().cpp_type_base()}_"
+            f"{hashlib.sha1(cast(bytes, self.pattern)).hexdigest()[:8]}_"
+            f"{self.encoding.upper()}_"
+            f"{self.end}_"
+            f"{self.start}_"
+            f"{self.l4}".replace('.', '_').replace('-', 'neg')
+        )

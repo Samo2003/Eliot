@@ -3,33 +3,55 @@ import random
 from typing import final
 from pydantic import BaseModel
 
-# Unit scale factors fot unit conversion
-FACTORS = { "ms": 1, "s": 1000, "min": 60000, "h": 3600000 }
+# Unit scale factors for time conversion to milliseconds
+FACTORS = {
+    "ms": 1,
+    "s": 1000,
+    "min": 60000,
+    "h": 3600000 
+}
 
 class DAGBaseModel(BaseModel, ABC):
-    """Abstract base class for all DAG nodes"""
+    """
+    Abstract base class for all semantic DAG elements.
+    """
 
     def __hash__(self) -> int:
-        """Allows DAG nodes to be used in sets"""
+        """
+        Allows DAG nodes to be used in sets.
+        """
+
         return hash(self.cpp_type())
     
     @abstractmethod
     def cpp_type(self) -> str:
-        """Returns C++ type name"""
+        """
+        Return the C++ type name.
+
+        Must be implemented by each concrete DAG element.
+        """
         pass
 
     @final  
     def hpp_define(self) -> str:
-        """Returns C++ header define"""
+        """
+        Returns C++ header define.
+        """
+
         return f"ELIOT_{self.cpp_type().upper()}_H"
     
     @final
     def cpp_name(self) -> str:
-        """Return C++ variable name"""
+        """
+        Return standardized C++ variable name derived from type.
+        """
+
         return self.cpp_type().lower()
     
     def cpp_call(self) -> str:
-        """Defines C++ formatted call based on state"""
+        """
+        Defines C++ formatted call based on state.
+        """
         if self.is_state():
             return f"({self.cpp_name()}, "
         return f"<{self.cpp_type()}>("
@@ -43,9 +65,18 @@ class DAGBaseModel(BaseModel, ABC):
         return ""
     
     def time(self) -> bool:
-        """Signalizes that node needs time module"""
+        """
+        Signal whether the element requires time-related support.
+
+        Used to conditionally include time utilities
+        in the generated code.
+        """
+
         return False
     
     def seed_value(self) -> int:
-        """Returns seed for generators"""
+        """
+        Generate a 32-bit random seed value.
+        """
+
         return random.getrandbits(32)

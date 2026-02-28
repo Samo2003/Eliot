@@ -4,7 +4,9 @@ from src.DAG.generators import ValueGeneratorBase, ValueGeneratorInt
 from .base import ConditionBase
 
 class Size(ConditionBase[Literal["Size"]]):
-    """Condition that checks packet size"""
+    """
+    Condition that checks packet size
+    """
 
     # Threshold size
     size: int | ValueGeneratorInt
@@ -19,7 +21,12 @@ class Size(ConditionBase[Literal["Size"]]):
         return self
 
     def cpp_type(self) -> str:
-        return f"{self.cpp_type_base()}_{self.size}_{self.op}{'_' + str(id(self)) if isinstance(self.size, ValueGeneratorBase) and self.size.is_state() else ''}"
+        return (
+            f"{self.cpp_type_base()}_"
+            f"{self.size}_"
+            f"{self.op}"
+            f"{'_' + str(id(self)) if isinstance(self.size, ValueGeneratorBase) and self.size.is_state() else ''}"
+        )
 
     def get_op(self) -> str:
         """Maps operation to C++ operator"""

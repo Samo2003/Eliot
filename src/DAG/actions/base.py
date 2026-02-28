@@ -6,7 +6,9 @@ from src.DAG.dag_base_model import DAGBaseModel
 T = TypeVar("T", bound=str)
 
 class ActionBase(DAGBaseModel, Generic[T], ABC):
-    """Abstract base class for Action nodes"""
+    """
+    Abstract base class for Action nodes
+    """
 
     # Discriminator used by Pydantic
     actionType: T

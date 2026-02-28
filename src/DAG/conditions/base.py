@@ -6,7 +6,9 @@ from src.DAG.dag_base_model import DAGBaseModel
 T = TypeVar("T", bound=str)
 
 class ConditionBase(DAGBaseModel, Generic[T], ABC):
-    """Abstract base class for all conditions"""
+    """
+    Abstract base class for all conditions
+    """
 
     # Discriminator used by Pydantic
     conditionType: T

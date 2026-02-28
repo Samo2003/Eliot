@@ -4,7 +4,9 @@ from typing import Literal, final
 from .base import ValueGeneratorBase, T, N
 
 class SeqCountBase(ValueGeneratorBase[T, N], ABC):
-    """Abstract sequential count generator base"""
+    """
+    Abstract base class for sequential count generators
+    """
 
     # Number of steps required to reach next value
     T: int = 1
@@ -19,17 +21,25 @@ class SeqCountBase(ValueGeneratorBase[T, N], ABC):
     def check_consistency(self):
         """Validates consistency"""
         if self.step == 0:
-            raise ValueError("step must be none zero")
-        if self.step > 0 and self.min is None:
-            raise ValueError("min is required for increasing sequence (step > 0)")
+            raise ValueError(
+                "step must be none zero"
+            )
         if self.step < 0 and self.max is None:
-            raise ValueError("max is required for decreasing sequence (step < 0)")
+            raise ValueError(
+                "max is required for decreasing sequence (step < 0)"
+            )
         if self.T <= 0:
-            raise ValueError("T must be >= 1")
+            raise ValueError(
+                "T must be >= 1"
+            )
         if self.seed is not None:
-            raise ValueError(f"Seed value has no effect in {self.generatorType}")
+            raise ValueError(
+                f"Seed value has no effect in {self.generatorType}"
+            )
         if self.mode == "reverse" and self.step >= 0 and self.max is None:
-            raise ValueError("max bound has to be defined for reverse mode with positive step")
+            raise ValueError(
+                "max bound has to be defined for reverse mode with positive step"
+            )
         return self
     
     @final
@@ -38,7 +48,12 @@ class SeqCountBase(ValueGeneratorBase[T, N], ABC):
     
     @final
     def cpp_type(self) -> str:
-        return f"{self.cpp_type_base()}_{self.T}_{self.N_to_str(self.step)}_{self.mode.upper()}"
+        return (
+            f"{self.cpp_type_base()}_"
+            f"{self.T}_"
+            f"{self.N_to_str(self.step)}_"
+            f"{self.mode.upper()}"
+        )
     
     @final
     def is_state(self) -> bool:
@@ -50,7 +65,7 @@ class SeqCountFloat(SeqCountBase[Literal["SeqCountFloat"], float]):
     def value(self) -> float:
         if self.step < 0:
             return self.max if self.max is not None else 0
-        return self.min if self.min is not None else 0
+        return self.min
 
 class SeqCountInt(SeqCountBase[Literal["SeqCountInt"], int]):
     """Sequential count int value generator"""
@@ -58,4 +73,4 @@ class SeqCountInt(SeqCountBase[Literal["SeqCountInt"], int]):
     def value(self) -> int:
         if self.step < 0:
             return self.max if self.max is not None else 0
-        return self.min if self.min is not None else 0
+        return self.min

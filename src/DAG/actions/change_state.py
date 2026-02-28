@@ -3,7 +3,9 @@ from pydantic import model_validator
 from .base import ActionBase
 
 class ChangeState(ActionBase[Literal["ChangeState"]]):
-    """Action that changes state of a given state node by ID reference"""
+    """
+    Action that changes state of a given state node by ID reference.
+    s"""
 
     # Target state node ID
     target: str

@@ -3,7 +3,9 @@ from pydantic import model_validator
 from .base import ConditionBase
 
 class Count(ConditionBase[Literal["Count"]]):
-    """Condition that counts packets"""
+    """
+    Condition that counts packets.
+    """
 
     # Number of packets after which the condition is fulfilled
     after: int = 0
@@ -23,4 +25,9 @@ class Count(ConditionBase[Literal["Count"]]):
         return True
     
     def cpp_type(self) -> str:
-        return f"{self.cpp_type_base()}_{self.after}_{id(self)}{'_' + str(self.duration) if self.duration else '' }"
+        return (
+            f"{self.cpp_type_base()}_"
+            f"{self.after}_"
+            f"{id(self)}"
+            f"{'_' + str(self.duration) if self.duration else '' }"
+        )

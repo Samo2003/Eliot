@@ -4,7 +4,9 @@ from pydantic import model_validator
 from .base import ConditionBase
 
 class IP(ConditionBase[Literal["IP"]]):
-    """Check IP address"""
+    """
+    Check IP address
+    """
 
     # Destination or source IP address
     ip: str | None = None

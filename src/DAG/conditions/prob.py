@@ -4,7 +4,9 @@ from src.DAG.generators import ValueGeneratorBase, ValueGeneratorFloat
 from .base import ConditionBase
 
 class Prob(ConditionBase[Literal["Prob"]]):
-    """Fulfils based on probability"""
+    """
+    Fulfills based on probability
+    """
 
     # Probability <0,1>
     x: float | ValueGeneratorFloat
@@ -17,9 +19,7 @@ class Prob(ConditionBase[Literal["Prob"]]):
         if isinstance(self.x, float) and (self.x < 0 or self.x > 1):
             raise ValueError("x must be in range <0,1>")
         elif isinstance(self.x, ValueGeneratorBase):
-            if self.x.min is None:
-                self.x.min = 0
-            elif self.x.min < 0:
+            if self.x.min < 0:
                 raise ValueError("min must be non negative")
 
             if self.x.max is None:
@@ -37,7 +37,11 @@ class Prob(ConditionBase[Literal["Prob"]]):
     def cpp_type(self) -> str:
         if isinstance(self.x, float):
             return f"{self.cpp_type_base()}_{str(self.x).replace('.', '_')}"
-        return f"{self.cpp_type_base()}_{self.x}{'_' + str(id(self)) if isinstance(self.x, ValueGeneratorBase) and self.x.is_state() else ''}"
+        return (
+            f"{self.cpp_type_base()}_"
+            f"{self.x}"
+            f"{'_' + str(id(self)) if isinstance(self.x, ValueGeneratorBase) and self.x.is_state() else ''}"
+        )
     
     def not_generator_x(self) -> bool:
         """Condition used in generating representing if x is a generator"""

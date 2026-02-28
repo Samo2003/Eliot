@@ -3,7 +3,9 @@ from pydantic import model_validator
 from .base import ConditionBase
 
 class Port(ConditionBase[Literal["Port"]]):
-    """Checks port numbers"""
+    """
+    Checks port numbers
+    """
 
     # Source or destination port
     port: int | None = None

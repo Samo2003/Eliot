@@ -4,7 +4,9 @@ from src.DAG.generators import ValueGeneratorInt
 from .base import ConditionBase
 
 class EveryN(ConditionBase[Literal["EveryN"]]):
-    """Condition that is fulfilled every nth packet"""
+    """
+    Condition that is fulfilled for every nth packet
+    """
 
     # Every `N`th packet the condition is fulfilled
     N: int | ValueGeneratorInt

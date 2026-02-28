@@ -5,12 +5,14 @@ from pydantic import model_validator
 from .base import ValueGeneratorBase, T, N
 
 class UniformBase(ValueGeneratorBase[T, N], ABC):
-    """Abstract uniform generator base"""
+    """
+    Abstract base class for uniform distribution generators
+    """
 
     @model_validator(mode="after")
     def ensure_min_max(self):
-        """Min and max interval must be defined"""
-        if self.min is None or self.max is None:
+        """Max interval must be defined"""
+        if self.max is None:
             raise ValueError("min and max must be provided for UniformFloat")
         return self
     
@@ -21,7 +23,7 @@ class UniformBase(ValueGeneratorBase[T, N], ABC):
     @final
     def get_min_max(self) -> Tuple[N, N]:
         """Convert interval range to specified type for Pylance"""
-        min_val = cast(N, self.min)
+        min_val = self.min
         max_val = cast(N, self.max)
         return min_val, max_val
     

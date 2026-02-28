@@ -1,40 +1,43 @@
 from abc import ABC, abstractmethod
-from typing import TypeVar, Generic, final
+from typing import TypeVar, Generic, cast, final
 from pydantic import model_validator
 from src.DAG.dag_base_model import DAGBaseModel
 
 # Generic type parameter for generator identifier
 T = TypeVar("T", bound=str)
 
-# Generic type parameter for generator type
-N = TypeVar("N", bound=float)
+# Generic type parameter for numeric value type
+N = TypeVar("N", int, float)
 
 class ValueGeneratorBase(DAGBaseModel, Generic[T, N], ABC):
-    """Abstract base class for value generators"""
+    """
+    Abstract base class for runtime value generators used in DAG.
+    """
 
-    # Add hash method from parent class because it was deleted by Generic
+    # Restore hash implementation removed by Generic inheritance
     __hash__ = DAGBaseModel.__hash__
 
-    # Discriminator used by Pydantic
+    # Discriminator used by Pydantic for polymorphic parsing
     generatorType: T
 
-    # Value range
-    min: N | None = None
+    # Optional numeric bounds
+    min: N = cast(N, 0)
     max: N | None = None
 
-    # If `True` value is generated only once and does not change
+    # If True, value is generated once and reused
     once: bool = False
 
-    # Set generator seed to ensure determinism
+    # Optional deterministic seed
     seed: int | None = None
 
     @model_validator(mode="after")
     def check_min(self):
-        if self.min is None:
-            self.min = 0    # type: ignore
-        if self.min < 0:    # type: ignore
+        """
+        Validate generator configuration.
+        """
+        if self.min < 0:
             raise ValueError(f"minimum value has to be 0 or greater")
-        if self.max is not None and self.min is not None and self.min > self.max:
+        if self.max is not None and self.min > self.max:
             raise ValueError("Generator cannot produce values")
         if self.seed is not None and self.seed < 0:
             raise ValueError("Seed value has to be a positive integer")
@@ -48,18 +51,32 @@ class ValueGeneratorBase(DAGBaseModel, Generic[T, N], ABC):
     @final
     def cpp_type_base(self) -> str:
         """Returns common generator base name"""
-        return f"{self.generatorType}Generator_{self.N_to_str(self.min)}_{self.N_to_str(self.min)}_{self.once}_{self.seed}"
+        return (
+            f"{self.generatorType}Generator_"
+            f"{self.N_to_str(self.min)}_"
+            f"{self.N_to_str(self.max)}_"
+            f"{self.once}_"
+            f"{self.seed}"
+        )
     
     @abstractmethod
     def value(self) -> N:
-        """Specify generator value used when `once` is `True`"""
+        """
+        Produce deterministic value when `once=True`.
+
+        Subclasses must define how a single value is computed.
+        """
         pass
 
     @final
     def apply_factor(self, factor: int) -> None:
-        """Apply scaling factor to all generator attributes"""
-        if self.min is not None:
-            self.min *= factor      # type: ignore
+        """
+        Scale numeric attributes by given factor.
+
+        Used for unit normalization.
+        """
+        
+        self.min *= factor          # type: ignore
         if self.max is not None:
             self.max *= factor      # type: ignore
 
@@ -67,12 +84,19 @@ class ValueGeneratorBase(DAGBaseModel, Generic[T, N], ABC):
 
     @abstractmethod
     def _apply_factor_inner(self, factor: int) -> None:
-        """Apply scaling factor to generator type specific attributes"""
+        """
+        Apply scaling to generator-specific parameters.
+        Must be implemented by subclasses.
+        """
         pass 
 
     @final
     def N_to_str(self, x: float | int | None) -> str:
-        """Converts generic type to string representation for C++ type names"""
+        """
+        Convert numeric value into C++-safe string fragment.
+
+        Floating points are normalized by replacing '.' with '_'.
+        """
         return str(x).replace('.', '_')
     
     @final
@@ -83,14 +107,20 @@ class ValueGeneratorBase(DAGBaseModel, Generic[T, N], ABC):
     
     @final
     def seed_value(self) -> int:
+        """
+        Return deterministic seed value if provided,
+        otherwise fallback to default random seed.
+        """
         if self.seed is not None:
             return self.seed
         return super().seed_value()
     
     @final
     def clamp(self, x: float) -> float:
-        """Clamps given value based on min and max"""
-        if self.min is not None and x < self.min:
+        """
+        Clamps given value based on min and max
+        """
+        if x < self.min:
             x = self.min
         if self.max is not None and x > self.max:
             x = self.max

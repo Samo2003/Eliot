@@ -5,7 +5,9 @@ from src.DAG.dag_base_model import FACTORS
 from .base import ConditionBase
 
 class TimePeriod(ConditionBase[Literal["TimePeriod"]]):
-    """Condition that check time-periods"""
+    """
+    Condition that periodically changes state based on elapsed time
+    """
 
     # Time for which the condition is fulfilled
     t: int | ValueGeneratorInt
@@ -28,7 +30,7 @@ class TimePeriod(ConditionBase[Literal["TimePeriod"]]):
                 raise ValueError("t must be greater that zero")
         else:
             self.t.apply_factor(FACTORS[self.unit])
-            if self.t.min is not None and self.t.min <= 0:
+            if self.t.min <= 0:
                 raise ValueError("t must be greater that zero")
         
         if self.f is None:
@@ -39,7 +41,7 @@ class TimePeriod(ConditionBase[Literal["TimePeriod"]]):
                 raise ValueError("f must be greater that zero")
         else:
             self.f.apply_factor(FACTORS[self.unit])
-            if self.f.min is not None and self.f.min <= 0:
+            if self.f.min <= 0:
                 raise ValueError("f must be greater that zero")
         self.unit = "ms"
         return self

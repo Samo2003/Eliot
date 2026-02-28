@@ -9,7 +9,9 @@ MIN_N = 2
 MAX_N = 2048
 
 class Reorder(ActionBase[Literal["Reorder"]]):
-    """Action that reorders given number of packets based on a certain strategy"""
+    """
+    Action that reorders given number of packets based on a certain strategy.
+    """
 
     # Packets to reorder
     n: int | ValueGeneratorInt
@@ -24,8 +26,6 @@ class Reorder(ActionBase[Literal["Reorder"]]):
             if self.n < MIN_N or self.n > MAX_N:
                 raise ValueError(f"n must be from {MIN_N} to {MAX_N}")
         else:
-            if self.n.min is None:
-                self.n.min = MIN_N
             if self.n.max is None:
                 self.n.max = MAX_N
             if self.n.min < MIN_N or self.n.max > MAX_N:

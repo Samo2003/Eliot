@@ -3,7 +3,9 @@ from pydantic import model_validator
 from .base import ConditionBase
 
 class Protocol(ConditionBase[Literal["Protocol"]]):
-    """Check protocol in IP header"""
+    """
+    Check protocol in IP header
+    """
 
     # Protocol identifier
     id: int

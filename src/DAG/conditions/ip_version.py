@@ -2,7 +2,9 @@ from typing import Literal
 from .base import ConditionBase
 
 class IPVersion(ConditionBase[Literal["IPVersion"]]):
-    """Check packets IP version"""
+    """
+    Check packets IP version
+    """
 
     # IP version to check
     v: Literal[4, 6] = 4

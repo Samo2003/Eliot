@@ -23,12 +23,14 @@ class Delay(ActionBase[Literal["Delay"]]):
             self.n *= FACTORS[self.unit]
 
             if self.n < 0 or self.n > MAX_DELAY:
-                raise ValueError(f"n must be from 0 to {MAX_DELAY} in ms got: {self.n}")
+                raise ValueError(
+                    f"n must be from 0 to {MAX_DELAY} in ms got: {self.n}"
+                )
         else:
             self.n.apply_factor(FACTORS[self.unit])
             if self.n.max is None:
                 self.n.max = MAX_DELAY
-            if (self.n.min is not None and self.n.min < 0) or self.n.max > MAX_DELAY:
+            if self.n.min < 0 or self.n.max > MAX_DELAY:
                 raise ValueError(f"n must be from 0 to {MAX_DELAY} in ms")
         self.unit = "ms"
         return self

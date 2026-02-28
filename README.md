@@ -1,9 +1,9 @@
 # Eliot
-**Eliot** is a code generation tool that transforms a behavioral specification network behavior into `C++` code. 
+**Eliot** is a code generation tool that transforms a behavioral network specification into `C++` code. 
 
 The user describes the runtime behavior of network communication using a `DAG` specification file, and **Eliot** generates the corresponding `C++` code. 
 
-The generated code is compiled together with a provided backend. A traits file serves as a linking layer between the generated code and the backend, allowing the generated code use the backend's methods and functions.
+The generated code is compiled together with a provided backend. A traits file serves as a linking layer between the generated code and the backend, allowing the generated code to use the backend's methods and functions.
 
 ---
 
@@ -40,7 +40,7 @@ You need to specify a traits file defining a linking layer between your backend 
 
 
 ### Code generation
-To generate the code and binary file run:
+To generate the code and binary file, run:
 ```bash
 python eliot.py \
     --dag <path_to_dag> \
@@ -66,3 +66,5 @@ To execute the tests run:
 ```bash
 pytest -n auto
 ```
+
+The tests are located in the `tests/` directory. They consist of end-to-end tests to verify the complete generation and execution pipeline. Each test consists of generating code from DAG specification, building a binary file, sending defined packet sequences and validating the provided constraints.
