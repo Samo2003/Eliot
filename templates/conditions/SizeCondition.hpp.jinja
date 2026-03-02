@@ -42,7 +42,7 @@ public:
         {% if condition.not_generator_size() %}
         return packet->size() {{ condition.get_op() }} {{ condition.size }};
         {% else %}
-        return packet->size() {{ condition.get_op() }} core::generate{{ condition.size.cpp_call() }});
+        return static_cast<int>(packet->size()) {{ condition.get_op() }} core::generate{{ condition.size.cpp_call() }});
         {% endif %}
     }
 

@@ -37,7 +37,7 @@ struct ProfilingTraits {
     /**
      * @brief Creates backend queue.
      */
-    inline static QueueType create_queue(int argc, char **argv) {
+    inline static QueueType create_queue(int /*argc*/, char** /*argv*/) {
         return QueueType();
     }
 

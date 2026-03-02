@@ -2,6 +2,9 @@
 
 namespace nf_queue_mock {
 
+/**
+ * @brief Construct configuration object from JSON file.
+ */
 Config::Config(const std::string& config_path) {
     std::ifstream ifs(config_path);
     if (!ifs)
@@ -20,21 +23,30 @@ Config::Config(const std::string& config_path) {
 
 }  
 
+/**
+ * @brief Extract value for given key from JSON.
+ */
 std::string Config::_get_value(const std::string& config_file, const std::string& key) {
+    // Locate key in file
     size_t pos = config_file.find("\"" + key + "\"");
     if (pos == std::string::npos)
         throw std::runtime_error(key + " not found in config file");
 
+    // Find ':' separator
     pos = config_file.find(':', pos);
     if (pos == std::string::npos)
         throw std::runtime_error("Invalid format for key: " + key);
 
     pos++;
+    // Skip whitespace
     while (pos < config_file.size() && isspace(config_file[pos]))
         pos++;
+
+    // String value
     if (config_file[pos] == '"') {
         size_t end = config_file.find('"', pos + 1);
         return config_file.substr(pos + 1, end - pos -1);
+    // Numeric value
     } else {
         size_t end = config_file.find(",", pos);
         return config_file.substr(pos, end - pos);

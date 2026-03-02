@@ -38,7 +38,7 @@ struct EchoTraits {
     /**
      * @brief Creates backend queue instance.
      */
-    inline static QueueType create_queue(int argc, char **argv) {
+    inline static QueueType create_queue(int /*argc*/, char** /*argv*/) {
         return QueueType();
     }
 

@@ -6,15 +6,38 @@
 
 namespace nf_queue_mock {
 
+/**
+ * @brief RAII wrapper for POSIX socket file descriptor.
+ *
+ * Ensures no file descriptor leaks occur.
+ */
 class Socket {
 public:
+    /**
+     * @brief Construct socket wrapper.
+     *
+     * @param fd File descriptor (default = invalid)
+     */
     explicit Socket(int fd = -1) noexcept : _fd(fd) {}
+
+    /**
+     * @brief Destructor closes descriptor if valid.
+     */
     ~Socket() noexcept { if (_fd >= 0) ::close(_fd); }
 
+    // Non-copyable
     Socket(const Socket&) = delete;
     Socket& operator=(const Socket&) = delete;
 
-    Socket(Socket&& other) noexcept : _fd(std::exchange(other._fd, -1)) {}
+    /**
+     * @brief Move constructor.
+     */
+    Socket(Socket&& other) noexcept 
+        : _fd(std::exchange(other._fd, -1)) {}
+
+    /**
+     * @brief Move assignment.
+     */
     Socket& operator=(Socket&& other) noexcept {
         if (this != &other) {
             if (_fd >= 0)
@@ -24,10 +47,18 @@ public:
         return *this;
     }
 
-    const int get() const noexcept { return _fd; }
+    /**
+     * @brief Get underlying file descriptor.
+     */
+    int get() const noexcept { return _fd; }
+
+    /**
+     * @brief Check if descriptor is valid.
+     */
     explicit operator bool() const noexcept { return _fd >= 0; }
 
 private:
+    ///> POSIX file descriptor
     int _fd;
 };
 

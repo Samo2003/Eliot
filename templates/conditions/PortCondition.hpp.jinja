@@ -54,7 +54,7 @@ public:
         int offset = packet->l4_offset();
 
         // Ensure enough bytes for src and dst port fields
-        if (offset < 0 || size < offset + 4)
+        if (offset < 0 || size < static_cast<size_t>(offset) + 4)
             return false;
 
         {% if condition.port is not none %}

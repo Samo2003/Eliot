@@ -51,7 +51,7 @@ public:
             return false;
 
         int offset = packet->l4_offset();
-        if (offset < 0 || size < offset + 2)
+        if (offset < 0 || size < static_cast<size_t>(offset) + 2)
             return false;
 
         // Check ICMP type field

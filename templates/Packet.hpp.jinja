@@ -130,12 +130,12 @@ public:
     /**
      * @brief Returns payload size.
      */
-    inline const size_t size() const noexcept { return payload().size(); }
+    inline size_t size() const noexcept { return payload().size(); }
 
     /**
      * @brief Returns IP version.
      */
-    inline const int version() const noexcept { 
+    inline int version() const noexcept { 
         const PayloadType& p = payload();
         return p.size() == 0 ? -1 : (p[0]) >> 4; 
     }
@@ -145,7 +145,7 @@ public:
      *
      * @param nh_only If true and IPv6, returns first next header value.
      */
-    inline const int protocol(bool nh_only = false) const noexcept {
+    inline int protocol(bool nh_only = false) const noexcept {
         _ensure_l4_parsed();
         return nh_only && version() == 6 ? _nh : _l4_protocol;
     }
@@ -153,7 +153,7 @@ public:
     /**
      * @brief Returns L4 header offset.
      */
-    inline const int l4_offset() const noexcept {
+    inline int l4_offset() const noexcept {
         _ensure_l4_parsed();
         return _l4_offset;
     }

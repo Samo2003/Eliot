@@ -81,7 +81,7 @@ private:
         uint64_t ns = (uint64_t)ts.tv_sec * 1000000000ull + ts.tv_nsec;
         return (ns * factor) >> 32;
 #else
-        static mach_timebase_info_data_t tb = {0};
+        static mach_timebase_info_data_t tb = {0, 0};
         if (tb.denom == 0) mach_timebase_info(&tb);
 
         uint64_t t = mach_absolute_time();

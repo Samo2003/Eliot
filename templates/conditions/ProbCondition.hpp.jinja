@@ -40,7 +40,7 @@ public:
      * @param packet Pointer to the evaluated packet (unused).
      * @return true with a given probability.
      */
-    static inline bool fulfilled(const Packet* packet) noexcept {
+    static inline bool fulfilled(const Packet* /*packet*/) noexcept {
         {% if condition.not_generator_x() %}
         return _prob() < _X;
         {% else %}
