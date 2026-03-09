@@ -28,11 +28,6 @@ class Generator:
         Entry point of the generation process.
         Executes the full generation pipeline.
         """
-
-        # Print DAG JSON specification and exit
-        if self._cfg.print_schema:
-            print(json.dumps(DAG.model_json_schema(), indent=4))
-            return
         
         # Clean output directory before generation
         self._builder.clear_generated_dir()

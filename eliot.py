@@ -1,14 +1,15 @@
 import sys
+import json
 import click
 from pathlib import Path
 from src.generator import Generator, GeneratorConfig
+from src.DAG import DAG
 
 @click.command()
 @click.option(
     "--dag",
     "-d", 
-    type=click.Path(exists=True,
-    path_type=Path),
+    type=click.Path(exists=True, path_type=Path),
     help="Path to DAG specification file (JSON or YAML)"
 )
 @click.option(
@@ -68,6 +69,11 @@ def main(
     and executes the code generation process.
     """
 
+    # Print DAG JSON specification and exit
+    if dag_schema:
+        print(json.dumps(DAG.model_json_schema(), indent=4))
+        return
+
     # Create generator configuration
     config = GeneratorConfig(
         source_root=Path(__file__).resolve().parent,
@@ -78,7 +84,6 @@ def main(
         backend_path=backend,
         profiling=profiling,
         testing=testing,
-        print_schema=dag_schema
     )
 
     generator = Generator(config)

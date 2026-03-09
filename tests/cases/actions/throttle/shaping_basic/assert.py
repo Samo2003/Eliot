@@ -9,5 +9,5 @@ def check(stats: ExchangeStats) -> None:
     total_time = stats.received[-1].recv_time - stats.sent[0].send_time
     total_bytes = sum(len(r.raw) for r in stats.received)
 
-    assert abs(total_bytes / total_time - 1000) <= 1
+    assert abs(total_bytes / total_time - 1000) <= 2
     

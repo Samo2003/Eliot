@@ -25,7 +25,7 @@ void Calendar::schedule(generated::Packet* packet, uint64_t delay) noexcept {
         return;
 
     // Mark packet as scheduled
-    packet->result = generated::Packet::Result::Calendar;
+    packet->result = generated::Packet::Result::Defer;
     
     // Time when packet processing should continue
     uint64_t due_tick = _current_tick_from_clock() + delay;
@@ -36,8 +36,9 @@ void Calendar::schedule(generated::Packet* packet, uint64_t delay) noexcept {
     // Number of ticks from now till due tick
     uint64_t diff = (due_tick > _current_tick) ? (due_tick - _current_tick) : 0;
     if (diff < _L0_SPAN) {
-        // Insert into L0
+        // L0 tick resolution
         uint32_t slot = static_cast<uint32_t>(due_tick & _MASK);
+        // Insert into L0
         _wheel0[slot].push(item);
     } else if (diff < _L1_SPAN) {
         // L1 tick resolution

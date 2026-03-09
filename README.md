@@ -1,9 +1,7 @@
 # Eliot
-**Eliot** is a code generation tool that transforms a behavioral network specification into `C++` code. 
+**Eliot** is a code generation tool for network fault injection.  
 
-The user describes the runtime behavior of network communication using a `DAG` specification file, and **Eliot** generates the corresponding `C++` code. 
-
-The generated code is compiled together with a provided backend. A traits file serves as a linking layer between the generated code and the backend, allowing the generated code to use the backend's methods and functions.
+It transforms a declarative behavioral network specification defined as a `DAG`, into `C++` code that is compiled into a standalone tool. The generated code is compiled together with a provided backend implementation. A traits file provides the linking layer between the generated code and the backend, allowing the generated model to interact with the fault injector backend.
 
 ---
 
@@ -68,3 +66,8 @@ pytest -n auto
 ```
 
 The tests are located in the `tests/` directory. They consist of end-to-end tests to verify the complete generation and execution pipeline. Each test consists of generating code from DAG specification, building a binary file, sending defined packet sequences and validating the provided constraints.
+
+---
+
+## Notes
+Some source code comments were generated using [`ChatGPT`](https://chat.openai.com).

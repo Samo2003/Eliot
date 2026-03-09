@@ -48,12 +48,6 @@ public:
     using PayloadType = std::vector<uint8_t>;
 
     /**
-     * @brief Constructs internal packet wrapper.
-     */
-    explicit inline InternalPacket(PacketType&& packet) noexcept 
-        : _packet(std::move(packet)) {}
-
-    /**
      * @brief Acquires packet from item pool.
      */
     static inline InternalPacket* acquire(PacketType&& packet) {
@@ -164,7 +158,7 @@ public:
     enum class Result { 
         Drop,
         Finish,
-        Calendar,
+        Defer,
         Processing
     };
     
@@ -175,6 +169,16 @@ public:
     Result result = Result::Processing;
 
 private:
+    /**
+     * @brief Constructs internal packet wrapper.
+     */
+    explicit inline InternalPacket(PacketType&& packet) noexcept 
+        : _packet(std::move(packet)) {}
+
+    ///> Grant access to constructor only for ItemPool
+    template<typename, size_t>
+    friend class core::ItemPool;
+
     ///> Backend packet instance.
     PacketType _packet;
 

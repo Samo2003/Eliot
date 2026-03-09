@@ -89,10 +89,8 @@ private:
      *
      * Represents one scheduled packet.
      */
-    struct CalendarItem {
-        CalendarItem(uint64_t t, generated::Packet *p) noexcept 
-            : tick(t), packet(p), next(nullptr) {}
-
+    class CalendarItem {
+    public:
         ///> Scheduled tick.
         uint64_t tick;
 
@@ -107,6 +105,14 @@ private:
         static void operator delete(void*) = delete;
         static void* operator new[](std::size_t) = delete;
         static void  operator delete[](void*) = delete;
+
+    private:
+        CalendarItem(uint64_t t, generated::Packet *p) noexcept 
+            : tick(t), packet(p), next(nullptr) {}
+
+        ///> Grant access to constructor only for ItemPool
+        template<typename, size_t>
+        friend class ItemPool;
     };
 
     ///> Bucket type used for each wheel slot.

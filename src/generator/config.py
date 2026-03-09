@@ -27,16 +27,12 @@ class GeneratorConfig(BaseModel):
     backend_path: Path
     profiling: bool
     testing: bool
-    print_schema: bool
 
     @model_validator(mode="after")
     def validate_config(self):
         """
         Ensures that exactly one input source is provided.
-        """
-        if self.print_schema:
-            return self
-        
+        """        
         if (self.dag_path is None) == (self.test_case_path is None):
             raise ValueError("Exactly one input file must be provided (--dag or --test_case)")
 

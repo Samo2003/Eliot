@@ -57,7 +57,7 @@ public:
      */
     inline void execute(Packet* packet) noexcept {
         _buffer[_buffer_index++] = packet;
-        packet->result = Packet::Result::Calendar;
+        packet->result = Packet::Result::Defer;
 
         // Wait until the buffer is full
         if (_buffer_index < _size)
