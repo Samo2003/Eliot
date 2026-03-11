@@ -57,7 +57,7 @@ private:
     static constexpr int _MAX = {{ generator.max if generator.max is not none else 0}};
 
     ///> Number of calls required to advance.
-    static constexpr int _CALLS_TO_ADVANCE = {{ generator.T }};
+    static constexpr int _CALLS_TO_ADVANCE = {{ generator.period }};
 
     ///> Current generated integer value.
     int _value = {{ generator.value() }};

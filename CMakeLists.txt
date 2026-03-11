@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(eliot LANGUAGES CXX)
+project(eliot-run LANGUAGES CXX)
 
 # Enforce C++20 standard
 set(CMAKE_CXX_STANDARD 20)
@@ -12,6 +12,9 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+
+# Name of resulting executable
+set(ELIOT_BINARY_NAME "eliot-run" CACHE STRING "Name of the generated executable")
 
 # Optional build modes
 option(PROFILING "Enable profiling mode" OFF)
@@ -70,7 +73,7 @@ add_subdirectory(${GENERATED_DIR}/static)
 target_include_directories(eliot_generated PUBLIC ${TRAITS_DIR})
 
 # Define final executable entry point
-add_executable(eliot ${GENERATED_DIR}/eliot.cpp)
+add_executable(${ELIOT_BINARY_NAME} ${GENERATED_DIR}/eliot.cpp)
 
 # Collect all backend targets defined in backend directory
 get_property(BACKEND_TARGETS DIRECTORY ${BACKEND_DIR} PROPERTY BUILDSYSTEM_TARGETS)
@@ -81,4 +84,4 @@ foreach(t ${BACKEND_TARGETS})
 endforeach()
 
 # Link generated library into final executable
-target_link_libraries(eliot PRIVATE eliot_generated)
+target_link_libraries(${ELIOT_BINARY_NAME} PRIVATE eliot_generated)

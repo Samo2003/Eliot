@@ -1,9 +1,10 @@
+from __future__ import annotations
 from pathlib import Path
 from pydantic import BaseModel, model_validator
 import yaml
 from typing import Any, Dict, List, Literal, cast
-from src.DAG import DAG
-from src.test_case.test_case import TestCase
+from eliot.DAG import DAG
+from eliot.test_case.test_case import TestCase
 
 class Payload(BaseModel):
     """
@@ -14,7 +15,7 @@ class Payload(BaseModel):
     encoding: Literal["raw", "ascii", "hex"] = "raw"
 
     @model_validator(mode="after")
-    def normalize_pattern(self):
+    def normalize_pattern(self) -> Payload:
         """
         Normalize payload into bytes representation after validation.
         """
@@ -79,7 +80,7 @@ class Case(BaseModel):
 
     @model_validator(mode="before")
     @classmethod
-    def resolve_build(cls, data: Any):
+    def resolve_build(cls, data: Any) -> Any:
         """
         Dynamically resolve build configuration type.
         """
@@ -103,7 +104,7 @@ class Case(BaseModel):
 
         raise ValueError("Unknown build format, expected TestCase or DAG")
 
-def load_case(path: Path):
+def load_case(path: Path) -> Case:
     """
     Load and validate test case from YAML file.
     """

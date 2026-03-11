@@ -1,6 +1,7 @@
 __pycache__/
 *venv*/
 .mypy_cache/
+*.egg-info
 
 # CMake build
 /build/
@@ -11,14 +12,11 @@ __pycache__/
 # VSCode setting
 .vscode/
 
-# Test packets config
-/tests/packets/packets.json
-
 # Editor files
 .DS_Store
 
 # Executable
-eliot
+eliot-run
 
 #tests
 /tests/output

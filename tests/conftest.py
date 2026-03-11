@@ -16,7 +16,7 @@ def output_dir() -> Path:
     output.mkdir(exist_ok=True)
     return output
 
-def pytest_addoption(parser: Parser):
+def pytest_addoption(parser: Parser) -> None:
     """
     Register custom CLI options for pytest.
 

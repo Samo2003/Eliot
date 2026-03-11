@@ -11,7 +11,7 @@ CASES_DIR = Path(__file__).parent / "cases"
     list(CASES_DIR.rglob("config.yaml")),
     ids=lambda p: str(p.parent.relative_to(CASES_DIR))
 )
-def test(case_path: Path, case_runner: CaseRunner):
+def test(case_path: Path, case_runner: CaseRunner) -> None:
     """
     Execute a single test case based on its config.yaml definition.
 

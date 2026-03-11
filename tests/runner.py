@@ -1,12 +1,11 @@
 import yaml
-import sys
 import socket
 import subprocess
 import time
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Tuple, cast
-from src.generator.config import BINARY_NAME
-from src.test_case.test_case import TestCase
+from eliot.generator.config import BINARY_NAME, ROOT_DIR
+from eliot.test_case.test_case import TestCase
 from .comm import ReceivedPacket, SentPacket, receive_packets, send_packets
 from .loader import Case, load_case
 from .stats import ExchangeStats
@@ -24,7 +23,7 @@ class CaseRunner:
         self.debug = debug
         self.workspace: Path
 
-    def run(self, case_path: Path):
+    def run(self, case_path: Path) -> None:
         """
         Execute one test case defined by config.yaml.
         """
@@ -84,20 +83,15 @@ class CaseRunner:
         """
 
         build_args = self._write_test_case(case)
-        generator_root = Path(__file__).resolve().parents[1]
-        workspace_rel = self.workspace.relative_to(generator_root)
+        workspace_rel = self.workspace.relative_to(ROOT_DIR)
 
         generator_args = [
-            sys.executable,
-            "eliot.py",
+            "eliot", "test",
             *build_args,
-            "-o", str(workspace_rel),
-            "--backend", str((generator_root / "mocks/echo").resolve()),
-            "--traits", str((generator_root / "traits/EchoTraits.hpp").resolve()),
-            "--testing"
+            "-o", str(workspace_rel)
         ]
 
-        generator = subprocess.run(generator_args, cwd=generator_root, text=True, capture_output=True)
+        generator = subprocess.run(generator_args, cwd=ROOT_DIR, text=True, capture_output=True)
 
         assert generator.returncode == 0, (
             f"stdout:\n{generator.stdout}\n"
@@ -151,7 +145,7 @@ class CaseRunner:
             
         return sent, received
  
-    def _assert(self, case_path: Path, stats: ExchangeStats):
+    def _assert(self, case_path: Path, stats: ExchangeStats) -> None:
         """
         Execute custom assertion logic defined in assert.py.
         """
@@ -172,7 +166,7 @@ class CaseRunner:
         check = cast(AssertFn, namespace["check"])
         check(stats)
 
-    def _dump_output(self, proc: subprocess.Popen[str]):
+    def _dump_output(self, proc: subprocess.Popen[str]) -> None:
         try:
             out, err = proc.communicate(timeout=1)
 
@@ -187,7 +181,7 @@ class CaseRunner:
         except Exception as e:
             print(f"Failed to dump process output: {e}")
 
-    def _stop_binary(self, proc: subprocess.Popen[str]):
+    def _stop_binary(self, proc: subprocess.Popen[str]) -> None:
         """
         Gracefully terminate binary process.
         """

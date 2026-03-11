@@ -68,26 +68,26 @@ def build_packet(step: Step, seq: int) -> bytes:
         if ip_address(step.dst).version == 6:
             if ip_address(step.src).version != 6:
                 step.src = step.dst
-            datagram = cast(Packet, IPv6(src=step.src, dst=step.dst) / payload)
+            datagram: Packet = IPv6(src=step.src, dst=step.dst) / payload
         elif ip_address(step.src).version == 6:
             if ip_address(step.dst).version != 6:
                 step.dst = step.src
-            datagram = cast(Packet, IPv6(src=step.src, dst=step.dst) / payload)
+            datagram = IPv6(src=step.src, dst=step.dst) / payload
         else:
-            datagram = cast(Packet, IP(src=step.src, dst=step.dst, proto=step.protocol_id) / payload)
+            datagram = IP(src=step.src, dst=step.dst, proto=step.protocol_id) / payload
         return bytes(datagram)
 
     # Combines packet headers together with payload
     if ip_address(step.dst).version == 6:
         if ip_address(step.src).version != 6:
             step.src = step.dst
-        datagram = cast(Packet, IPv6(src=step.src, dst=step.dst) / header /  payload)
+        datagram = IPv6(src=step.src, dst=step.dst) / header /  payload
     elif ip_address(step.src).version == 6:
         if ip_address(step.dst).version != 6:
             step.dst = step.src
-        datagram = cast(Packet, IPv6(src=step.src, dst=step.dst) / header / payload)
+        datagram = IPv6(src=step.src, dst=step.dst) / header / payload
     else:
-        datagram = cast(Packet, IP(src=step.src, dst=step.dst) / header / payload)
+        datagram = IP(src=step.src, dst=step.dst) / header / payload
     return bytes(datagram)
 
 def send_packets(steps: List[Step], sock: socket.socket) -> List[SentPacket]:

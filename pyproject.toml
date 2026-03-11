@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=82", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "eliot"
+version = "1.0.0"
+description = "Generate packet-processing pipelines from DAG specifications"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pydantic",
+    "scapy",
+    "pyyaml",
+    "jinja2",
+    "click"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-xdist",
+    "mypy",
+    "types-PyYAML"
+]
+
+[project.scripts]
+eliot = "eliot.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = ["src", "tests"]
+exclude = "tests/cases/"
+install_types = true
