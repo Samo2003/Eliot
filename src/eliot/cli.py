@@ -74,13 +74,12 @@ def execute_generator(
         sys.exit(1)
 
 @click.group(
-    invoke_without_command=True,
+    context_settings={"help_option_names": ["-h", "--help"]},
     help="Generate packet-processing pipelines from DAG specifications"
 )
-@click.pass_context
-def eliot(ctx: click.Context) -> None:
-    if ctx.invoked_subcommand is None:
-        ctx.invoke(generate)
+def eliot() -> None:
+    """CLI entrypoint for Eliot."""
+    pass
 
 @eliot.command(
     help="Generate packet-processing pipelines from DAG specifications"

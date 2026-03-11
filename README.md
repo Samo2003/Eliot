@@ -25,7 +25,7 @@ For development purposes install with development dependencies:
 pip install -e ".[dev]"
 export PYTHONPATH=src
 ```
-This ensures the `src/` directory is available on the Python path for the current shell session. If you want this to be applied whenever the virtual environment is activated, add it to the activation script:
+This ensures the `src/` directory is available in the Python path for the current shell session. If you want this to be applied whenever the virtual environment is activated, add it to the activation script:
 ```bash
 echo 'export PYTHONPATH="$PWD/src"' >> .venv/bin/activate
 ```
@@ -35,11 +35,15 @@ echo 'export PYTHONPATH="$PWD/src"' >> .venv/bin/activate
 ## Usage
 The following commands assume that the virtual environment is activated.
 
-### Print DAG JSON specification
-To print the DAG JSON specification run:
-```bash
-eliot schema
-```
+### Available Commands
+
+| Command | Description |
+|--------|-------------|
+| `generate` | Generate pipeline code using a custom backend and traits file |
+| `benchmark` | Generate code using the benchmark backend |
+| `profile` | Generate code configured for profiling |
+| `test` | Generate code using the testing backend |
+| `schema` | Print the JSON schema for DAG specifications |
 
 ### DAG specification
 To define the network target behavior you need to create a `DAG` specification file in `YAML` or `JSON` format. Example files can be found in `example_dags/`. The exact arguments and structures of each node can be found in classes defined in `src/eliot/DAG/`.
