@@ -13,8 +13,8 @@ git clone https://github.com/Samo2003/BP.git Eliot
 cd Eliot
 
 # Create virtual environment
-python3 -m venv .venv
-source .venv/bin/activate
+python3 -m venv venv
+source venv/bin/activate
 
 # Install dependencies
 pip install .
@@ -23,11 +23,6 @@ pip install .
 For development purposes install with development dependencies:
 ```bash
 pip install -e ".[dev]"
-export PYTHONPATH=src
-```
-This ensures the `src/` directory is available in the Python path for the current shell session. If you want this to be applied whenever the virtual environment is activated, add it to the activation script:
-```bash
-echo 'export PYTHONPATH="$PWD/src"' >> .venv/bin/activate
 ```
 
 ---

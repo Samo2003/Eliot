@@ -1,28 +1,26 @@
-name: Payload hex
+name: Payload regex binary
 
 build:
   defaultAction: Drop
   rules:
     - type: all
-      conditions: 
+      conditions:
         - conditionType: Payload
-          pattern: aaaa
-          type: hex
+          pattern: "\xAA\xBB.*\xCC"
+          type: regex
       actions:
         - actionType: Finish
 
 send:
   - payload:
-      value: aaaa
+      value: aabbcc
       encoding: hex
   - payload:
-      value: AAAA
+      value: aabb00cc
       encoding: hex
   - payload:
-      value: aaaa
-      encoding: ascii
+      value: aacc
+      encoding: hex
   - payload:
-      value: aaaa
-  - payload:
-      value: bbbb
-    count: 5
+      value: bbcc
+      encoding: hex

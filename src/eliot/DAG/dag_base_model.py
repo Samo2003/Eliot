@@ -8,7 +8,7 @@ FACTORS = {
     "ms": 1,
     "s": 1000,
     "min": 60000,
-    "h": 3600000 
+    "h": 3600000
 }
 
 class DAGBaseModel(BaseModel, ABC):

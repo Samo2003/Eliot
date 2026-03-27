@@ -16,8 +16,6 @@
 #ifndef ELIOT_CALENDAR_H
 #define ELIOT_CALENDAR_H
 
-#include <vector>
-#include <optional>
 #include <array>
 #include "../Time.hpp"
 #include "../Bucket.hpp"

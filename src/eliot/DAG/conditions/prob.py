@@ -24,7 +24,7 @@ class Prob(ConditionBase[Literal["Prob"]]):
                 raise ValueError("min must be non negative")
 
             if self.x.max is None:
-                self.x.max = 1
+                self.x.max = 1.0
             elif self.x.max > 1:
                 raise ValueError("max must be smaller than 1")
             

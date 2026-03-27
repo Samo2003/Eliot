@@ -1,0 +1,29 @@
+name: Payload regex basic
+
+build:
+  defaultAction: Drop
+  rules:
+    - type: all
+      conditions:
+        - conditionType: Payload
+          pattern: GET.*HTTP
+          type: regex
+      actions:
+        - actionType: Finish
+
+send:
+  - payload: 
+      value: "GET /index.html HTTP/1.1"
+      encoding: ascii
+  - payload:
+      value: "GET HTTP"
+      encoding: ascii
+  - payload:
+      value: "POST /index HTTP/1.1"
+      encoding: ascii
+  - payload:
+      value: "GET /something"
+      encoding: ascii
+  - payload:
+      value: "random data"
+      encoding: ascii

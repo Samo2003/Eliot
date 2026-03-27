@@ -1,6 +1,7 @@
 from __future__ import annotations
 import hashlib
-from typing import Literal, cast
+import re
+from typing import Literal
 from pydantic import model_validator
 from .base import ConditionBase
 
@@ -12,8 +13,8 @@ class Payload(ConditionBase[Literal["Payload"]]):
     # Pattern to match
     pattern: bytes | str
 
-    # Pattern encoding
-    encoding: Literal["raw", "ascii", "hex"] = "raw"
+    # Pattern type
+    type: Literal["raw", "ascii", "hex", "regex"] = "raw"
 
     # Initial offset (if negative, counted from the end)
     start: int = 0
@@ -26,20 +27,16 @@ class Payload(ConditionBase[Literal["Payload"]]):
     l4: bool = False 
 
     @model_validator(mode="after")
-    def validate_offsets(self) -> Payload:
-        if self.start == self.end:
-            raise ValueError("start and end offsets have to be different")
-        if len(self.pattern) < 1:
-            raise ValueError("invalid pattern")
-        if self.end is not None:
-            if self.start >= 0 and self.end >= 0 and self.end - self.start < len(self.pattern):
-                raise ValueError("invalid pattern length")
-            if self.start < 0 and self.end < 0 and self.end - self.start < len(self.pattern):
-                raise ValueError("invalid pattern length")
-        return self
-    
-    @model_validator(mode="after")
     def normalize_pattern(self) -> Payload:
+        if self.type == "regex":
+            if not isinstance(self.pattern, str):
+                raise TypeError("regex pattern must be a string")
+            try:
+                re.compile(self.pattern, re.ASCII)
+            except re.error as e:
+                raise ValueError(f"invalid regex pattern: {e}")
+            return self
+            
         if isinstance(self.pattern, (bytes, bytearray)):
             self.pattern = bytes(self.pattern)
             return self
@@ -47,12 +44,12 @@ class Payload(ConditionBase[Literal["Payload"]]):
         if not isinstance(self.pattern, str):
             raise TypeError("pattern must be str or bytes")
         
-        if self.encoding == "hex":
+        if self.type == "hex":
             try:
                 self.pattern = bytes.fromhex(self.pattern)
             except ValueError:
                 raise ValueError("invalid hex pattern")
-        elif self.encoding == "ascii":
+        elif self.type == "ascii":
             try:
                 self.pattern = self.pattern.encode("ascii")
             except UnicodeEncodeError:
@@ -61,13 +58,43 @@ class Payload(ConditionBase[Literal["Payload"]]):
             self.pattern = self.pattern.encode("latin1")
 
         return self
-    
+
+    @model_validator(mode="after")
+    def validate_offsets(self) -> Payload:
+        if self.start == self.end:
+            raise ValueError("start and end offsets have to be different")
+        if self.type != "regex":
+            if len(self.pattern) < 1:
+                raise ValueError("invalid pattern")
+            if self.end is not None:
+                if self.start >= 0 and self.end >= 0 and self.end - self.start < len(self.pattern):
+                    raise ValueError("invalid pattern length")
+                if self.start < 0 and self.end < 0 and self.end - self.start < len(self.pattern):
+                    raise ValueError("invalid pattern length")
+        return self
+
+    @property
+    def regex_pattern(self) -> str:
+        if self.type != "regex":
+            raise TypeError("regex_pattern used for non-regex type")
+        if not isinstance(self.pattern, str):
+            raise TypeError("regex pattern must be string")
+
+        return self.pattern.encode("unicode_escape").decode("ascii")
+
     def cpp_type(self) -> str:
+        if isinstance(self.pattern, bytes):
+            pattern_bytes = self.pattern
+        elif isinstance(self.pattern, str):
+            pattern_bytes = self.pattern.encode("utf-8")
+        else:
+            raise TypeError("invalid pattern type")
+
         return (
             f"{super().cpp_type_base()}_"
-            f"{hashlib.sha1(cast(bytes, self.pattern)).hexdigest()[:8]}_"
-            f"{self.encoding.upper()}_"
+            f"{hashlib.sha1(pattern_bytes).hexdigest()[:8]}_"
+            f"{self.type.upper()}_"
             f"{self.end}_"
             f"{self.start}_"
-            f"{self.l4}".replace('.', '_').replace('-', 'neg')
-        )
+            f"{self.l4}"
+        ).replace('.', '_').replace('-', 'neg')

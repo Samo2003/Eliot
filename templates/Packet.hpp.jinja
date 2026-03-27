@@ -168,6 +168,12 @@ public:
     ///> Current packet evaluation result.
     Result result = Result::Processing;
 
+    // Disable dynamic allocation.
+    static void* operator new(std::size_t) = delete;
+    static void  operator delete(void*) = delete;
+    static void* operator new[](std::size_t) = delete;
+    static void  operator delete[](void*) = delete;
+
 private:
     /**
      * @brief Constructs internal packet wrapper.
@@ -214,12 +220,6 @@ private:
         static core::ItemPool<InternalPacket<Traits>, 4096> pool;
         return pool;
     }
-
-    // Disable dynamic allocation.
-    static void* operator new(std::size_t) = delete;
-    static void  operator delete(void*) = delete;
-    static void* operator new[](std::size_t) = delete;
-    static void  operator delete[](void*) = delete;
 
     /**
      * @brief Parses L4 header information.

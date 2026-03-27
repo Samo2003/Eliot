@@ -1,0 +1,14 @@
+# Delays all incoming packets with a sequenced delay
+root:
+  action:
+    actionType: Delay
+    n: 
+      generatorType: SeqCountInt
+      step: 17
+      period: 3
+      mode: reverse
+      min: 1
+      max: 200
+  next:
+    action:
+      actionType: Finish

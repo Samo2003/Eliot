@@ -13,7 +13,12 @@
 #ifndef {{ condition.hpp_define() }}
 #define {{ condition.hpp_define() }}
 
+{% if condition.type == "regex" %}
+#include <regex>
+#include <string_view>
+{% else %}
 #include <cstring>
+{% endif %}
 #include <algorithm>
 #include "../Packet.hpp"
 
@@ -95,12 +100,17 @@ public:
         const size_t begin = layer_beg + static_cast<size_t>(beg_rel);
         const size_t end = layer_beg + static_cast<size_t>(end_rel);
 
-        // Pattern cannot fit into window
         const size_t window_length = end - begin;
+        const uint8_t* window = data + begin;
+
+        {% if condition.type == "regex" %}
+        // REGEX search
+        std::string_view sv(reinterpret_cast<const char*>(window), window_length);
+        return std::regex_search(sv.begin(), sv.end(), _REGEX);
+        {% else %}
+        // Pattern cannot fit into window
         if (window_length < _PATTERN_LEN)
             return false;
-
-        const uint8_t* window = data + begin;
 
         {% if condition.pattern | length == 1 %}
         // Optimized single-byte search
@@ -113,9 +123,17 @@ public:
         return std::search(window, window + window_length, _PATTERN, _PATTERN + _PATTERN_LEN) != window + window_length;
     #endif            
         {% endif %}
+        {% endif %}
     }
 
 private:
+    {% if condition.type == "regex" %}
+    ///> REGEX pattern definition.
+    inline static const std::regex _REGEX{
+        R"__REGEX__({{ condition.regex_pattern }})__REGEX__",
+        std::regex::ECMAScript | std::regex::optimize
+    };
+    {% else %}
     ///> Byte pattern to be searched for.
     static constexpr uint8_t _PATTERN[] = {
         {%- for b in condition.pattern -%}
@@ -125,6 +143,7 @@ private:
 
     ///> Length of the search pattern.
     static constexpr size_t _PATTERN_LEN = {{ condition.pattern | length }};
+    {% endif %}
 };
 
 }   // namespace eliot::generated

@@ -67,6 +67,7 @@ class Builder:
 
         # Avoid unnecessary reconfiguration in testing mode
         if not self._cfg.testing or not (self._build_dir / "CMakeCache.txt").exists():
+            shutil.rmtree(self._build_dir, ignore_errors=True)
             subprocess.run(cmake_args, check=True)
 
     def _run_cmake(self) -> None:
@@ -92,5 +93,11 @@ class Builder:
         if not binary.exists():
             raise RuntimeError("ERROR: build failed no binary file found")
         
+        target = self._cfg.output_path / BINARY_NAME
+        
+        # Remove old binary if it exists
+        if target.exists():
+            target.unlink()
+        
         # Copy resulting binary to output directory
-        shutil.copy2(binary, self._cfg.output_path)
+        shutil.copy2(binary, target)

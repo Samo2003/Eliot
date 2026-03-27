@@ -26,7 +26,7 @@ namespace eliot::backend {
  *
  * Payload is directly modifiable (no local copy is required).
  */
-struct ProfilingTraits {
+struct BenchmarkTraits {
 
     ///> Backend packet representation.
     using PacketType = nf_queue_benchmark::NFQueuePacket;
@@ -92,7 +92,7 @@ struct ProfilingTraits {
 };
 
 ///> Alias used by generated code.
-using ActiveTraits = ProfilingTraits;
+using ActiveTraits = BenchmarkTraits;
 
 }   // namespace eliot::backend
 

@@ -1,0 +1,35 @@
+# RNG benchmark DAG with probabilistic branching
+root:
+  condition:
+    conditionType: Prob
+    x:
+      generatorType: UniformFloat
+      min: 0
+      max: 1
+  if_true:
+    condition:
+      conditionType: Prob
+      x:
+        generatorType: NormalFloat
+        m: 0.5
+        s: 0.2
+    if_true:
+      action:
+        actionType: Finish
+    if_false:
+      action:
+        actionType: Drop
+  
+  if_false:
+    condition:
+      conditionType: Prob
+      x:
+        generatorType: NormalFloat
+        m: 0.3
+        s: 0.1
+    if_true:
+      action:
+        actionType: Finish
+    if_false:
+      action:
+        actionType: Drop

@@ -1,0 +1,23 @@
+name: Payload regex window
+
+build:
+  defaultAction: Drop
+  rules:
+    - type: all
+      conditions:
+        - conditionType: Payload
+          pattern: ABC
+          type: regex
+          start: 2
+          end: 6
+          l4: true
+      actions:
+        - actionType: Finish
+
+send:
+  - payload:
+      value: "XXABCYY"
+  - payload:
+      value: "ABCXXXX"
+  - payload:
+      value: "XXABXXXX"
