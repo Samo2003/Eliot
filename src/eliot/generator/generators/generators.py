@@ -46,7 +46,7 @@ class ValueGeneratorGenerator(GeneratorBase):
         # Generate individual generator implementations
         for generator in context.generators:
             template_name = f"generators/{generator.generatorType}Generator.hpp.jinja"
-            output_name = f"{generator.cpp_type()}.hpp"
+            output_name = f"{generator.cpp_type}.hpp"
             output_path = generators_dir / output_name
 
             self._generate_to_file(

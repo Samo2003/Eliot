@@ -21,15 +21,17 @@ class Size(ConditionBase[Literal["Size"]]):
             raise ValueError("Size has to be a positive integer")
         return self
 
+    @property
     def cpp_type(self) -> str:
         return (
-            f"{self.cpp_type_base()}_"
+            f"{self.cpp_type_base}_"
             f"{self.size}_"
             f"{self.op}"
-            f"{'_' + str(id(self)) if isinstance(self.size, ValueGeneratorBase) and self.size.is_state() else ''}"
+            f"{'_' + str(id(self)) if isinstance(self.size, ValueGeneratorBase) and self.size.is_state else ''}"
         )
 
-    def get_op(self) -> str:
+    @property
+    def op_str(self) -> str:
         """Maps operation to C++ operator"""
         ops = {
             "lt": "<",
@@ -40,6 +42,7 @@ class Size(ConditionBase[Literal["Size"]]):
         }
         return ops[self.op]
     
+    @property
     def not_generator_size(self) -> bool:
         """Condition used in generating representing if size is a generator"""
         return isinstance(self.size, int)

@@ -54,7 +54,7 @@ def build_cases(
             "id": node_id,
             "type": "ActionCase",
             "action": node.action,
-            "final": node.action.is_final(),
+            "final": node.action.is_final,
             # Recursively process continuation if exists
             "next": build_cases(
                 node.next, 

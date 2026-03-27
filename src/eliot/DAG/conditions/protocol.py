@@ -21,8 +21,10 @@ class Protocol(ConditionBase[Literal["Protocol"]]):
         
         return self
     
+    @property
     def cpp_type(self) -> str:
-        return f"{super().cpp_type_base()}_{self.id}_{self.nh}"
+        return f"{self.cpp_type_base}_{self.id}_{self.nh}"
     
-    def get_nh(self) -> str:
+    @property
+    def nh_str(self) -> str:
         return "true" if self.nh else "false"

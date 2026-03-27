@@ -21,8 +21,9 @@ class DAGBaseModel(BaseModel, ABC):
         Allows DAG nodes to be used in sets.
         """
 
-        return hash(self.cpp_type())
+        return hash(self.cpp_type)
     
+    @property
     @abstractmethod
     def cpp_type(self) -> str:
         """
@@ -32,38 +33,44 @@ class DAGBaseModel(BaseModel, ABC):
         """
         pass
 
+    @property
     @final  
     def hpp_define(self) -> str:
         """
         Returns C++ header define.
         """
 
-        return f"ELIOT_{self.cpp_type().upper()}_H"
+        return f"ELIOT_{self.cpp_type.upper()}_H"
     
+    @property
     @final
     def cpp_name(self) -> str:
         """
         Return standardized C++ variable name derived from type.
         """
 
-        return self.cpp_type().lower()
+        return self.cpp_type.lower()
     
+    @property
     def cpp_call(self) -> str:
         """
         Defines C++ formatted call based on state.
         """
-        if self.is_state():
-            return f"({self.cpp_name()}, "
-        return f"<{self.cpp_type()}>("
+        if self.is_state:
+            return f"({self.cpp_name}, "
+        return f"<{self.cpp_type}>("
     
+    @property
     def is_state(self) -> bool:
         """Defines if node is state or not"""
         return False
     
+    @property
     def init(self) -> str:
         """Initialization if required"""
         return ""
     
+    @property
     def time(self) -> bool:
         """
         Signal whether the element requires time-related support.
@@ -74,6 +81,7 @@ class DAGBaseModel(BaseModel, ABC):
 
         return False
     
+    @property
     def seed_value(self) -> int:
         """
         Generate a 32-bit random seed value.

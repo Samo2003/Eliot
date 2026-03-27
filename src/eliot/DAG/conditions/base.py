@@ -16,6 +16,7 @@ class ConditionBase(DAGBaseModel, Generic[T], ABC):
     # Condition value can be inverted
     invert: bool = False
 
+    @property
     @final
     def cpp_type_base(self) -> str:
         """Returns common condition base name"""

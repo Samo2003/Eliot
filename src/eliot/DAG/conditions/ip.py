@@ -41,8 +41,9 @@ class IP(ConditionBase[Literal["IP"]]):
 
         return self
     
+    @property
     def cpp_type(self) -> str:
-        parts = [super().cpp_type_base()]
+        parts = [self.cpp_type_base]
 
         if self.src is not None:
             parts.append(f"src_{self.src.replace('.', '_').replace(':', '_')}")
@@ -56,6 +57,7 @@ class IP(ConditionBase[Literal["IP"]]):
         """Converts ip string to bytes"""
         return ipaddress.ip_address(ip).packed
     
+    @property
     def ipv4(self) -> bool:
         """Determines if condition is checking IPv4 or IPv6 packets"""
         if self.ip is not None:

@@ -26,7 +26,7 @@ class StateGenerator(GeneratorBase):
             template_name = "states/StateNode.hpp.jinja"
 
             # Output file name derived from state C++ type representation
-            output_name = f"{state.cpp_type()}.hpp"
+            output_name = f"{state.cpp_type}.hpp"
             output_path = state_dir / output_name
 
             # Render template with state-specific data

@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import Literal
-from pydantic import model_validator
+from pydantic import PrivateAttr, model_validator
 from .base import ActionBase
 
 class ChangeState(ActionBase[Literal["ChangeState"]]):
@@ -15,7 +15,7 @@ class ChangeState(ActionBase[Literal["ChangeState"]]):
     state: str
 
     # `StateNode` cpp_type assigned during generating
-    state_cpp_type: str | None = None
+    _state_cpp_type: str | None = PrivateAttr(default=None)
 
     @model_validator(mode="after")
     def upper_state(self) -> ChangeState:
@@ -23,21 +23,26 @@ class ChangeState(ActionBase[Literal["ChangeState"]]):
         self.state = self.state.upper()
         return self
 
+    @property
     def cpp_type(self) -> str:
-        return f"{self.cpp_type_base()}_{self.target}_{self.state}"
+        return f"{self.cpp_type_base}_{self.target}_{self.state}"
     
+    @property
     def is_state(self) -> bool:
         return True
 
-    def attach_state_node_type(self, state_cpp_type: str) -> None:
-        """Attaches `StateNode` C++ type used for node referencing in generated code"""
-        self.state_cpp_type = state_cpp_type
-    
-    def get_state_cpp_type(self) -> str:
+    @property
+    def state_cpp_type(self) -> str:
         """Retrieve and validate `StateNode` C++ type was attached"""
-        if self.state_cpp_type is None:
+        if self._state_cpp_type is None:
             raise RuntimeError(f"StateNode with id: {self.target} not attached to action node")
-        return self.state_cpp_type
+        return self._state_cpp_type
+
+    @state_cpp_type.setter
+    def state_cpp_type(self, state_cpp_type: str) -> None:
+        """Attaches `StateNode` C++ type used for node referencing in generated code"""
+        self._state_cpp_type = state_cpp_type
     
+    @property
     def init(self) -> str:
-        return f" = {self.cpp_type()}({self.get_state_cpp_type().lower()})"
+        return f" = {self.cpp_type}({self.state_cpp_type.lower()})"

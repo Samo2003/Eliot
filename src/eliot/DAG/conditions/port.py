@@ -33,8 +33,9 @@ class Port(ConditionBase[Literal["Port"]]):
                 raise ValueError(f"invalid port number: {port}")
         return self
     
+    @property
     def cpp_type(self) -> str:
-        parts = [super().cpp_type_base()]
+        parts = [self.cpp_type_base]
 
         if self.port is not None:
             parts.append(f"any_{self.port}")

@@ -36,15 +36,19 @@ class Delay(ActionBase[Literal["Delay"]]):
         self.unit = "ms"
         return self
 
+    @property
     def cpp_type(self) -> str:
-        return f"{self.cpp_type_base()}_{self.n}_{id(self)}"
+        return f"{self.cpp_type_base}_{self.n}_{id(self)}"
 
+    @property
     def calendar(self) -> bool:
         return True
     
+    @property
     def is_state(self) -> bool:
         return True
     
+    @property
     def not_generator_n(self) -> bool:
         """Condition used in generating representing if n is a generator"""
         return isinstance(self.n, int)

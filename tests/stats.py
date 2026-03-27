@@ -75,6 +75,7 @@ class ExchangeStats:
             if r.seq is None or r.seq not in sent_by_seq or r.seq not in used_seqs
         ]
 
+    @property
     def no_losses(self) -> bool:
         """
         Returns True all exchanges have response

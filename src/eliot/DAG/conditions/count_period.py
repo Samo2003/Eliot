@@ -37,16 +37,20 @@ class CountPeriod(ConditionBase[Literal["CountPeriod"]]):
                 raise ValueError("f must be greater than zero")
         return self
 
+    @property
     def cpp_type(self) -> str:
-        return f"{self.cpp_type_base()}_{self.t}_{self.f}_{id(self)}"
+        return f"{self.cpp_type_base}_{self.t}_{self.f}_{id(self)}"
     
+    @property
     def is_state(self) -> bool:
         return True
     
+    @property
     def not_generator_t(self) -> bool:
         """Condition used in generating representing if t is a generator"""
         return isinstance(self.t, int)
     
+    @property
     def not_generator_f(self) -> bool:
         """Condition used in generating representing if f is a generator"""
         return isinstance(self.f, int)

@@ -32,11 +32,14 @@ class Time(ConditionBase[Literal["Time"]]):
         self.unit = "ms"
         return self
 
+    @property
     def cpp_type(self) -> str:
-        return f"{self.cpp_type_base()}_{self.after}_{self.duration}_{self.instant}_{id(self)}"
+        return f"{self.cpp_type_base}_{self.after}_{self.duration}_{self.instant}_{id(self)}"
     
+    @property
     def is_state(self) -> bool:
         return self.instant
     
+    @property
     def time(self) -> bool:
         return True

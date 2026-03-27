@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import Any, Dict, List, Set
-from pydantic import BaseModel, model_validator
+from pydantic import BaseModel, PrivateAttr, model_validator
 from .dag_base_model import DAGBaseModel
 from .conditions import Condition
 from .actions import Action
@@ -27,9 +27,9 @@ class ActionNode(BaseModel):
         - Final actions must NOT have a next node.
         - Non-final actions MUST have a next node.
         """
-        if self.action.is_final() and self.next is not None:
+        if self.action.is_final and self.next is not None:
             raise ValueError("Final action node can't have next")
-        if not self.action.is_final() and self.next is None:
+        if not self.action.is_final and self.next is None:
             raise ValueError("Non final action node requires next node")
         return self
 
@@ -65,7 +65,7 @@ class Transition(BaseModel):
     next: DAGNode
 
     # Case ID assigned during IR generation
-    id: int | None = None
+    _id: int | None = PrivateAttr(default=None)
 
     @model_validator(mode="after")
     def upper_state(self) -> Transition:
@@ -75,23 +75,25 @@ class Transition(BaseModel):
         """
         self.state = self.state.upper()
         return self
-
-    def attach_id(self, id: int) -> None:
-        """Assign branch ID assigned during generating"""
-        self.id = id
-
-    def get_id(self) -> int:
+    
+    @property
+    def id(self) -> int:
         """
         Retrieve assigned case ID.
 
         Raises:
             RuntimeError if ID has not been attached.
         """
-        if self.id is None:
+        if self._id is None:
             raise RuntimeError(
                 f"Transition ID not attached to transition with state: {self.state}"
             )
-        return self.id
+        return self._id
+    
+    @id.setter
+    def id(self, value: int) -> None:
+        """Assign branch ID assigned during generating"""
+        self._id = value
 
 class StateNode(DAGBaseModel):
     """
@@ -132,6 +134,7 @@ class StateNode(DAGBaseModel):
 
         return self
     
+    @property
     def states(self) -> List[str]:
         """Retrieve list of defined states in `Transition` nodes"""
         states: List[str] = []
@@ -139,9 +142,11 @@ class StateNode(DAGBaseModel):
             states.append(transition.state)
         return states
     
+    @property
     def is_state(self) -> bool:
         return True
     
+    @property
     def cpp_type(self) -> str:
         return f"{self.id.upper()}StateNode"
     
@@ -160,7 +165,7 @@ class StateNode(DAGBaseModel):
 
         # Attach branch IDs to Transition nodes
         for transition in self.transitions:
-            transition.attach_id(state_transition_map[transition.state])
+            transition.id = state_transition_map[transition.state]
 
 # Union type representing any valid DAG node
 DAGNode = ActionNode | DecisionNode | StateNode

@@ -35,20 +35,23 @@ class Prob(ConditionBase[Literal["Prob"]]):
             raise ValueError("Seed value has to be a positive integer")
         return self
     
+    @property
     def cpp_type(self) -> str:
         if isinstance(self.x, float):
-            return f"{self.cpp_type_base()}_{str(self.x).replace('.', '_')}"
+            return f"{self.cpp_type_base}_{str(self.x).replace('.', '_')}"
         return (
-            f"{self.cpp_type_base()}_"
+            f"{self.cpp_type_base}_"
             f"{self.x}"
-            f"{'_' + str(id(self)) if isinstance(self.x, ValueGeneratorBase) and self.x.is_state() else ''}"
+            f"{'_' + str(id(self)) if isinstance(self.x, ValueGeneratorBase) and self.x.is_state else ''}"
         )
     
+    @property
     def not_generator_x(self) -> bool:
         """Condition used in generating representing if x is a generator"""
         return isinstance(self.x, float)
     
+    @property
     def seed_value(self) -> int:
         if self.seed is not None:
             return self.seed
-        return super().seed_value()
+        return super().seed_value

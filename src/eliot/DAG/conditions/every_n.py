@@ -18,12 +18,15 @@ class EveryN(ConditionBase[Literal["EveryN"]]):
             raise ValueError("after must not be negative")
         return self
 
+    @property
     def cpp_type(self) -> str:
-        return f"{self.cpp_type_base()}_{self.N}_{id(self)}"
+        return f"{self.cpp_type_base}_{self.N}_{id(self)}"
     
+    @property
     def is_state(self) -> bool:
         return True
     
+    @property
     def not_generator_N(self) -> bool:
         """Condition used in generating representing if N is a generator"""
         return isinstance(self.N, int)

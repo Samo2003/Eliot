@@ -24,13 +24,13 @@
 #include "static/calendar/Calendar.hpp"
 {% endif %}
 {% for state in states %}
-#include "states/{{ state.cpp_type() }}.hpp"
+#include "states/{{ state.cpp_type }}.hpp"
 {% endfor %}
 {% for condition in conditions %}
-#include "conditions/{{ condition.cpp_type() }}.hpp"
+#include "conditions/{{ condition.cpp_type }}.hpp"
 {% endfor %}
 {% for action in actions %}
-#include "actions/{{ action.cpp_type() }}.hpp"
+#include "actions/{{ action.cpp_type }}.hpp"
 {% endfor %}
 
 namespace eliot::generated {
@@ -78,16 +78,16 @@ private:
 
     {% endif %}
 {% for state in states %}
-    {{ state.cpp_type() }} {{ state.cpp_name() }};
+    {{ state.cpp_type }} {{ state.cpp_name }};
 {% endfor %}
 {% for condition in conditions %}
-    {% if condition.is_state() %}
-    {{ condition.cpp_type() }} {{ condition.cpp_name() }}{{ condition.init() }};
+    {% if condition.is_state %}
+    {{ condition.cpp_type }} {{ condition.cpp_name }}{{ condition.init }};
     {% endif %}
 {% endfor %}
 {% for action in actions %}
-    {% if action.is_state() %}
-    {{ action.cpp_type() }} {{ action.cpp_name() }}{{ action.init() }};
+    {% if action.is_state %}
+    {{ action.cpp_type }} {{ action.cpp_name }}{{ action.init }};
     {% endif %}
 {% endfor %}
 };

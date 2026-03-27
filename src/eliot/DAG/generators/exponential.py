@@ -51,10 +51,11 @@ class ExponentialBase(ValueGeneratorBase[T, N], ABC):
         if self.rate is not None:
             self.rate /= factor
     
+    @property
     @final
     def cpp_type(self) -> str:
         return (
-            f"{self.cpp_type_base()}_"
+            f"{self.cpp_type_base}_"
             f"{self.N_to_str(self.mean)}_"
             f"{self.N_to_str(self.rate)}"
         )
@@ -62,6 +63,7 @@ class ExponentialBase(ValueGeneratorBase[T, N], ABC):
 class ExponentialFloat(ExponentialBase[Literal["ExponentialFloat"], float]):
     """Exponential Float value generator"""
     
+    @property
     def value(self) -> float:
         if self.seed is not None:
             u = random.Random(self.seed).random()
@@ -77,6 +79,7 @@ class ExponentialFloat(ExponentialBase[Literal["ExponentialFloat"], float]):
 class ExponentialInt(ExponentialBase[Literal["ExponentialInt"], int]):
     """Exponential Int value generator"""
     
+    @property
     def value(self) -> int:
         if self.seed is not None:
             u = random.Random(self.seed).random()

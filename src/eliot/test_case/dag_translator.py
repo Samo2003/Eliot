@@ -33,7 +33,7 @@ def build_action_chain(
     for action in reversed(actions):
         next_node = ActionNode(
             action=action, 
-            next=None if action.is_final() else next_node        # Final actions dont have next
+            next=None if action.is_final else next_node        # Final actions dont have next
         )
 
     # Build chain bottom-up

@@ -21,22 +21,25 @@ class UniformBase(ValueGeneratorBase[T, N], ABC):
     def _apply_factor_inner(self, factor: int) -> None:
         """Just to implement abstract method nothing to do"""
     
+    @property
     @final
-    def get_min_max(self) -> Tuple[N, N]:
+    def min_max(self) -> Tuple[N, N]:
         """Convert interval range to specified type for Pylance"""
         min_val = self.min
         max_val = cast(N, self.max)
         return min_val, max_val
     
+    @property
     @final
     def cpp_type(self) -> str:
-        return self.cpp_type_base()
+        return self.cpp_type_base
 
 class UniformFloat(UniformBase[Literal["UniformFloat"], float]):
     """Uniform Float value generator"""
 
+    @property
     def value(self) -> float:
-        min_val, max_val = self.get_min_max()
+        min_val, max_val = self.min_max
         if self.seed is not None:
             return random.Random(self.seed).uniform(min_val, max_val)
         return random.uniform(min_val, max_val)
@@ -44,8 +47,9 @@ class UniformFloat(UniformBase[Literal["UniformFloat"], float]):
 class UniformInt(UniformBase[Literal["UniformInt"], int]):
     """Uniform int value generator"""
 
+    @property
     def value(self) -> int:
-        min_val, max_val = self.get_min_max()
+        min_val, max_val = self.min_max
         if self.seed is not None:
             return random.Random(self.seed).randint(min_val, max_val)
         return random.randint(min_val, max_val)

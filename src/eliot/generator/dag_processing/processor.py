@@ -36,14 +36,14 @@ class DAGProcessor:
         collected_conditions, collected_actions, state_nodes, collected_generators = collect_nodes(dag.root)
 
         # Collect all unique nodes required for generation
-        require_calendar = any(action.calendar() for action in collected_actions)
+        require_calendar = any(action.calendar for action in collected_actions)
 
         # Determine whether time support is required
         require_time = require_calendar or any(
-            action.time() 
+            action.time
             for action in collected_actions
         ) or any(
-            condition.time() 
+            condition.time
             for condition in collected_conditions
         )
 

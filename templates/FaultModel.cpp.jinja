@@ -25,14 +25,14 @@ void FaultModel::evaluate(Packet* packet) noexcept {
             // NODE: {{ node.label }}
             case {{ node.id }}:
                 {% if node.type == "DecisionCase" %}
-                packet->state = {{ '!' if node.condition.invert else '' }}core::evaluate_condition{{ node.condition.cpp_call() }}packet) ? {{ node.if_true.id }} : {{ node.if_false.id }};
+                packet->state = {{ '!' if node.condition.invert else '' }}core::evaluate_condition{{ node.condition.cpp_call }}packet) ? {{ node.if_true.id }} : {{ node.if_false.id }};
                 {% elif node.type == "StateCase" %}
-                packet->state = core::get_next_state({{ node.state_node.cpp_name() }});
+                packet->state = core::get_next_state({{ node.state_node.cpp_name }});
                 {% else %}
-                {% if not node.action.is_final() %}
+                {% if not node.action.is_final %}
                 packet->state = {{ node.next.id }};
                 {% endif %}
-                core::execute_action{{ node.action.cpp_call() }}packet);
+                core::execute_action{{ node.action.cpp_call }}packet);
                 {% endif %}
                 continue;
 {% endfor %}

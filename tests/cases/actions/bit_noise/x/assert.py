@@ -2,7 +2,7 @@ from typing import List
 from tests.stats import ExchangeStats
 
 def check(stats: ExchangeStats) -> None:
-    assert stats.no_losses()
+    assert stats.no_losses
 
     ratios: List[float] = []
     for e in stats.exchanges:

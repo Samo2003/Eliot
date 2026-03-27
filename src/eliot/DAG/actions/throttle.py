@@ -28,18 +28,22 @@ class Throttle(ActionBase[Literal["Throttle"]]):
             raise ValueError("limit and burst both have to be positive")
         return self
 
+    @property
     def calendar(self) -> bool:
         return self.mode == "shaping"
     
+    @property
     def time(self) -> bool:
         return True
     
+    @property
     def is_state(self) -> bool:
         return True
     
+    @property
     def cpp_type(self) -> str:
         return (
-            f"{self.cpp_type_base()}_"
+            f"{self.cpp_type_base}_"
             f"{self.rate}_"
             f"{self.burst}_"
             f"{id(self)}"

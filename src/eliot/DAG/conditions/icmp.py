@@ -25,8 +25,9 @@ class ICMP(ConditionBase[Literal["ICMP"]]):
 
         return self
     
+    @property
     def cpp_type(self) -> str:
-        parts = [super().cpp_type_base()]
+        parts = [self.cpp_type_base]
         parts.append(f"type_{self.type}")
 
         if self.code is not None:

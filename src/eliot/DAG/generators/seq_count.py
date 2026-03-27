@@ -47,15 +47,17 @@ class SeqCountBase(ValueGeneratorBase[T, N], ABC):
     def _apply_factor_inner(self, factor: int) -> None:
         self.step *= factor
     
+    @property
     @final
     def cpp_type(self) -> str:
         return (
-            f"{self.cpp_type_base()}_"
+            f"{self.cpp_type_base}_"
             f"{self.period}_"
             f"{self.N_to_str(self.step)}_"
             f"{self.mode.upper()}"
         )
     
+    @property
     @final
     def is_state(self) -> bool:
         return not self.once
@@ -63,6 +65,7 @@ class SeqCountBase(ValueGeneratorBase[T, N], ABC):
 class SeqCountFloat(SeqCountBase[Literal["SeqCountFloat"], float]):
     """Sequential count float value generator"""
     
+    @property
     def value(self) -> float:
         if self.step < 0:
             return self.max if self.max is not None else 0
@@ -71,6 +74,7 @@ class SeqCountFloat(SeqCountBase[Literal["SeqCountFloat"], float]):
 class SeqCountInt(SeqCountBase[Literal["SeqCountInt"], int]):
     """Sequential count int value generator"""
     
+    @property
     def value(self) -> int:
         if self.step < 0:
             return self.max if self.max is not None else 0

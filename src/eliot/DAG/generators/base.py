@@ -53,8 +53,9 @@ class ValueGeneratorBase(DAGBaseModel, Generic[T, N], ABC):
     @final
     def __str__(self) -> str:
         """Returns string representations of generator"""
-        return self.cpp_type()
+        return self.cpp_type
     
+    @property
     @final
     def cpp_type_base(self) -> str:
         """Returns common generator base name"""
@@ -66,6 +67,7 @@ class ValueGeneratorBase(DAGBaseModel, Generic[T, N], ABC):
             f"{self.seed}"
         )
     
+    @property
     @abstractmethod
     def value(self) -> N:
         """
@@ -106,12 +108,14 @@ class ValueGeneratorBase(DAGBaseModel, Generic[T, N], ABC):
         """
         return str(x).replace('.', '_')
     
+    @property
     @final
     def cpp_call(self) -> str:
-        if self.is_state():
-            return f"({self.cpp_name()}"
-        return super().cpp_call()
+        if self.is_state:
+            return f"({self.cpp_name}"
+        return super().cpp_call
     
+    @property
     @final
     def seed_value(self) -> int:
         """
@@ -120,7 +124,7 @@ class ValueGeneratorBase(DAGBaseModel, Generic[T, N], ABC):
         """
         if self.seed is not None:
             return self.seed
-        return super().seed_value()
+        return super().seed_value
     
     @final
     def clamp(self, x: float) -> float:

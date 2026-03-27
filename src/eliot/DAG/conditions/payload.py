@@ -82,6 +82,7 @@ class Payload(ConditionBase[Literal["Payload"]]):
 
         return self.pattern.encode("unicode_escape").decode("ascii")
 
+    @property
     def cpp_type(self) -> str:
         if isinstance(self.pattern, bytes):
             pattern_bytes = self.pattern
@@ -91,10 +92,10 @@ class Payload(ConditionBase[Literal["Payload"]]):
             raise TypeError("invalid pattern type")
 
         return (
-            f"{super().cpp_type_base()}_"
+            f"{self.cpp_type_base}_"
             f"{hashlib.sha1(pattern_bytes).hexdigest()[:8]}_"
             f"{self.type.upper()}_"
             f"{self.end}_"
             f"{self.start}_"
             f"{self.l4}"
-        ).replace('.', '_').replace('-', 'neg')
+        ).replace('-', 'neg')

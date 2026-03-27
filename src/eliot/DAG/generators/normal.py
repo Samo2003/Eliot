@@ -39,10 +39,11 @@ class NormalBase(ValueGeneratorBase[T, N], ABC):
         self.m *= factor
         self.s *= factor
     
+    @property
     @final
     def cpp_type(self) -> str:
         return (
-            f"{self.cpp_type_base()}_"
+            f"{self.cpp_type_base}_"
             f"{self.N_to_str(self.m)}_"
             f"{self.N_to_str(self.s)}"
         )
@@ -50,6 +51,7 @@ class NormalBase(ValueGeneratorBase[T, N], ABC):
 class NormalFloat(NormalBase[Literal["NormalFloat"], float]):
     """Normal Float value generator"""
     
+    @property
     def value(self) -> float:
         if self.seed is not None:
             x = random.Random(self.seed).gauss(self.m, self.s)
@@ -60,6 +62,7 @@ class NormalFloat(NormalBase[Literal["NormalFloat"], float]):
 class NormalInt(NormalBase[Literal["NormalInt"], int]):
     """Normal Int value generator"""
     
+    @property
     def value(self) -> int:
         if self.seed is not None:
             x = random.Random(self.seed).gauss(self.m, self.s)

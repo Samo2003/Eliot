@@ -24,7 +24,7 @@ class ActionGenerator(GeneratorBase):
             template_name = f"actions/{action.actionType}Action.hpp.jinja"
 
             # Output file name derived from C++ type representation
-            output_name = f"{action.cpp_type()}.hpp"
+            output_name = f"{action.cpp_type}.hpp"
             output_path = actions_dir / output_name
 
             # Render action template

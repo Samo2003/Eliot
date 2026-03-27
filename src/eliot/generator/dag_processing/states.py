@@ -70,13 +70,13 @@ def process_state_nodes(
         used_states[action.target].add(action.state)
 
         # Verify that target state is defined in the StateNode
-        if action.state not in target_node.states():
+        if action.state not in target_node.states:
             raise ValueError(
                 f"Cannot set undefined state {action.state} to StateNode with id: {target_node.id}"
             )
 
         # Attach resolved C++ type name to action for code generation
-        action.attach_state_node_type(target_node.cpp_type())
+        action.state_cpp_type = target_node.cpp_type
 
     # Check for unused state nodes
     unused = set(state_node_map.keys()) - used_state_nodes
@@ -87,7 +87,7 @@ def process_state_nodes(
 
     # Validate all defined states are reachable
     for node_id, node in state_node_map.items():
-        defined_states = set(node.states())
+        defined_states = set(node.states)
         reachable_states = used_states[node_id] | {node.initial}
 
         unreachable = defined_states - reachable_states

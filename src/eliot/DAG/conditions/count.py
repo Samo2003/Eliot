@@ -22,12 +22,14 @@ class Count(ConditionBase[Literal["Count"]]):
             raise ValueError("duration must not be negative")
         return self
 
+    @property
     def is_state(self) -> bool:
         return True
     
+    @property
     def cpp_type(self) -> str:
         return (
-            f"{self.cpp_type_base()}_"
+            f"{self.cpp_type_base}_"
             f"{self.after}_"
             f"{id(self)}"
             f"{'_' + str(self.duration) if self.duration else '' }"

@@ -64,9 +64,10 @@ class BitNoise(ActionBase[Literal["BitNoise"]]):
                     raise ValueError("invalid window length")
         return self
     
+    @property
     def cpp_type(self) -> str:
         type_name = (
-            f"{self.cpp_type_base()}_"
+            f"{self.cpp_type_base}_"
             f"{self.x}_"
             f"{self.n}_"
             f"{self.start}_"
@@ -75,26 +76,30 @@ class BitNoise(ActionBase[Literal["BitNoise"]]):
             f"{self.layer.upper()}"
         )
 
-        state_x = isinstance(self.x, ValueGeneratorBase) and self.x.is_state()
-        state_n = isinstance(self.n, ValueGeneratorBase) and self.n.is_state()
-        state_start = isinstance(self.start, ValueGeneratorBase) and self.start.is_state()
-        state_end = isinstance(self.end, ValueGeneratorBase) and self.end.is_state()
+        state_x = isinstance(self.x, ValueGeneratorBase) and self.x.is_state
+        state_n = isinstance(self.n, ValueGeneratorBase) and self.n.is_state
+        state_start = isinstance(self.start, ValueGeneratorBase) and self.start.is_state
+        state_end = isinstance(self.end, ValueGeneratorBase) and self.end.is_state
         if state_x or state_n or state_start or state_end or self.mode == "random":
             type_name += f"{id(self)}"
         return type_name.replace('-', "neg").replace('.', '_')
     
+    @property
     def not_generator_x(self) -> bool:
         """Condition used in generating representing if x is a generator"""
         return isinstance(self.x, float)
     
+    @property
     def not_generator_n(self) -> bool:
         """Condition used in generating representing if n is a generator"""
         return isinstance(self.n, int)
     
+    @property
     def not_generator_start(self) -> bool:
         """Condition used in generating representing if start is a generator"""
         return isinstance(self.start, int)
     
+    @property
     def not_generator_end(self) -> bool:
         """Condition used in generating representing if end is a generator"""
         return isinstance(self.end, int)

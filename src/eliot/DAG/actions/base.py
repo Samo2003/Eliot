@@ -13,20 +13,24 @@ class ActionBase(DAGBaseModel, Generic[T], ABC):
     # Discriminator used by Pydantic
     actionType: T
 
+    @property
     @final
     def cpp_type_base(self) -> str:
         """Returns common action base name"""
         return f"{self.actionType}Action"
     
+    @property
     def is_final(self) -> bool:
         """Signalizes if action is final"""
         return False
     
+    @property
     def calendar(self) -> bool:
         """Signalizes that action needs calendar"""
         return False
     
+    @property
     def init(self) -> str:
-        if self.calendar():
-            return f" = {self.cpp_type()}(_calendar)"
-        return super().init()
+        if self.calendar:
+            return f" = {self.cpp_type}(_calendar)"
+        return super().init
