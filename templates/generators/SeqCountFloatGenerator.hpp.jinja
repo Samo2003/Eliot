@@ -29,7 +29,7 @@ public:
     {% if generator.once %}
      * This method always returns the same value.
     {% else %}
-     * The internal value is advanced every {{ generator.T }} calls
+     * The internal value is advanced every {{ generator.period }} calls
      * according to the {{ generator.mode }} stepping mode.
     {% endif %}
      *

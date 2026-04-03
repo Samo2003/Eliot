@@ -1,0 +1,23 @@
+name: Sequential time generator delay
+
+build:
+  defaultAction: Finish
+  rules:
+    - type: all
+      conditions: []
+      actions:
+        - actionType: Delay
+          n: 
+            generatorType: SeqTimeInt
+            min: 20
+            max: 100
+            step: 20
+            period: 100
+            mode: reverse
+
+timeout: 3
+
+send:
+  - count: 20
+    interval: 100
+  

@@ -2,11 +2,12 @@ from __future__ import annotations
 from abc import ABC
 from pydantic import model_validator
 from typing import Literal, final
+from eliot.DAG.dag_base_model import FACTORS
 from .base import ValueGeneratorBase, T, N
 
-class SeqCountBase(ValueGeneratorBase[T, N], ABC):
+class SeqBase(ValueGeneratorBase[T, N], ABC):
     """
-    Abstract base class for sequential count generators
+    Abstract base class for sequential generators
     """
 
     # Number of steps required to reach next value
@@ -19,7 +20,7 @@ class SeqCountBase(ValueGeneratorBase[T, N], ABC):
     mode: Literal["repeat", "keep", "reverse"] = "keep"
 
     @model_validator(mode="after")
-    def check_consistency(self) -> SeqCountBase[T, N]:
+    def check_consistency(self) -> SeqBase[T, N]:
         """Validates consistency"""
         if self.step == 0:
             raise ValueError(
@@ -48,7 +49,6 @@ class SeqCountBase(ValueGeneratorBase[T, N], ABC):
         self.step *= factor
     
     @property
-    @final
     def cpp_type(self) -> str:
         return (
             f"{self.cpp_type_base}_"
@@ -62,7 +62,7 @@ class SeqCountBase(ValueGeneratorBase[T, N], ABC):
     def is_state(self) -> bool:
         return not self.once
     
-class SeqCountFloat(SeqCountBase[Literal["SeqCountFloat"], float]):
+class SeqCountFloat(SeqBase[Literal["SeqCountFloat"], float]):
     """Sequential count float value generator"""
     
     @property
@@ -71,9 +71,61 @@ class SeqCountFloat(SeqCountBase[Literal["SeqCountFloat"], float]):
             return self.max if self.max is not None else 0
         return self.min
 
-class SeqCountInt(SeqCountBase[Literal["SeqCountInt"], int]):
+class SeqCountInt(SeqBase[Literal["SeqCountInt"], int]):
     """Sequential count int value generator"""
     
+    @property
+    def value(self) -> int:
+        if self.step < 0:
+            return self.max if self.max is not None else 0
+        return self.min
+    
+class SeqTimeBase(SeqBase[T, N], ABC):
+    """
+    Abstract base class for sequential time generators
+    """
+    
+    # Time units
+    unit: Literal["ms", "s", "min", "h"] = "ms"
+    
+    # If `True` time is counted from starting eliot else from first generator call
+    instant: bool = False
+    
+    @model_validator(mode="after")
+    def convert_time(self) -> SeqTimeBase[T, N]:
+        """Converts time based on given units"""
+        self.period *= FACTORS[self.unit]
+        self.unit = "ms"
+        return self
+    
+    @property
+    @final
+    def time(self) -> bool:
+        return True
+    
+    @property
+    @final
+    def cpp_type(self) -> str:
+        return (
+            f"{self.cpp_type_base}_"
+            f"{self.period}_"
+            f"{self.N_to_str(self.step)}_"
+            f"{self.mode.upper()}_"
+            f"{self.instant}"
+        )
+
+class SeqTimeFloat(SeqTimeBase[Literal["SeqTimeFloat"], float]):
+    """Sequential time float value generator"""
+     
+    @property
+    def value(self) -> float:
+        if self.step < 0:
+            return self.max if self.max is not None else 0
+        return self.min
+
+class SeqTimeInt(SeqTimeBase[Literal["SeqTimeInt"], int]):
+    """Sequential time int value generator"""
+     
     @property
     def value(self) -> int:
         if self.step < 0:
