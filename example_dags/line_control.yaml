@@ -58,12 +58,12 @@ root:
         id: control                         # State node identifier
         initial: ACTIVE
         transitions:
-          - state: ACTIVE
+          ACTIVE:
             next:
               action:
                 actionType: Finish
           
-          - state: DELAY
+          DELAY:
             next:
               action:
                 actionType: Delay
@@ -75,7 +75,7 @@ root:
                 action:
                   actionType: Finish
           
-          - state: DROP
+          DROP:
             next:
               action:
                 actionType: Drop

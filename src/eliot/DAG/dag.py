@@ -58,23 +58,11 @@ class Transition(BaseModel):
     switch-based dispatch.
     """
 
-    # State triggering this transition
-    state: str
-
     # Next node for this state
     next: DAGNode
 
     # Case ID assigned during IR generation
     _id: int | None = PrivateAttr(default=None)
-
-    @model_validator(mode="after")
-    def upper_state(self) -> Transition:
-        """
-        Normalize state identifier to uppercase
-        to ensure case-insensitive consistency.
-        """
-        self.state = self.state.upper()
-        return self
     
     @property
     def id(self) -> int:
@@ -86,7 +74,7 @@ class Transition(BaseModel):
         """
         if self._id is None:
             raise RuntimeError(
-                f"Transition ID not attached to transition with state: {self.state}"
+                f"Transition ID not attached to transition"
             )
         return self._id
     
@@ -107,7 +95,7 @@ class StateNode(DAGBaseModel):
     initial: str
 
     # Transitions for each defined state
-    transitions: list[Transition]
+    transitions: dict[str, Transition]
 
     @model_validator(mode="after")
     def validate_node(self) -> StateNode:
@@ -118,16 +106,17 @@ class StateNode(DAGBaseModel):
         - Initial state must exist among transitions.
         - Node ID and state names are normalized to uppercase.
         """
-        used: set[str] = set()
-        for transition in self.transitions:
-            if transition.state in used:
-                raise ValueError(
-                    f"State {transition.state} used multiple times in node {self.id}"
-                )
-            used.add(transition.state)
         self.id = self.id.upper()
         self.initial = self.initial.upper()
-        if self.initial not in used:
+        
+        # Normalize keys
+        new_transitions: dict[str, Transition] = {
+            key.upper(): transition
+            for key, transition in self.transitions.items()
+        }
+        self.transitions = new_transitions
+        
+        if self.initial not in self.transitions:
             raise ValueError(
                 f"No transition for initial state fount in node {self.id}"
             )
@@ -137,10 +126,7 @@ class StateNode(DAGBaseModel):
     @property
     def states(self) -> list[str]:
         """Retrieve list of defined states in `Transition` nodes"""
-        states: list[str] = []
-        for transition in self.transitions:
-            states.append(transition.state)
-        return states
+        return list(self.transitions.keys())
     
     @property
     def is_state(self) -> bool:
@@ -159,13 +145,14 @@ class StateNode(DAGBaseModel):
         """
 
         # Create state name to Transition map
-        state_transition_map: dict[str, int] = {}
-        for state, c in case["transitions"]:
-            state_transition_map[state] = c["id"]
+        state_transition_map: dict[str, int] = {
+            state: c["id"]
+            for state, c in case["transitions"]
+        }
 
         # Attach branch IDs to Transition nodes
-        for transition in self.transitions:
-            transition.id = state_transition_map[transition.state]
+        for state, transition in self.transitions.items():
+            transition.id = state_transition_map[state]
 
 # Union type representing any valid DAG node
 DAGNode = ActionNode | DecisionNode | StateNode

@@ -9,7 +9,7 @@ build:
       id: drone1
       initial: INIT
       transitions:
-        - state: INIT
+        INIT:
           next:
             condition:
               conditionType: Payload
@@ -28,7 +28,7 @@ build:
               action:
                 actionType: Finish
 
-        - state: UP
+        UP:
           next:
             condition:
               conditionType: Payload
@@ -54,7 +54,7 @@ build:
               action:
                 actionType: Finish
           
-        - state: DOWN
+        DOWN:
           next:
             condition:
               conditionType: Payload
@@ -80,7 +80,7 @@ build:
         id: drone2
         initial: INIT
         transitions:
-          - state: INIT
+          INIT:
             next:
               condition:
                 conditionType: Payload
@@ -99,7 +99,7 @@ build:
                 action:
                   actionType: Finish
 
-          - state: UP
+          UP:
             next:
               condition:
                 conditionType: Payload
@@ -125,7 +125,7 @@ build:
                 action:
                   actionType: Finish
             
-          - state: DOWN
+          DOWN:
             next:
               condition:
                 conditionType: Payload

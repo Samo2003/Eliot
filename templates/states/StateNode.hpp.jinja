@@ -40,9 +40,9 @@ public:
     inline unsigned get_next_packet_state(void) const noexcept {
         // Determine transition based on current state
         switch (_state) {
-{% for t in state.transitions %}
-            case State::{{ t.state }}:
-                return {{ t.id }};
+{% for state, transition in state.transitions.items() %}
+            case State::{{ state }}:
+                return {{ transition.id }};
 {% endfor %}
         }
 

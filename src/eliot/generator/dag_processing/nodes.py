@@ -80,7 +80,7 @@ def collect_nodes(
         states.add(node)
 
         # Recursively traverse state transitions
-        for t in node.transitions:
+        for t in node.transitions.values():
             conditions_transition, actions_transition, states_transition, generators_transition = collect_nodes(t.next)
 
             # Merge results

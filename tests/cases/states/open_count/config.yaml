@@ -5,7 +5,7 @@ build:
     id: Node
     initial: init
     transitions:
-      - state: INIT
+      INIT:
         next: 
           action: 
             actionType: ChangeState
@@ -14,7 +14,7 @@ build:
           next:
             action: 
               actionType: Drop
-      - state: open
+      open:
         next:
           condition:
             conditionType: Count
@@ -30,7 +30,7 @@ build:
             next:
               action: 
                 actionType: Drop
-      - state: close
+      close:
         next:
           action:
             actionType: Drop

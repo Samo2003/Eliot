@@ -74,13 +74,13 @@ def build_cases(
             # Each transition is converted into a Case
             "transitions": [
                 (
-                    transition.state, build_cases(
+                    state, build_cases(
                         transition.next, 
                         counter, 
-                        path + [f"STATE({node.id})={transition.state}"]
+                        path + [f"STATE({node.id})={state}"]
                     )
                 )
-                for transition in node.transitions
+                for state, transition in node.transitions.items()
             ],
             
             # Metadata for comment generation
