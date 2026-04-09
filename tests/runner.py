@@ -3,7 +3,7 @@ import socket
 import subprocess
 import time
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Tuple, cast
+from typing import Any, Callable, cast
 from eliot.generator.config import BINARY_NAME, ROOT_DIR
 from eliot.test_case.test_case import TestCase
 from .comm import ReceivedPacket, SentPacket, receive_packets, send_packets
@@ -61,7 +61,7 @@ class CaseRunner:
         workspace.mkdir(parents=True, exist_ok=True)
         return workspace
     
-    def _write_test_case(self, case: Case) -> List[str]:
+    def _write_test_case(self, case: Case) -> list[str]:
         """
         Serialize test case configuration for generator.
         """
@@ -130,7 +130,7 @@ class CaseRunner:
         assert line.startswith("LISTEN_PORT=")
         return int(line.split("=")[1])
 
-    def _send_packets(self, case: Case, port: int) -> Tuple[List[SentPacket], List[ReceivedPacket]]:
+    def _send_packets(self, case: Case, port: int) -> tuple[list[SentPacket], list[ReceivedPacket]]:
         """
         Send packets to running binary and collect responses.
         """
@@ -155,7 +155,7 @@ class CaseRunner:
         if not assert_file.exists():
             raise RuntimeError(f"Missing assert.py in {case_path.parent}")
 
-        namespace: Dict[str, Any] = {}
+        namespace: dict[str, Any] = {}
         exec(assert_file.read_text(), namespace)
 
         if "check" not in namespace:

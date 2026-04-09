@@ -1,4 +1,3 @@
-from typing import List, Tuple
 import math
 from eliot.generator.config import GeneratorContext
 from .base import GeneratorBase
@@ -57,7 +56,7 @@ class ValueGeneratorGenerator(GeneratorBase):
                 }
             )
 
-    def _generate_ziggurat_tables(self) -> Tuple[List[int], List[float], List[float]]:
+    def _generate_ziggurat_tables(self) -> tuple[list[int], list[float], list[float]]:
         """
         Generate lookup tables for the Ziggurat algorithm
         used for fast normal distribution sampling.

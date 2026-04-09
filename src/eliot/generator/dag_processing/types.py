@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import List, Literal, Tuple, TypedDict
+from typing import Literal, TypedDict
 from eliot.DAG import StateNode, Condition, Action
 
 class CaseBase(TypedDict):
@@ -9,7 +9,7 @@ class CaseBase(TypedDict):
     """
     
     id: int                             # Unique identifier of this case
-    path: List[str]                     # Logical path in DAG for generating comments
+    path: list[str]                     # Logical path in DAG for generating comments
     label: str                          # Node label for generating comments
 
 class DecisionCase(CaseBase):
@@ -42,7 +42,7 @@ class StateCase(CaseBase):
 
     type: Literal["StateCase"]          # Discriminator for runtime/code generation
     state_node: StateNode               # Associated state definition
-    transitions: List[Tuple[str, Case]] # Each transition maps a state name to the next case
+    transitions: list[tuple[str, Case]] # Each transition maps a state name to the next case
 
 # Unified type used throughout generation pipeline
 Case = DecisionCase | ActionCase | StateCase

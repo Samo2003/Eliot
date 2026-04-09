@@ -1,4 +1,4 @@
-from typing import List, cast
+from typing import cast
 from eliot.DAG.dag import DAG, ActionNode, DecisionNode
 from eliot.DAG.actions import Action
 from eliot.DAG.actions.drop import Drop
@@ -6,7 +6,7 @@ from eliot.DAG.actions.finish import Finish
 from .test_case import TestCase, Rule
 
 def build_action_chain(
-    actions: List[Action],
+    actions: list[Action],
     default_node: ActionNode | DecisionNode
 ) -> ActionNode:
     """

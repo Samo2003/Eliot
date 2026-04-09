@@ -1,12 +1,12 @@
 import sys
 import json
-from typing import Any, Callable, List
+from typing import Any, Callable
 import click
 from pathlib import Path
 from eliot.generator import Generator, GeneratorConfig
 from eliot.DAG import DAG
 
-COMMON_OPTIONS: List[Callable[[Callable[..., Any]], Callable[..., Any]]] = [
+COMMON_OPTIONS: list[Callable[[Callable[..., Any]], Callable[..., Any]]] = [
     click.option(
         "--dag",
         "-d",

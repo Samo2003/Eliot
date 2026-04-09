@@ -1,12 +1,12 @@
 from itertools import count
-from typing import Iterator, List
+from typing import Iterator
 from eliot.DAG import DAGNode, DecisionNode, ActionNode, DAG
 from .types import Case
 
 def build_cases(
     node: DAGNode, 
     counter: Iterator[int], 
-    path: List[str]
+    path: list[str]
 ) -> Case:
     """
     Recursively transform a DAGNode into a Case-based
@@ -88,7 +88,7 @@ def build_cases(
             "label": f"STATE({node.id})"
         }
 
-def flatten_cases(root: Case) -> List[Case]:
+def flatten_cases(root: Case) -> list[Case]:
     """
     Flatten Case tree into a linear list.
     
@@ -99,7 +99,7 @@ def flatten_cases(root: Case) -> List[Case]:
         List of Cases
     """
 
-    result: List[Case] = []
+    result: list[Case] = []
 
     # Recursive inorder traversing flattening function
     def flatten(node: Case) -> None:
@@ -116,7 +116,7 @@ def flatten_cases(root: Case) -> List[Case]:
     flatten(root)
     return result
 
-def get_cases(dag: DAG) -> List[Case]:
+def get_cases(dag: DAG) -> list[Case]:
     """
     Convert DAG into flattened Case list.
     """

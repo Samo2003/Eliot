@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from typing import Dict, List, Set
 from .comm import ReceivedPacket, SentPacket
 
 @dataclass
@@ -38,19 +37,19 @@ class ExchangeStats:
     Computes statistics and relationships between sent and received packets.
     """
 
-    def __init__(self, sent: List[SentPacket], received: List[ReceivedPacket]):
+    def __init__(self, sent: list[SentPacket], received: list[ReceivedPacket]):
         self.sent_count = len(sent)
         self.sent = sent
         self.received_count = len(received)
         self.received = received
 
         # Map sent packets by sequence number for quick lookup
-        sent_by_seq: Dict[int, SentPacket] = {
+        sent_by_seq: dict[int, SentPacket] = {
             s.seq: s for s in sent
         }
 
         # Map first received packet per sequence number
-        recv_by_seq: Dict[int, ReceivedPacket] = {}
+        recv_by_seq: dict[int, ReceivedPacket] = {}
         for r in received:
             if r.seq is not None and r.seq not in recv_by_seq:
                 recv_by_seq[r.seq] = r
@@ -65,7 +64,7 @@ class ExchangeStats:
         ]
 
         # Track sequence numbers that were successfully matched
-        used_seqs: Set[int] = {
+        used_seqs: set[int] = {
             r.seq for r in recv_by_seq.values()
             if r.seq in sent_by_seq
         }
@@ -92,14 +91,14 @@ class ExchangeStats:
             and all(not e.has_response for e in self.exchanges[n:])
         )
     
-    def bit_diff(self, a: bytes, b: bytes) -> List[int]:
+    def bit_diff(self, a: bytes, b: bytes) -> list[int]:
         """
         Computes bit-level differences between two byte sequences.
 
         Returns:
             List of bit indices (0-based) that differ.
         """
-        out: List[int] = []
+        out: list[int] = []
         for i, (x, y) in enumerate(zip(a, b)):
             d = x ^ y
             for bit in range(8):

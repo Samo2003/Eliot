@@ -1,6 +1,6 @@
 import yaml
 from pathlib import Path
-from typing import List, Literal
+from typing import Literal
 from pydantic import BaseModel
 from eliot.DAG import Condition, Action
 
@@ -13,8 +13,8 @@ class Rule(BaseModel):
     """
 
     type: Literal["all", "any"]                     # Logical operator defining how conditions are evaluated.
-    conditions: List[Condition]                     # List of Conditions.
-    actions: List[Action]                           # List of Actions
+    conditions: list[Condition]                     # List of Conditions.
+    actions: list[Action]                           # List of Actions
 
 class TestCase(BaseModel):
     """
@@ -25,7 +25,7 @@ class TestCase(BaseModel):
     """
 
     defaultAction: Literal["Finish", "Drop"]        # Default action applied to packets
-    rules: List[Rule]                               # List of rules for evaluation
+    rules: list[Rule]                               # List of rules for evaluation
 
 def load_test_case(file_path: Path) -> TestCase:
     """

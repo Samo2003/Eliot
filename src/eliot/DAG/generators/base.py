@@ -1,6 +1,6 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import Any, Dict, TypeVar, Generic, final
+from typing import Any, TypeVar, Generic, final
 from pydantic import model_validator
 from eliot.DAG.dag_base_model import DAGBaseModel
 
@@ -32,7 +32,7 @@ class ValueGeneratorBase(DAGBaseModel, Generic[T, N], ABC):
     seed: int | None = None
     
     @model_validator(mode="before")
-    def default_min(cls, values: Dict[str, Any]) -> Dict[str, Any]:
+    def default_min(cls, values: dict[str, Any]) -> dict[str, Any]:
         if "min" not in values:
             values["min"] = 0
         return values

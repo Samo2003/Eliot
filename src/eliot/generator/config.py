@@ -1,7 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List, Set
 from pydantic import BaseModel, model_validator
 from eliot.DAG import Condition, Action, StateNode, ValueGenerator
 from .dag_processing.types import Case
@@ -55,16 +54,16 @@ class GeneratorContext:
     generated_dir: Path
 
     # Unique conditions
-    conditions: Set[Condition]
+    conditions: set[Condition]
 
     # Unique actions
-    actions: Set[Action]
+    actions: set[Action]
 
     # All state nodes from DAG
-    state_nodes: Set[StateNode]
+    state_nodes: set[StateNode]
 
     # Value generators
-    generators: Set[ValueGenerator]
+    generators: set[ValueGenerator]
 
     # Traits file name
     traits: str
@@ -74,4 +73,4 @@ class GeneratorContext:
     require_time: bool
 
     # Processed execution cases
-    cases: List[Case]
+    cases: list[Case]

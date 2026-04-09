@@ -1,7 +1,7 @@
 from __future__ import annotations
 from abc import ABC
 import random
-from typing import Literal, Tuple, cast, final
+from typing import Literal, cast, final
 from pydantic import model_validator
 from .base import ValueGeneratorBase, T, N
 
@@ -23,7 +23,7 @@ class UniformBase(ValueGeneratorBase[T, N], ABC):
     
     @property
     @final
-    def min_max(self) -> Tuple[N, N]:
+    def min_max(self) -> tuple[N, N]:
         """Convert interval range to specified type for Pylance"""
         min_val = self.min
         max_val = cast(N, self.max)

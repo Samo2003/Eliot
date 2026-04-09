@@ -1,9 +1,8 @@
-from typing import Set, Tuple
 from eliot.DAG import Condition, Action, ValueGeneratorBase, StateNode, DecisionNode, ActionNode, DAGNode, ValueGenerator
 
 def get_generators(
     node: Condition | Action
-) -> Set[ValueGenerator]:
+) -> set[ValueGenerator]:
     """
     Extract value generators from a Condition or Action instance.
 
@@ -26,11 +25,11 @@ def get_generators(
 
 def collect_nodes(
     node: DAGNode
-) -> Tuple[
-    Set[Condition],
-    Set[Action],
-    Set[StateNode],
-    Set[ValueGenerator]
+) -> tuple[
+    set[Condition],
+    set[Action],
+    set[StateNode],
+    set[ValueGenerator]
 ]:
     """
     Recursively traverse the DAG and collect all unique nodes.
@@ -42,10 +41,10 @@ def collect_nodes(
         Set of recursively collected nodes.
     """
 
-    conditions: Set[Condition] = set()
-    actions: Set[Action] = set()
-    states: Set[StateNode] = set()
-    generators: Set[ValueGenerator] = set()
+    conditions: set[Condition] = set()
+    actions: set[Action] = set()
+    states: set[StateNode] = set()
+    generators: set[ValueGenerator] = set()
 
     if isinstance(node, DecisionNode):
         # Collect condition from decision node

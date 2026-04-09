@@ -1,8 +1,7 @@
-from typing import List
 from tests.stats import ExchangeStats
 
 def check(stats: ExchangeStats) -> None:
-    intervals: List[int] = []
+    intervals: list[int] = []
     last_drop = 0
     counter = 0
 

@@ -1,12 +1,11 @@
-from typing import Dict, Set, List
 from eliot.DAG.actions.change_state import ChangeState
 from eliot.DAG import StateNode
 from .types import Case, StateCase
 
 def process_state_nodes(
-    state_nodes: Set[StateNode],
-    actions: List[ChangeState],
-    cases: List[Case]
+    state_nodes: set[StateNode],
+    actions: list[ChangeState],
+    cases: list[Case]
 ) -> None:
     """
     Post-processing step for state machine nodes.
@@ -18,9 +17,9 @@ def process_state_nodes(
     4. Enriches ChangeState actions with resolved C++ type information.
 
     Args:
-        state_nodes: Set of state nodes
-        actions: Set of actions
-        cases: Set of flattened DAG nodes into cases
+        state_nodes: set of state nodes
+        actions: set of actions
+        cases: set of flattened DAG nodes into cases
     """
 
     def find_case(id: str) -> StateCase:
@@ -41,7 +40,7 @@ def process_state_nodes(
         )
 
     # Build ID -> StateNode mapping and ensure uniqueness
-    state_node_map: Dict[str, StateNode] = {}
+    state_node_map: dict[str, StateNode] = {}
     for node in state_nodes:
         if node.id in state_node_map:
             raise ValueError(f"Duplicate StateNode id detected: {node.id}")
@@ -50,8 +49,8 @@ def process_state_nodes(
         # Attach transition identifiers to StateNode model
         node.attach_transition_ids(find_case(node.id))
     
-    used_state_nodes: Set[str] = set()
-    used_states: Dict[str, Set[str]] = {node.id: set() for node in state_nodes}
+    used_state_nodes: set[str] = set()
+    used_states: dict[str, set[str]] = {node.id: set() for node in state_nodes}
 
     # Validate ChangeState action references
     for action in actions:

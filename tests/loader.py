@@ -2,7 +2,7 @@ from __future__ import annotations
 from pathlib import Path
 from pydantic import BaseModel, model_validator
 import yaml
-from typing import Any, Dict, List, Literal, cast
+from typing import Any, Literal, cast
 from eliot.DAG import DAG
 from eliot.test_case.test_case import TestCase
 
@@ -75,7 +75,7 @@ class Case(BaseModel):
 
     name: str
     timeout: float = 1
-    send: List[Step]
+    send: list[Step]
     build: TestCase | DAG
 
     @model_validator(mode="before")
@@ -88,7 +88,7 @@ class Case(BaseModel):
         if not isinstance(data, dict):
             return data
         
-        raw = cast(Dict[str, Any], data)
+        raw = cast(dict[str, Any], data)
 
         build = raw.get("build")
         if not isinstance(build, dict):

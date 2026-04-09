@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Any, Dict, List, Set
+from typing import Any
 from pydantic import BaseModel, PrivateAttr, model_validator
 from .dag_base_model import DAGBaseModel
 from .conditions import Condition
@@ -107,7 +107,7 @@ class StateNode(DAGBaseModel):
     initial: str
 
     # Transitions for each defined state
-    transitions: List[Transition]
+    transitions: list[Transition]
 
     @model_validator(mode="after")
     def validate_node(self) -> StateNode:
@@ -118,7 +118,7 @@ class StateNode(DAGBaseModel):
         - Initial state must exist among transitions.
         - Node ID and state names are normalized to uppercase.
         """
-        used: Set[str] = set()
+        used: set[str] = set()
         for transition in self.transitions:
             if transition.state in used:
                 raise ValueError(
@@ -135,9 +135,9 @@ class StateNode(DAGBaseModel):
         return self
     
     @property
-    def states(self) -> List[str]:
+    def states(self) -> list[str]:
         """Retrieve list of defined states in `Transition` nodes"""
-        states: List[str] = []
+        states: list[str] = []
         for transition in self.transitions:
             states.append(transition.state)
         return states
@@ -159,7 +159,7 @@ class StateNode(DAGBaseModel):
         """
 
         # Create state name to Transition map
-        state_transition_map: Dict[str, int] = {}
+        state_transition_map: dict[str, int] = {}
         for state, c in case["transitions"]:
             state_transition_map[state] = c["id"]
 

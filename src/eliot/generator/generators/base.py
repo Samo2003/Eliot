@@ -1,7 +1,7 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Any, Dict, List, ClassVar, Type
+from typing import Any, ClassVar, Type
 from jinja2 import Environment, FileSystemLoader
 from jinja2.exceptions import TemplateError
 from eliot.generator.config import GeneratorContext, TEMPLATE_DIR
@@ -15,7 +15,7 @@ class GeneratorBase(ABC):
     """
 
     # Registry of all generator modules
-    registry: ClassVar[List[Type[GeneratorBase]]] = []
+    registry: ClassVar[list[Type[GeneratorBase]]] = []
 
     # Shared Jinja2 environment used for template rendering
     env: ClassVar[Environment] = Environment(
@@ -49,7 +49,7 @@ class GeneratorBase(ABC):
         self, 
         template_name: str, 
         output_path: Path,
-        context_data: Dict[str, Any] | None = None
+        context_data: dict[str, Any] | None = None
     ) -> None:
         """
         Render a Jinja2 template and write the result to a file.

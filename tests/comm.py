@@ -2,7 +2,7 @@ import socket
 import struct
 import time
 import os
-from typing import List, cast
+from typing import cast
 from scapy.layers.inet import TCP, UDP, ICMP, IP
 from scapy.packet import Packet, Raw
 from scapy.layers.inet6 import IPv6
@@ -90,12 +90,12 @@ def build_packet(step: Step, seq: int) -> bytes:
         datagram = IP(src=step.src, dst=step.dst) / header / payload
     return bytes(datagram)
 
-def send_packets(steps: List[Step], sock: socket.socket) -> List[SentPacket]:
+def send_packets(steps: list[Step], sock: socket.socket) -> list[SentPacket]:
     """
     Send packets defined in test steps.
     """
 
-    sent_packets: List[SentPacket] = []
+    sent_packets: list[SentPacket] = []
     seq = 0
 
     for step in steps:
@@ -129,12 +129,12 @@ def send_packets(steps: List[Step], sock: socket.socket) -> List[SentPacket]:
 
     return sent_packets
 
-def receive_packets(sock: socket.socket, timeout: float) -> List[ReceivedPacket]:
+def receive_packets(sock: socket.socket, timeout: float) -> list[ReceivedPacket]:
     """
     Receive packets until timeout expires.
     """
 
-    packets: List[ReceivedPacket] = []
+    packets: list[ReceivedPacket] = []
     sock.settimeout(0.1)
 
     deadline = time.time() + timeout
