@@ -1,41 +1,7 @@
 from typing import Any
-from pydantic import BaseModel, PrivateAttr, model_validator
+from pydantic import PrivateAttr, model_validator
 from eliot.DAG.dag_base_model import DAGBaseModel
 from .node import DAGNode
-
-class Transition(BaseModel):
-    """
-    Represents a single transition in a StateNode.
-
-    Each transition maps a state name to the next DAG node.
-    During generation, a unique case ID is attached for
-    switch-based dispatch.
-    """
-
-    # Next node for this state
-    next: DAGNode
-
-    # Case ID assigned during IR generation
-    _id: int | None = PrivateAttr(default=None)
-    
-    @property
-    def id(self) -> int:
-        """
-        Retrieve assigned case ID.
-
-        Raises:
-            RuntimeError if ID has not been attached.
-        """
-        if self._id is None:
-            raise RuntimeError(
-                f"Transition ID not attached to transition"
-            )
-        return self._id
-    
-    @id.setter
-    def id(self, value: int) -> None:
-        """Assign branch ID used during generating"""
-        self._id = value
 
 class StateNode(DAGBaseModel, DAGNode):
     """
@@ -49,7 +15,10 @@ class StateNode(DAGBaseModel, DAGNode):
     initial: str
 
     # Transitions for each defined state
-    transitions: dict[str, Transition]
+    transitions: dict[str, DAGNode]
+    
+    # Maps state to transition id
+    _state_map: dict[str, int] = PrivateAttr(default={})
 
     @model_validator(mode="after")
     def validate_node(self) -> StateNode:
@@ -63,7 +32,7 @@ class StateNode(DAGBaseModel, DAGNode):
         self.initial = self.initial.upper()
         
         # Normalize keys
-        new_transitions: dict[str, Transition] = {
+        new_transitions: dict[str, DAGNode] = {
             key.upper(): transition
             for key, transition in self.transitions.items()
         }
@@ -78,7 +47,7 @@ class StateNode(DAGBaseModel, DAGNode):
     
     @property
     def states(self) -> list[str]:
-        """Retrieve list of defined states in `Transition` nodes"""
+        """Retrieve list of defined states"""
         return list(self.transitions.keys())
     
     @property
@@ -96,13 +65,8 @@ class StateNode(DAGBaseModel, DAGNode):
         The provided `case` corresponds to the IR StateCase
         produced during DAG processing.
         """
-
-        # Create state name to Transition map
-        state_transition_map: dict[str, int] = {
+        
+        self._state_map = {
             state: c["id"]
             for state, c in case["transitions"]
         }
-
-        # Attach branch IDs to Transition nodes
-        for state, transition in self.transitions.items():
-            transition.id = state_transition_map[state]

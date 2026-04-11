@@ -10,7 +10,75 @@ build:
       initial: INIT
       transitions:
         INIT:
-          next:
+          condition:
+            conditionType: Payload
+            pattern: UP
+            encoding: ascii
+            l4: true
+          if_true:
+            action:
+              actionType: ChangeState
+              target: drone1
+              state: UP
+            next:
+              action:
+                actionType: Finish
+          if_false:
+            action:
+              actionType: Finish
+
+        UP:
+          condition:
+            conditionType: Payload
+            pattern: DOWN
+            encoding: ascii
+            l4: true
+          if_true:
+            condition:
+              conditionType: EveryN
+              N: 3
+            if_true:
+              action:
+                actionType: ChangeState
+                target: drone1
+                state: DOWN
+              next:
+                action:
+                  actionType: Finish
+            if_false:
+              action:
+                actionType: Drop
+          if_false:
+            action:
+              actionType: Finish
+          
+        DOWN:
+          condition:
+            conditionType: Payload
+            pattern: DOWN
+            encoding: ascii
+            l4: true
+          if_true:
+            action:
+              actionType: ChangeState
+              target: drone1
+              state: UP
+            next:
+              action:
+                actionType: Finish
+          if_false:
+            action:
+              actionType: Finish
+
+    if_false:
+      condition:
+        conditionType: IP
+        dst: 10.10.10.20
+      if_true:
+        id: drone2
+        initial: INIT
+        transitions:
+          INIT:
             condition:
               conditionType: Payload
               pattern: UP
@@ -19,7 +87,7 @@ build:
             if_true:
               action:
                 actionType: ChangeState
-                target: drone1
+                target: drone2
                 state: UP
               next:
                 action:
@@ -28,8 +96,7 @@ build:
               action:
                 actionType: Finish
 
-        UP:
-          next:
+          UP:
             condition:
               conditionType: Payload
               pattern: DOWN
@@ -42,7 +109,7 @@ build:
               if_true:
                 action:
                   actionType: ChangeState
-                  target: drone1
+                  target: drone2
                   state: DOWN
                 next:
                   action:
@@ -53,9 +120,8 @@ build:
             if_false:
               action:
                 actionType: Finish
-          
-        DOWN:
-          next:
+            
+          DOWN:
             condition:
               conditionType: Payload
               pattern: DOWN
@@ -64,7 +130,7 @@ build:
             if_true:
               action:
                 actionType: ChangeState
-                target: drone1
+                target: drone2
                 state: UP
               next:
                 action:
@@ -72,77 +138,7 @@ build:
             if_false:
               action:
                 actionType: Finish
-    if_false:
-      condition:
-        conditionType: IP
-        dst: 10.10.10.20
-      if_true:
-        id: drone2
-        initial: INIT
-        transitions:
-          INIT:
-            next:
-              condition:
-                conditionType: Payload
-                pattern: UP
-                encoding: ascii
-                l4: true
-              if_true:
-                action:
-                  actionType: ChangeState
-                  target: drone2
-                  state: UP
-                next:
-                  action:
-                    actionType: Finish
-              if_false:
-                action:
-                  actionType: Finish
 
-          UP:
-            next:
-              condition:
-                conditionType: Payload
-                pattern: DOWN
-                encoding: ascii
-                l4: true
-              if_true:
-                condition:
-                  conditionType: EveryN
-                  N: 3
-                if_true:
-                  action:
-                    actionType: ChangeState
-                    target: drone2
-                    state: DOWN
-                  next:
-                    action:
-                      actionType: Finish
-                if_false:
-                  action:
-                    actionType: Drop
-              if_false:
-                action:
-                  actionType: Finish
-            
-          DOWN:
-            next:
-              condition:
-                conditionType: Payload
-                pattern: DOWN
-                encoding: ascii
-                l4: true
-              if_true:
-                action:
-                  actionType: ChangeState
-                  target: drone2
-                  state: UP
-                next:
-                  action:
-                    actionType: Finish
-              if_false:
-                action:
-                  actionType: Finish
       if_false:
         action:
           actionType: Finish

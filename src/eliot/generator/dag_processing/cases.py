@@ -79,8 +79,8 @@ def build_cases(
             "transitions": [
                 (
                     state, build_cases(
-                        transition.next, 
-                        counter, 
+                        transition,
+                        counter,
                         path + [f"STATE({node.id})={state}"]
                     )
                 )

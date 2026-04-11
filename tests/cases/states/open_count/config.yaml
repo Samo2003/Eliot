@@ -6,34 +6,31 @@ build:
     initial: init
     transitions:
       INIT:
-        next: 
+        action: 
+          actionType: ChangeState
+          target: Node
+          state: open
+        next:
+          action: 
+            actionType: Drop
+      open:
+        condition:
+          conditionType: Count
+          after: 3
+        if_false:
+          action: 
+            actionType: Finish
+        if_true:
           action: 
             actionType: ChangeState
             target: Node
-            state: open
+            state: close
           next:
             action: 
               actionType: Drop
-      open:
-        next:
-          condition:
-            conditionType: Count
-            after: 3
-          if_false:
-            action: 
-              actionType: Finish
-          if_true:
-            action: 
-              actionType: ChangeState
-              target: Node
-              state: close
-            next:
-              action: 
-                actionType: Drop
       close:
-        next:
-          action:
-            actionType: Drop
+        action:
+          actionType: Drop
 
 send:
   - count: 7

@@ -48,27 +48,24 @@ build:
           initial: ACTIVE
           transitions:
             ACTIVE:
+              action:
+                actionType: Finish
+            
+            DELAY:
+              action:
+                actionType: Delay
+                n:
+                  generatorType: NormalInt
+                  m: 200
+                  s: 25
+                  seed: 123456
               next:
                 action:
                   actionType: Finish
             
-            DELAY:
-              next:
-                action:
-                  actionType: Delay
-                  n:
-                    generatorType: NormalInt
-                    m: 200
-                    s: 25
-                    seed: 123456
-                next:
-                  action:
-                    actionType: Finish
-            
             DROP:
-              next:
-                action:
-                  actionType: Drop
+              action:
+                actionType: Drop
 
 timeout: 2
 

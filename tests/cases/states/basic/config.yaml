@@ -6,18 +6,16 @@ build:
     initial: init
     transitions:
       INIT:
-        next: 
-          action: 
-            actionType: ChangeState
-            target: Node
-            state: end
-          next:
-            action: 
-              actionType: Finish
-      end:
+        action: 
+          actionType: ChangeState
+          target: Node
+          state: end
         next:
           action: 
-            actionType: Drop
+            actionType: Finish
+      end:
+        action: 
+          actionType: Drop
 
 send:
   - count: 5

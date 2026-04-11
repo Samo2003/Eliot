@@ -5,7 +5,7 @@ from eliot.DAG.conditions import Condition
 from .node import DAGNode
 from .action import ActionNode
 from .decision import DecisionNode
-from .state import StateNode, Transition
+from .state import StateNode
 
 class DAGNodeFactory:
     """
@@ -81,14 +81,11 @@ class DAGNodeFactory:
 
         - Iterates through transitions
         - Recursively builds target nodes
-        - Wraps each transition in a Transition object
         """
         transitions_data: dict[str, dict[str, Any]] = data.get("transitions", {})
 
-        transitions: dict[str, Transition] = {
-            state: Transition(
-                next=DAGNodeFactory.create(t["next"])
-            )
+        transitions: dict[str, DAGNode] = {
+            state: DAGNodeFactory.create(t)
             for state, t in transitions_data.items()
         }
 

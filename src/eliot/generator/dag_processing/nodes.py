@@ -36,6 +36,9 @@ def collect_nodes(
 
     Args:
         node: DAG node to process.
+        
+    Raises:
+        RuntimeError when unknown node type is encountered.
 
     Returns:
         Set of recursively collected nodes.
@@ -81,7 +84,7 @@ def collect_nodes(
 
         # Recursively traverse state transitions
         for t in node.transitions.values():
-            conditions_transition, actions_transition, states_transition, generators_transition = collect_nodes(t.next)
+            conditions_transition, actions_transition, states_transition, generators_transition = collect_nodes(t)
 
             # Merge results
             conditions |= conditions_transition
