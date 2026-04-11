@@ -1,6 +1,7 @@
 from itertools import count
 from typing import Iterator
-from eliot.DAG import DAGNode, DecisionNode, ActionNode, DAG
+from eliot.DAG import DAG
+from eliot.DAG.nodes import StateNode, DAGNode, DecisionNode, ActionNode
 from .types import Case
 
 def build_cases(
@@ -19,6 +20,9 @@ def build_cases(
         node: DAG node to process
         counter: Counter used for generating unique case identifiers
         path: Path to node id DAG
+        
+    Raises:
+        RuntimeError in case of an unknown DAGNode type
 
     Returns:
         Prepared case node
@@ -66,7 +70,7 @@ def build_cases(
             "path": path,
             "label": f"ACTION({node.action.actionType})"
         }
-    else:
+    elif isinstance(node, StateNode):
         return {
             "id": node_id,
             "type": "StateCase",
@@ -87,6 +91,8 @@ def build_cases(
             "path": path,
             "label": f"STATE({node.id})"
         }
+
+    raise RuntimeError(f"Unknown node type in build_cases: {node.__class__.__name__}")
 
 def flatten_cases(root: Case) -> list[Case]:
     """

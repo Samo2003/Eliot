@@ -76,7 +76,7 @@ def collect_nodes(
             states |= states_next
             generators |= generators_next
 
-    else:
+    elif isinstance(node, StateNode):
         states.add(node)
 
         # Recursively traverse state transitions
@@ -88,5 +88,8 @@ def collect_nodes(
             actions |= actions_transition
             states |= states_transition
             generators |= generators_transition
+    
+    else:
+        raise RuntimeError(f"Unknown node type in collect_nodes: {node.__class__.__name__}")
 
     return conditions, actions, states, generators

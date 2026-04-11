@@ -18,7 +18,7 @@ class DAGBaseModel(BaseModel, ABC):
 
     def __hash__(self) -> int:
         """
-        Allows DAG nodes to be used in sets.
+        Allows DAG elements to be used in sets.
         """
 
         return hash(self.cpp_type)

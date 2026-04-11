@@ -1,5 +1,6 @@
 from typing import cast
-from eliot.DAG.dag import DAG, ActionNode, DecisionNode
+from eliot.DAG.dag import DAG
+from eliot.DAG.nodes import ActionNode, DecisionNode
 from eliot.DAG.actions import Action
 from eliot.DAG.actions.drop import Drop
 from eliot.DAG.actions.finish import Finish

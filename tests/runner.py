@@ -74,7 +74,7 @@ class CaseRunner:
         else:
             path = self.workspace / "dag.yaml"
             with open(path, "w", encoding="utf-8") as f:
-                yaml.safe_dump(case.build.model_dump(), f)
+                yaml.safe_dump(case.build.model_dump(serialize_as_any=True), f)
             return ["-d", str(path)]
     
     def _generate_and_build(self, case: Case) -> Path:
