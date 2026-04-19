@@ -5,10 +5,10 @@ build:
   rules:
     - type: all
       conditions: 
-        - conditionType: IPVersion
+        - type: IPVersion
           v: 4
       actions:
-        - actionType: Finish
+        - type: Finish
 
 send:
   - count: 1

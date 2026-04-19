@@ -2,16 +2,16 @@
 
 root:
   condition:
-    conditionType: Protocol
+    type: Protocol
     id: 17    # UDP
   if_true:
     action:
-      actionType: Replicate
+      type: Replicate
       n: 1
     next:
       action:
-        actionType: Finish
+        type: Finish
   if_false:
     action:
-      actionType: Finish
+      type: Finish
   

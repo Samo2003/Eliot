@@ -1,11 +1,11 @@
 # Drops every third packet
 root:
   condition:
-    conditionType: EveryN
+    type: EveryN
     N: 3
   if_true:
     action:
-      actionType: Drop
+      type: Drop
   if_false:
     action:
-      actionType: Finish
+      type: Finish

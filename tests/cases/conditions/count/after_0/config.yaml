@@ -5,11 +5,11 @@ build:
   rules:
     - type: all
       conditions: 
-        - conditionType: Count
+        - type: Count
           after: 0
           duration: 2
       actions:
-        - actionType: Finish
+        - type: Finish
 
 send: 
   - count: 12

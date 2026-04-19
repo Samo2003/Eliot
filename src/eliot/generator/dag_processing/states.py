@@ -1,10 +1,10 @@
-from eliot.DAG.actions.change_state import ChangeState
+from eliot.DAG.actions.set_state import SetState
 from eliot.DAG import StateNode
 from .types import Case, StateCase
 
 def process_state_nodes(
     state_nodes: set[StateNode],
-    actions: list[ChangeState],
+    actions: list[SetState],
     cases: list[Case]
 ) -> None:
     """
@@ -13,8 +13,8 @@ def process_state_nodes(
     This function:
     1. Validates uniqueness of StateNode identifiers.
     2. Links StateNode definitions with their corresponding StateCase.
-    3. Verifies semantic correctness of ChangeState actions.
-    4. Enriches ChangeState actions with resolved C++ type information.
+    3. Verifies semantic correctness of SetState actions.
+    4. Enriches SetState actions with resolved C++ type information.
 
     Args:
         state_nodes: set of state nodes
@@ -52,12 +52,12 @@ def process_state_nodes(
     used_state_nodes: set[str] = set()
     used_states: dict[str, set[str]] = {node.id: set() for node in state_nodes}
 
-    # Validate ChangeState action references
+    # Validate SetState action references
     for action in actions:
         # Verify that referenced StateNode exists
         if action.target not in state_node_map:
             raise ValueError(
-                f"Undefined reference to state node in ChangeState action: {action.target}"
+                f"Undefined reference to state node in SetState action: {action.target}"
             )
 
         target_node = state_node_map[action.target]

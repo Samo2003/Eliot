@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from pathlib import Path
-from eliot.DAG.actions.change_state import ChangeState
+from eliot.DAG.actions.set_state import SetState
 from eliot.generator.config import GeneratorContext
 from eliot.DAG import DAG
 from .nodes import collect_nodes
@@ -56,7 +56,7 @@ class DAGProcessor:
             [
                 node 
                 for node in collected_actions 
-                if isinstance(node, ChangeState)
+                if isinstance(node, SetState)
             ],
             cases
         )

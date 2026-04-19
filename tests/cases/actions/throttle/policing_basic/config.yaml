@@ -6,7 +6,7 @@ build:
     - type: all
       conditions: []
       actions:
-        - actionType: Throttle
+        - type: Throttle
           mode: policing
           rate: 1000
 

@@ -11,13 +11,13 @@ class ActionBase(DAGBaseModel, Generic[T], ABC):
     """
 
     # Discriminator used by Pydantic
-    actionType: T
+    type: T
 
     @property
     @final
     def cpp_type_base(self) -> str:
         """Returns common action base name"""
-        return f"{self.actionType}Action"
+        return f"{self.type}Action"
     
     @property
     def is_final(self) -> bool:

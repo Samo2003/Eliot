@@ -5,11 +5,11 @@ build:
   rules:
     - type: all
       conditions: 
-        - conditionType: Payload
+        - type: Payload
           pattern: aaaa
-          type: hex
+          pattern_type: hex
       actions:
-        - actionType: Finish
+        - type: Finish
 
 send:
   - payload:

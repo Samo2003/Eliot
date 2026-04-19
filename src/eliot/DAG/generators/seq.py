@@ -36,7 +36,7 @@ class SeqBase(ValueGeneratorBase[T, N], ABC):
             )
         if self.seed is not None:
             raise ValueError(
-                f"Seed value has no effect in {self.generatorType}"
+                f"Seed value has no effect in {self.type}"
             )
         if self.mode == "reverse" and self.step >= 0 and self.max is None:
             raise ValueError(

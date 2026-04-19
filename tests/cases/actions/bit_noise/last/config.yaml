@@ -6,7 +6,7 @@ build:
     - type: all
       conditions: []
       actions:
-        - actionType: BitNoise
+        - type: BitNoise
           n: 3
           mode: last
           end: -32    # Skip seq in payload (last 4 bytes)

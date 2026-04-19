@@ -8,7 +8,7 @@ class StateNode(DAGBaseModel, DAGNode):
     Represents a state node in DAG.
     """
 
-    # Identifier used for ChangeState references
+    # Identifier used for SetState references
     id: str
 
     # Initial state of the node

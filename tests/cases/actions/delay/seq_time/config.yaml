@@ -6,9 +6,9 @@ build:
     - type: all
       conditions: []
       actions:
-        - actionType: Delay
+        - type: Delay
           n: 
-            generatorType: SeqTimeInt
+            type: SeqTimeInt
             min: 20
             max: 100
             step: 20

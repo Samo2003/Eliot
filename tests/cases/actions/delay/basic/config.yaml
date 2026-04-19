@@ -6,7 +6,7 @@ build:
     - type: all
       conditions: []
       actions:
-        - actionType: Delay
+        - type: Delay
           n: 100
 
 send:

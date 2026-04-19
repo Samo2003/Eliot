@@ -5,11 +5,11 @@ build:
   rules:
     - type: all
       conditions:
-        - conditionType: Payload
+        - type: Payload
           pattern: GET.*HTTP
-          type: regex
+          pattern_type: regex
       actions:
-        - actionType: Finish
+        - type: Finish
 
 send:
   - payload: 

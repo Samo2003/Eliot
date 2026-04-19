@@ -5,10 +5,10 @@ build:
   rules:
     - type: all
       conditions: 
-        - conditionType: Port
+        - type: Port
           dst: 5555
       actions:
-        - actionType: Finish
+        - type: Finish
 
 send:
   - sport: 5555

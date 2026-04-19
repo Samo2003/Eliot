@@ -5,14 +5,14 @@ build:
   rules:
     - type: all
       conditions:
-        - conditionType: TimePeriod
+        - type: TimePeriod
           t:
-            generatorType: SeqCountInt
+            type: SeqCountInt
             min: 100
             step: 100
           f: 100
       actions:
-        - actionType: Finish
+        - type: Finish
 
 send:
   - count: 1

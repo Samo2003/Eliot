@@ -21,7 +21,7 @@ class ConditionGenerator(GeneratorBase):
         
         for condition in context.conditions:
             # Template selected based on condition type
-            template_name = f"conditions/{condition.conditionType}Condition.hpp.jinja"
+            template_name = f"conditions/{condition.type}Condition.hpp.jinja"
 
             # Output file name derived from C++ type representation
             output_name = f"{condition.cpp_type}.hpp"

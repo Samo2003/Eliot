@@ -6,7 +6,7 @@ build:
     - type: all
       conditions: []
       actions:
-        - actionType: BitNoise
+        - type: BitNoise
           n: 5
           mode: first
 

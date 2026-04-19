@@ -9,18 +9,18 @@ class ICMP(ConditionBase[Literal["ICMP"]]):
     """
 
     # ICMP type to check
-    type: int
+    icmp_type: int
 
     # ICMP code to check
-    code: int | None = None
+    icmp_code: int | None = None
 
     @model_validator(mode="after")
     def validate_icmp(self) -> ICMP:
-        if self.type < 0 or self.type > 255:
+        if self.icmp_type < 0 or self.icmp_type > 255:
             raise ValueError("ICMP type must be in range <0,255>")
 
-        if self.code is not None:
-            if self.code < 0 or self.code > 255:
+        if self.icmp_code is not None:
+            if self.icmp_code < 0 or self.icmp_code > 255:
                 raise ValueError("ICMP code must be in range <0,255>")
 
         return self
@@ -30,7 +30,7 @@ class ICMP(ConditionBase[Literal["ICMP"]]):
         parts = [self.cpp_type_base]
         parts.append(f"type_{self.type}")
 
-        if self.code is not None:
-            parts.append(f"code_{self.code}")
+        if self.icmp_code is not None:
+            parts.append(f"code_{self.icmp_code}")
 
         return "_".join(parts)

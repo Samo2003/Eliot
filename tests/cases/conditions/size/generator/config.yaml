@@ -5,14 +5,14 @@ build:
   rules:
     - type: all
       conditions: 
-        - conditionType: Size
+        - type: Size
           size:
-            generatorType: UniformInt
+            type: UniformInt
             min: 30
             max: 40
           op: gt
       actions:
-        - actionType: Finish
+        - type: Finish
 
 send:       # All packet sizes are +20 for IPv4 header
   - payload_size: 25

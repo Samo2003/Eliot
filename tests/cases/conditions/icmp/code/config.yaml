@@ -5,11 +5,11 @@ build:
   rules:
     - type: all
       conditions: 
-        - conditionType: ICMP
-          type: 8
-          code: 5
+        - type: ICMP
+          icmp_type: 8
+          icmp_code: 5
       actions:
-        - actionType: Drop
+        - type: Drop
 
 send: 
   - protocol: icmp

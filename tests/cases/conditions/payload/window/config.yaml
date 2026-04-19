@@ -5,12 +5,12 @@ build:
   rules:
     - type: all
       conditions:
-        - conditionType: Payload
+        - type: Payload
           pattern: aaaa
           start: 22
           end: 26
       actions:
-        - actionType: Finish
+        - type: Finish
 
 send:
   - payload: 

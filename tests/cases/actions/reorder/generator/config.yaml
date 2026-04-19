@@ -6,9 +6,9 @@ build:
     - type: all
       conditions: []
       actions:
-        - actionType: Reorder
+        - type: Reorder
           n: 
-            generatorType: SeqCountInt
+            type: SeqCountInt
             min: 2
             step: 1
           strategy: reverse

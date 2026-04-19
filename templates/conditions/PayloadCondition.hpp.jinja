@@ -13,7 +13,7 @@
 #ifndef {{ condition.hpp_define }}
 #define {{ condition.hpp_define }}
 
-{% if condition.type == "regex" %}
+{% if condition.pattern_type == "regex" %}
 #include <regex>
 #include <string_view>
 {% else %}
@@ -103,7 +103,7 @@ public:
         const size_t window_length = end - begin;
         const uint8_t* window = data + begin;
 
-        {% if condition.type == "regex" %}
+        {% if condition.pattern_type == "regex" %}
         // REGEX search
         std::string_view sv(reinterpret_cast<const char*>(window), window_length);
         return std::regex_search(sv.begin(), sv.end(), _REGEX);
@@ -127,7 +127,7 @@ public:
     }
 
 private:
-    {% if condition.type == "regex" %}
+    {% if condition.pattern_type == "regex" %}
     ///> REGEX pattern definition.
     inline static const std::regex _REGEX{
         R"__REGEX__({{ condition.regex_pattern }})__REGEX__",

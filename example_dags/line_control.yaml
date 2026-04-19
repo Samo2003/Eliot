@@ -14,65 +14,65 @@
 
 root:
   condition:
-    conditionType: Payload
+    type: Payload
     pattern: DELAY
-    encoding: ascii
+    pattern_type: ascii
     l4: true
   if_true:
     action:
-      actionType: ChangeState
+      type: SetState
       target: control                       # State node reference
       state: DELAY
     next:
       action:
-        actionType: Drop
+        type: Drop
   if_false:
     condition:
-      conditionType: Payload
+      type: Payload
       pattern: ACTIVE
-      encoding: ascii
+      pattern_type: ascii
       l4: true
     if_true:
       action:
-        actionType: ChangeState
+        type: SetState
         target: control                     # State node reference
         state: ACTIVE
       next:
         action:
-          actionType: Drop
+          type: Drop
     if_false:
       condition:
-        conditionType: Payload
+        type: Payload
         pattern: DROP
-        encoding: ascii
+        pattern_type: ascii
         l4: true
       if_true:
         action:
-          actionType: ChangeState
+          type: SetState
           target: control                   # State node reference
           state: DROP
         next:
           action:
-            actionType: Drop
+            type: Drop
       if_false:
         id: control                         # State node identifier
         initial: ACTIVE
         transitions:
           ACTIVE:
             action:
-              actionType: Finish
+              type: Finish
           
           DELAY:
             action:
-              actionType: Delay
+              type: Delay
               n:
-                generatorType: NormalInt
+                type: NormalInt
                 m: 200
                 s: 25
             next:
               action:
-                actionType: Finish
+                type: Finish
           
           DROP:
             action:
-              actionType: Drop
+              type: Drop

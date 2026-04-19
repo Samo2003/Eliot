@@ -5,10 +5,10 @@ build:
   rules:
     - type: all
       conditions: 
-        - conditionType: Payload
+        - type: Payload
           pattern: "b\x01\x05"
       actions:
-        - actionType: Finish
+        - type: Finish
 
 send:
   - payload:

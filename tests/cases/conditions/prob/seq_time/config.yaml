@@ -5,16 +5,16 @@ build:
   rules:
     - type: all
       conditions: 
-        - conditionType: Prob
+        - type: Prob
           seed: 123456
           x:
-            generatorType: SeqTimeFloat
+            type: SeqTimeFloat
             min: 0.1
             max: 0.8
             step: 0.1
             period: 200
       actions:
-        - actionType: Finish
+        - type: Finish
 
 timeout: 3
 

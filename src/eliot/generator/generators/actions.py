@@ -21,7 +21,7 @@ class ActionGenerator(GeneratorBase):
 
         for action in context.actions:
             # Template selected based on action type
-            template_name = f"actions/{action.actionType}Action.hpp.jinja"
+            template_name = f"actions/{action.type}Action.hpp.jinja"
 
             # Output file name derived from C++ type representation
             output_name = f"{action.cpp_type}.hpp"

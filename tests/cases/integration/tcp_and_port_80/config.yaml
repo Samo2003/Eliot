@@ -3,21 +3,21 @@ name: Drops all TCP packets to or from port 80
 build:
   root:
     condition:
-      conditionType: Protocol
+      type: Protocol
       id: 6             # TCP protocol number
     if_true:
       condition:
-        conditionType: Port
+        type: Port
         port: 80
       if_true:
         action:
-          actionType: Drop
+          type: Drop
       if_false:
         action:
-          actionType: Finish
+          type: Finish
     if_false:
       action:
-        actionType: Finish
+        type: Finish
 
 send:
   - protocol: tcp

@@ -5,15 +5,15 @@ build:
   rules:
     - type: all
       conditions: 
-        - conditionType: EveryN
+        - type: EveryN
           N: 
-            generatorType: ExponentialInt
+            type: ExponentialInt
             min: 2
             max: 6
             mean: 4
             seed: 123456
       actions:
-        - actionType: Drop
+        - type: Drop
 
 send: 
   - count: 2000

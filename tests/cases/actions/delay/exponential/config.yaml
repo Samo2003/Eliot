@@ -6,9 +6,9 @@ build:
     - type: all
       conditions: []
       actions:
-        - actionType: Delay
+        - type: Delay
           n: 
-            generatorType: ExponentialInt
+            type: ExponentialInt
             mean: 100
             seed: 123456
 

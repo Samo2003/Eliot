@@ -5,10 +5,10 @@ build:
   rules:
     - type: all
       conditions:
-        - conditionType: Time
+        - type: Time
           after: 100
       actions:
-        - actionType: Finish
+        - type: Finish
 
 send:
   - count: 1

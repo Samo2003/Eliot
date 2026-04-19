@@ -5,10 +5,10 @@ build:
   rules:
     - type: all
       conditions: 
-        - conditionType: Count
+        - type: Count
           after: 4
       actions:
-        - actionType: Drop
+        - type: Drop
 
 send: 
   - count: 12

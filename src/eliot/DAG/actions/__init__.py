@@ -1,7 +1,7 @@
 from typing import Annotated, Union
 from pydantic import Field
 from .bit_noise import BitNoise
-from .change_state import ChangeState
+from .set_state import SetState
 from .delay import Delay
 from .drop import Drop
 from .finish import Finish
@@ -18,7 +18,7 @@ Action = Annotated[
         Replicate,
         Throttle,
         BitNoise,
-        ChangeState
+        SetState
     ],
-    Field(discriminator="actionType")
+    Field(discriminator="type")
 ]

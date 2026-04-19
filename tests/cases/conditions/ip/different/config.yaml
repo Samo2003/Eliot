@@ -5,11 +5,11 @@ build:
   rules:
     - type: all
       conditions: 
-        - conditionType: IP
+        - type: IP
           src: 127.0.0.1
           dst: 10.0.10.1
       actions:
-        - actionType: Drop
+        - type: Drop
 
 send: 
   - dst: 10.0.10.1

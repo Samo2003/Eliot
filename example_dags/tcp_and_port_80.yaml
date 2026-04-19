@@ -1,18 +1,18 @@
 # Drops all TCP packets with source or destination port 80
 root:
   condition:
-    conditionType: Protocol
+    type: Protocol
     id: 6     # TCP protocol number
   if_true:
     condition:
-      conditionType: Port
+      type: Port
       port: 80
     if_true:
       action:
-        actionType: Drop
+        type: Drop
     if_false:
       action:
-        actionType: Finish
+        type: Finish
   if_false:
     action:
-      actionType: Finish
+      type: Finish

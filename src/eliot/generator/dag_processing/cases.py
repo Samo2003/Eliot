@@ -41,17 +41,17 @@ def build_cases(
             "if_true": build_cases(
                 node.if_true, 
                 counter, 
-                path + [f"DECISION({node.condition.conditionType})=true"]
+                path + [f"DECISION({node.condition.type})=true"]
             ),
             "if_false": build_cases(
                 node.if_false, 
                 counter, 
-                path + [f"DECISION({node.condition.conditionType})=false"]
+                path + [f"DECISION({node.condition.type})=false"]
             ),
 
             # Metadata for comment generation
             "path": path,
-            "label": f"DECISION({node.condition.conditionType})"
+            "label": f"DECISION({node.condition.type})"
         }
     elif isinstance(node, ActionNode):
         return {
@@ -63,12 +63,12 @@ def build_cases(
             "next": build_cases(
                 node.next, 
                 counter, 
-                path + [f"ACTION({node.action.actionType})"]
+                path + [f"ACTION({node.action.type})"]
             ) if node.next else None,
 
             # Metadata for comment generation
             "path": path,
-            "label": f"ACTION({node.action.actionType})"
+            "label": f"ACTION({node.action.type})"
         }
     elif isinstance(node, StateNode):
         return {

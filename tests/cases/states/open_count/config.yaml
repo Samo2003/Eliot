@@ -7,30 +7,30 @@ build:
     transitions:
       INIT:
         action: 
-          actionType: ChangeState
+          type: SetState
           target: Node
           state: open
         next:
           action: 
-            actionType: Drop
+            type: Drop
       open:
         condition:
-          conditionType: Count
+          type: Count
           after: 3
         if_false:
           action: 
-            actionType: Finish
+            type: Finish
         if_true:
           action: 
-            actionType: ChangeState
+            type: SetState
             target: Node
             state: close
           next:
             action: 
-              actionType: Drop
+              type: Drop
       close:
         action:
-          actionType: Drop
+          type: Drop
 
 send:
   - count: 7

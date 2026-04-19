@@ -3,9 +3,9 @@ from typing import Literal
 from pydantic import PrivateAttr, model_validator
 from .base import ActionBase
 
-class ChangeState(ActionBase[Literal["ChangeState"]]):
+class SetState(ActionBase[Literal["SetState"]]):
     """
-    Action that changes state of a given state node by ID reference.
+    Action that sets state of a given state node by ID reference.
     s"""
 
     # Target state node ID
@@ -18,7 +18,7 @@ class ChangeState(ActionBase[Literal["ChangeState"]]):
     _state_cpp_type: str | None = PrivateAttr(default=None)
 
     @model_validator(mode="after")
-    def upper_state(self) -> ChangeState:
+    def upper_state(self) -> SetState:
         self.target = self.target.upper()
         self.state = self.state.upper()
         return self

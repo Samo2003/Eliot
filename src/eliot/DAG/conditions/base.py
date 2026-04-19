@@ -11,7 +11,7 @@ class ConditionBase(DAGBaseModel, Generic[T], ABC):
     """
 
     # Discriminator used by Pydantic
-    conditionType: T
+    type: T
 
     # Condition value can be inverted
     invert: bool = False
@@ -20,4 +20,4 @@ class ConditionBase(DAGBaseModel, Generic[T], ABC):
     @final
     def cpp_type_base(self) -> str:
         """Returns common condition base name"""
-        return f"{self.conditionType}Condition"
+        return f"{self.type}Condition"

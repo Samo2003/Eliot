@@ -94,9 +94,9 @@ def translate_to_DAG(test_case: TestCase) -> DAG:
 
     # Creates default action based on value from test case
     default_action = (
-        Drop(actionType="Drop") 
-        if test_case.defaultAction == "Drop" 
-        else Finish(actionType="Finish")
+        Drop(type="Drop")
+        if test_case.defaultAction == "Drop"
+        else Finish(type="Finish")
     )
 
     # Creates default ActionNode to add to the bottom of the tree

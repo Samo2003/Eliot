@@ -5,10 +5,10 @@ build:
   rules:
     - type: all
       conditions: 
-        - conditionType: EveryN
+        - type: EveryN
           N: 3
       actions:
-        - actionType: Drop
+        - type: Drop
 
 send: 
   - count: 12

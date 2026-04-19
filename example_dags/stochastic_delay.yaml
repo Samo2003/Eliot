@@ -1,22 +1,22 @@
 # Delays all incoming packets with a random delay and then stochastically drop packets
 root:
   action:
-    actionType: Delay
+    type: Delay
     n: 
-      generatorType: NormalInt
+      type: NormalInt
       m: 100
       s: 30
       min: 1
   next:
     condition:
-      conditionType: Prob
+      type: Prob
       x:
-        generatorType: NormalFloat
+        type: NormalFloat
         m: 0.5
         s: 0.2
     if_true:
       action:
-        actionType: Finish
+        type: Finish
     if_false:
       action:
-        actionType: Drop
+        type: Drop

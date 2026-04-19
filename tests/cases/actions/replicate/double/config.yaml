@@ -6,9 +6,9 @@ build:
     - type: all
       conditions: []
       actions:
-        - actionType: Replicate
+        - type: Replicate
           n: 10
-        - actionType: Replicate
+        - type: Replicate
           n: 10
 
 send:

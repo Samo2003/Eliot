@@ -11,7 +11,7 @@ ValueGeneratorInt = Annotated[
         uniform.UniformInt,
         exponential.ExponentialInt
     ],
-    Field(discriminator="generatorType")
+    Field(discriminator="type")
 ]
 
 ValueGeneratorFloat = Annotated[
@@ -22,7 +22,7 @@ ValueGeneratorFloat = Annotated[
         uniform.UniformFloat,
         exponential.ExponentialFloat
     ],
-    Field(discriminator="generatorType")
+    Field(discriminator="type")
 ]
 
 ValueGenerator: TypeAlias = ValueGeneratorBase[str, int] | ValueGeneratorBase[str, float]

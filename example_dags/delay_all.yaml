@@ -1,9 +1,9 @@
 # Delays all incoming packets with a sequenced delay
 root:
   action:
-    actionType: Delay
+    type: Delay
     n: 
-      generatorType: SeqCountInt
+      type: SeqCountInt
       step: 17
       period: 3
       mode: reverse
@@ -11,4 +11,4 @@ root:
       max: 200
   next:
     action:
-      actionType: Finish
+      type: Finish

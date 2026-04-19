@@ -14,7 +14,7 @@ class Payload(ConditionBase[Literal["Payload"]]):
     pattern: bytes | str
 
     # Pattern type
-    type: Literal["raw", "ascii", "hex", "regex"] = "raw"
+    pattern_type: Literal["raw", "ascii", "hex", "regex"] = "raw"
 
     # Initial offset (if negative, counted from the end)
     start: int = 0
@@ -28,7 +28,7 @@ class Payload(ConditionBase[Literal["Payload"]]):
 
     @model_validator(mode="after")
     def normalize_pattern(self) -> Payload:
-        if self.type == "regex":
+        if self.pattern_type == "regex":
             if not isinstance(self.pattern, str):
                 raise TypeError("regex pattern must be a string")
             try:
@@ -44,12 +44,12 @@ class Payload(ConditionBase[Literal["Payload"]]):
         if not isinstance(self.pattern, str):
             raise TypeError("pattern must be str or bytes")
         
-        if self.type == "hex":
+        if self.pattern_type == "hex":
             try:
                 self.pattern = bytes.fromhex(self.pattern)
             except ValueError:
                 raise ValueError("invalid hex pattern")
-        elif self.type == "ascii":
+        elif self.pattern_type == "ascii":
             try:
                 self.pattern = self.pattern.encode("ascii")
             except UnicodeEncodeError:
@@ -63,7 +63,7 @@ class Payload(ConditionBase[Literal["Payload"]]):
     def validate_offsets(self) -> Payload:
         if self.start == self.end:
             raise ValueError("start and end offsets have to be different")
-        if self.type != "regex":
+        if self.pattern_type != "regex":
             if len(self.pattern) < 1:
                 raise ValueError("invalid pattern")
             if self.end is not None:
@@ -75,7 +75,7 @@ class Payload(ConditionBase[Literal["Payload"]]):
 
     @property
     def regex_pattern(self) -> str:
-        if self.type != "regex":
+        if self.pattern_type != "regex":
             raise TypeError("regex_pattern used for non-regex type")
         if not isinstance(self.pattern, str):
             raise TypeError("regex pattern must be string")
@@ -94,7 +94,7 @@ class Payload(ConditionBase[Literal["Payload"]]):
         return (
             f"{self.cpp_type_base}_"
             f"{hashlib.sha1(pattern_bytes).hexdigest()[:8]}_"
-            f"{self.type.upper()}_"
+            f"{self.pattern_type.upper()}_"
             f"{self.end}_"
             f"{self.start}_"
             f"{self.l4}"

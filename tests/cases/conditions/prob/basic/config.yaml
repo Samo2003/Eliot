@@ -5,11 +5,11 @@ build:
   rules:
     - type: all
       conditions: 
-        - conditionType: Prob
+        - type: Prob
           x: 0.5
           seed: 123456
       actions:
-        - actionType: Finish
+        - type: Finish
 
 send:
   - count: 1000

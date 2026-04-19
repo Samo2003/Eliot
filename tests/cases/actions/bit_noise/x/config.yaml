@@ -6,9 +6,9 @@ build:
     - type: all
       conditions: []
       actions:
-        - actionType: BitNoise
+        - type: BitNoise
           x: 
-            generatorType: ExponentialFloat
+            type: ExponentialFloat
             max: 0.8
             mean: 0.2
             seed: 123456

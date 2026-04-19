@@ -2,11 +2,11 @@
 
 root:
   condition:
-    conditionType: Prob
+    type: Prob
     x: 0.3
   if_true:
     action:
-      actionType: Drop
+      type: Drop
   if_false:
     action:
-      actionType: Finish
+      type: Finish

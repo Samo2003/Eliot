@@ -30,5 +30,5 @@ Condition = Annotated[
         Payload,
         IPVersion
     ],
-    Field(discriminator="conditionType")
+    Field(discriminator="type")
 ]

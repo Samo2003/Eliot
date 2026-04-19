@@ -7,15 +7,15 @@ build:
     transitions:
       INIT:
         action: 
-          actionType: ChangeState
+          type: SetState
           target: Node
           state: end
         next:
           action: 
-            actionType: Finish
+            type: Finish
       end:
         action: 
-          actionType: Drop
+          type: Drop
 
 send:
   - count: 5

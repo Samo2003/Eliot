@@ -19,7 +19,7 @@ class ValueGeneratorBase(DAGBaseModel, Generic[T, N], ABC):
     __hash__ = DAGBaseModel.__hash__
 
     # Discriminator used by Pydantic for polymorphic parsing
-    generatorType: T
+    type: T
 
     # Optional numeric bounds
     min: N
@@ -60,7 +60,7 @@ class ValueGeneratorBase(DAGBaseModel, Generic[T, N], ABC):
     def cpp_type_base(self) -> str:
         """Returns common generator base name"""
         return (
-            f"{self.generatorType}Generator_"
+            f"{self.type}Generator_"
             f"{self.N_to_str(self.min)}_"
             f"{self.N_to_str(self.max)}_"
             f"{self.once}_"

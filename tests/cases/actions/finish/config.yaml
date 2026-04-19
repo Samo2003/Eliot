@@ -6,7 +6,7 @@ build:
     - type: all
       conditions: []
       actions:
-        - actionType: Finish
+        - type: Finish
 
 send: []
   

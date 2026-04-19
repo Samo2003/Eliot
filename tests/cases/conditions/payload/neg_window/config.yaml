@@ -5,12 +5,12 @@ build:
   rules:
     - type: all
       conditions:
-        - conditionType: Payload
+        - type: Payload
           pattern: aaaa
           start: -10  # +4 for seq number in payload
           end: -6     # +4 for seq number in payload
       actions:
-        - actionType: Finish
+        - type: Finish
 
 send:
   - payload:
