@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import Literal
-from pydantic import model_validator
+from pydantic import field_validator
 from eliot.DAG.generators import ValueGeneratorInt
 from .base import ConditionBase
 
@@ -12,11 +12,12 @@ class EveryN(ConditionBase[Literal["EveryN"]]):
     # Every `N`th packet the condition is fulfilled
     N: int | ValueGeneratorInt
 
-    @model_validator(mode="after")
-    def validate_n(self) -> EveryN:
-        if isinstance(self.N, int) and self.N < 0:
+    @field_validator("N", mode="after")
+    @classmethod
+    def validate_n(cls, N: int | ValueGeneratorInt) -> int | ValueGeneratorInt:
+        if isinstance(N, int) and N < 0:
             raise ValueError("after must not be negative")
-        return self
+        return N
 
     @property
     def cpp_type(self) -> str:

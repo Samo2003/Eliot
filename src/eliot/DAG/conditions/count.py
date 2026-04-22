@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import Literal
-from pydantic import model_validator
+from pydantic import field_validator
 from .base import ConditionBase
 
 class Count(ConditionBase[Literal["Count"]]):
@@ -13,14 +13,20 @@ class Count(ConditionBase[Literal["Count"]]):
 
     # Number of packets for which the condition is fulfilled if missing condition stays fulfilled
     duration: int | None = None
-
-    @model_validator(mode="after")
-    def validate_counts(self) -> Count:
-        if self.after < 0:
+    
+    @field_validator("after", mode="after")
+    @classmethod
+    def validate_after(cls, after: int) -> int:
+        if after < 0:
             raise ValueError("after must not be negative")
-        if self.duration and self.duration <= 0:
+        return after
+    
+    @field_validator("after", mode="after")
+    @classmethod
+    def validate_duration(cls, duration: int | None) -> int | None:
+        if duration and duration <= 0:
             raise ValueError("duration must not be negative")
-        return self
+        return duration
 
     @property
     def is_state(self) -> bool:

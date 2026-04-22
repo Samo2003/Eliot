@@ -2,18 +2,18 @@ name: 1 packet to open let 3 pass and then close
 
 build:
   root:
-    id: Node
-    initial: init
+    id: NODE
+    initial: INIT
     transitions:
       INIT:
         action: 
           type: SetState
-          target: Node
-          state: open
+          target: NODE
+          state: OPEN
         next:
           action: 
             type: Drop
-      open:
+      OPEN:
         condition:
           type: Count
           after: 3
@@ -23,12 +23,12 @@ build:
         if_true:
           action: 
             type: SetState
-            target: Node
-            state: close
+            target: NODE
+            state: CLOSE
           next:
             action: 
               type: Drop
-      close:
+      CLOSE:
         action:
           type: Drop
 

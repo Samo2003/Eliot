@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import Literal
-from pydantic import model_validator
+from pydantic import field_validator
 from eliot.DAG.generators import ValueGeneratorBase, ValueGeneratorInt
 from .base import ConditionBase
 
@@ -15,11 +15,12 @@ class Size(ConditionBase[Literal["Size"]]):
     # Compare operation
     op: Literal["lt", "le", "eq", "ge", "gt"]
 
-    @model_validator(mode="after")
-    def validate_size(self) -> Size:
-        if isinstance(self.size, int) and self.size < 0:
-            raise ValueError("Size has to be a positive integer")
-        return self
+    @field_validator("size", mode="after")
+    @classmethod
+    def validate_size(cls, size: int | ValueGeneratorInt) -> int | ValueGeneratorInt:
+        if isinstance(size, int) and size < 0:
+            raise ValueError("size has to be a positive integer")
+        return size
 
     @property
     def cpp_type(self) -> str:

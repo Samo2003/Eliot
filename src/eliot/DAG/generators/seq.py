@@ -1,6 +1,6 @@
 from __future__ import annotations
 from abc import ABC
-from pydantic import model_validator
+from pydantic import field_validator, model_validator
 from typing import Literal, final
 from eliot.DAG.dag_base_model import FACTORS
 from .base import ValueGeneratorBase, T, N
@@ -18,6 +18,14 @@ class SeqBase(ValueGeneratorBase[T, N], ABC):
 
     # Handling reached max or min value
     mode: Literal["repeat", "keep", "reverse"] = "keep"
+    
+    @field_validator("seed", mode="after")
+    @classmethod
+    def validate_seed(cls, seed: int | None) -> None:
+        if seed is not None:
+            raise ValueError(
+                f"seed value has no effect in Seq generators"
+            )
 
     @model_validator(mode="after")
     def check_consistency(self) -> SeqBase[T, N]:
@@ -33,10 +41,6 @@ class SeqBase(ValueGeneratorBase[T, N], ABC):
         if self.period <= 0:
             raise ValueError(
                 "T must be >= 1"
-            )
-        if self.seed is not None:
-            raise ValueError(
-                f"Seed value has no effect in {self.type}"
             )
         if self.mode == "reverse" and self.step >= 0 and self.max is None:
             raise ValueError(

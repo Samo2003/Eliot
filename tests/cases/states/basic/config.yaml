@@ -2,18 +2,18 @@ name: Basic StateNode Test
 
 build:
   root:
-    id: Node
-    initial: init
+    id: NODE
+    initial: INIT
     transitions:
       INIT:
         action: 
           type: SetState
-          target: Node
-          state: end
+          target: NODE
+          state: END
         next:
           action: 
             type: Finish
-      end:
+      END:
         action: 
           type: Drop
 

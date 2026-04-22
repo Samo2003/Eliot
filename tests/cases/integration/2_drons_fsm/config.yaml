@@ -6,7 +6,7 @@ build:
       type: IP
       dst: 10.10.10.10
     if_true:
-      id: drone1
+      id: DRONE1
       initial: INIT
       transitions:
         INIT:
@@ -18,7 +18,7 @@ build:
           if_true:
             action:
               type: SetState
-              target: drone1
+              target: DRONE1
               state: UP
             next:
               action:
@@ -40,7 +40,7 @@ build:
             if_true:
               action:
                 type: SetState
-                target: drone1
+                target: DRONE1
                 state: DOWN
               next:
                 action:
@@ -61,7 +61,7 @@ build:
           if_true:
             action:
               type: SetState
-              target: drone1
+              target: DRONE1
               state: UP
             next:
               action:
@@ -75,7 +75,7 @@ build:
         type: IP
         dst: 10.10.10.20
       if_true:
-        id: drone2
+        id: DRONE2
         initial: INIT
         transitions:
           INIT:
@@ -87,7 +87,7 @@ build:
             if_true:
               action:
                 type: SetState
-                target: drone2
+                target: DRONE2
                 state: UP
               next:
                 action:
@@ -109,7 +109,7 @@ build:
               if_true:
                 action:
                   type: SetState
-                  target: drone2
+                  target: DRONE2
                   state: DOWN
                 next:
                   action:
@@ -130,7 +130,7 @@ build:
             if_true:
               action:
                 type: SetState
-                target: drone2
+                target: DRONE2
                 state: UP
               next:
                 action:

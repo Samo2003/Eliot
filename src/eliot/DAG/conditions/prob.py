@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import Literal
-from pydantic import model_validator
+from pydantic import field_validator
 from eliot.DAG.generators import ValueGeneratorBase, ValueGeneratorFloat
 from .base import ConditionBase
 
@@ -14,26 +14,31 @@ class Prob(ConditionBase[Literal["Prob"]]):
 
     # Set generator seed to ensure determinism
     seed: int | None = None
-
-    @model_validator(mode="after")
-    def validate_x(self) -> Prob:
-        if isinstance(self.x, float) and (self.x < 0 or self.x > 1):
+    
+    @field_validator("x", mode="after")
+    @classmethod
+    def validate_x(cls, x: float | ValueGeneratorFloat) -> float | ValueGeneratorFloat:
+        if isinstance(x, float) and (x < 0 or x > 1):
             raise ValueError("x must be in range <0,1>")
-        elif isinstance(self.x, ValueGeneratorBase):
-            if self.x.min < 0:
+        elif isinstance(x, ValueGeneratorBase):
+            if x.min < 0:
                 raise ValueError("min must be non negative")
 
-            if self.x.max is None:
-                self.x.max = 1.0
-            elif self.x.max > 1:
+            if x.max is None:
+                x.max = 1.0
+            elif x.max > 1:
                 raise ValueError("max must be smaller than 1")
             
-            if self.x.max < self.x.min:
+            if x.max < x.min:
                 raise ValueError("max must be bigger than min")
-            
-        if self.seed is not None and self.seed < 0:
-            raise ValueError("Seed value has to be a positive integer")
-        return self
+        return x
+    
+    @field_validator("seed", mode="after")
+    @classmethod
+    def validate_seed(cls, seed: int | None) -> int | None:
+        if seed is not None and seed < 0:
+            raise ValueError("seed value has to be a positive integer")
+        return seed
     
     @property
     def cpp_type(self) -> str:

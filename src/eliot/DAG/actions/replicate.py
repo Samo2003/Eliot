@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import Literal
-from pydantic import model_validator
+from pydantic import field_validator
 from eliot.DAG.generators import ValueGeneratorInt, ValueGeneratorBase
 from .base import ActionBase
 
@@ -11,16 +11,17 @@ class Replicate(ActionBase[Literal["Replicate"]]):
 
     # Number of times to replicate the packet
     n: int | ValueGeneratorInt
-
-    @model_validator(mode="after")
-    def validate_n(self) -> Replicate:
-        if isinstance(self.n, int):
-            if self.n <= 0:
+    
+    @field_validator("n", mode="after")
+    @classmethod
+    def validate_n(cls, n: int | ValueGeneratorInt) -> int | ValueGeneratorInt:
+        if isinstance(n, int):
+            if n <= 0:
                 raise ValueError("n must be a positive number")
         else:
-            if self.n.min <= 0:
+            if n.min <= 0:
                 raise ValueError("n must be a positive number")
-        return self
+        return n
     
     @property
     def cpp_type(self) -> str:

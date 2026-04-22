@@ -1,5 +1,5 @@
 from typing import Any
-from pydantic import PrivateAttr, model_validator
+from pydantic import PrivateAttr, field_validator, model_validator
 from eliot.DAG.dag_base_model import DAGBaseModel
 from .node import DAGNode
 
@@ -19,30 +19,38 @@ class StateNode(DAGBaseModel, DAGNode):
     
     # Maps state to transition id
     _state_map: dict[str, int] = PrivateAttr(default={})
+    
+    @field_validator("id", mode="after")
+    @classmethod
+    def validate_id(cls, id: str) -> str:
+        if id != id.upper():
+            raise ValueError("id has to be upper case")
+        return id
+    
+    @field_validator("initial", mode="after")
+    @classmethod
+    def validate_initial(cls, initial: str) -> str:
+        if initial != initial.upper():
+            raise ValueError("initial has to be upper case")
+        return initial
+    
+    @field_validator("transitions", mode="after")
+    @classmethod
+    def validate_transitions(cls, transitions: dict[str, DAGNode]) -> dict[str, DAGNode]:
+        for key in transitions.keys():
+            if key != key.upper():
+                raise ValueError("state values have to be upper case")
+        return transitions
 
     @model_validator(mode="after")
     def validate_node(self) -> StateNode:
         """
-        Validate state node consistency:
-
-        - Node ID and state names are normalized to uppercase.
-        - Initial state must exist among transitions.
+        Validates state node contains transition for initial state.
         """
-        self.id = self.id.upper()
-        self.initial = self.initial.upper()
-        
-        # Normalize keys
-        new_transitions: dict[str, DAGNode] = {
-            key.upper(): transition
-            for key, transition in self.transitions.items()
-        }
-        self.transitions = new_transitions
-        
         if self.initial not in self.transitions:
             raise ValueError(
-                f"No transition for initial state fount in node {self.id}"
+                f"no transition for initial state fount in node {self.id}"
             )
-
         return self
     
     @property

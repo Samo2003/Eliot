@@ -21,7 +21,7 @@ root:
   if_true:
     action:
       type: SetState
-      target: control                       # State node reference
+      target: CONTROL                       # State node reference
       state: DELAY
     next:
       action:
@@ -35,7 +35,7 @@ root:
     if_true:
       action:
         type: SetState
-        target: control                     # State node reference
+        target: CONTROL                     # State node reference
         state: ACTIVE
       next:
         action:
@@ -49,13 +49,13 @@ root:
       if_true:
         action:
           type: SetState
-          target: control                   # State node reference
+          target: CONTROL                   # State node reference
           state: DROP
         next:
           action:
             type: Drop
       if_false:
-        id: control                         # State node identifier
+        id: CONTROL                         # State node identifier
         initial: ACTIVE
         transitions:
           ACTIVE:

@@ -1,7 +1,7 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Any, TypeVar, Generic, final
-from pydantic import model_validator
+from pydantic import field_validator, model_validator
 from eliot.DAG.dag_base_model import DAGBaseModel
 
 # Generic type parameter for generator identifier
@@ -38,7 +38,7 @@ class ValueGeneratorBase(DAGBaseModel, Generic[T, N], ABC):
         return values
 
     @model_validator(mode="after")
-    def check_min(self) -> ValueGeneratorBase[T, N]:
+    def validate_bounds(self) -> ValueGeneratorBase[T, N]:
         """
         Validate generator configuration.
         """
@@ -46,9 +46,14 @@ class ValueGeneratorBase(DAGBaseModel, Generic[T, N], ABC):
             raise ValueError(f"minimum value has to be 0 or greater")
         if self.max is not None and self.min > self.max:
             raise ValueError("Generator cannot produce values")
-        if self.seed is not None and self.seed < 0:
-            raise ValueError("Seed value has to be a positive integer")
         return self
+    
+    @field_validator("seed", mode="after")
+    @classmethod
+    def validate_seed(cls, seed: int | None) -> int | None:
+        if seed is not None and seed < 0:
+            raise ValueError("seed value has to be a positive integer")
+        return seed
 
     @final
     def __str__(self) -> str:

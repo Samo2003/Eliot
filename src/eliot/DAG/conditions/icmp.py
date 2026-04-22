@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import Literal
-from pydantic import model_validator
+from pydantic import field_validator
 from .base import ConditionBase
 
 class ICMP(ConditionBase[Literal["ICMP"]]):
@@ -13,17 +13,21 @@ class ICMP(ConditionBase[Literal["ICMP"]]):
 
     # ICMP code to check
     icmp_code: int | None = None
-
-    @model_validator(mode="after")
-    def validate_icmp(self) -> ICMP:
-        if self.icmp_type < 0 or self.icmp_type > 255:
+    
+    @field_validator("icmp_type", mode="after")
+    @classmethod
+    def validate_type(cls, icmp_type: int) -> int:
+        if icmp_type < 0 or icmp_type > 255:
             raise ValueError("ICMP type must be in range <0,255>")
-
-        if self.icmp_code is not None:
-            if self.icmp_code < 0 or self.icmp_code > 255:
+        return icmp_type
+    
+    @field_validator("icmp_code", mode="after")
+    @classmethod
+    def validate_code(cls, icmp_code: int | None) -> int | None:
+        if icmp_code is not None:
+            if icmp_code < 0 or icmp_code > 255:
                 raise ValueError("ICMP code must be in range <0,255>")
-
-        return self
+        return icmp_code
     
     @property
     def cpp_type(self) -> str:

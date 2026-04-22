@@ -2,7 +2,7 @@ from __future__ import annotations
 from abc import ABC
 import random
 from typing import Literal, cast, final
-from pydantic import model_validator
+from pydantic import field_validator
 from .base import ValueGeneratorBase, T, N
 
 class UniformBase(ValueGeneratorBase[T, N], ABC):
@@ -10,12 +10,13 @@ class UniformBase(ValueGeneratorBase[T, N], ABC):
     Abstract base class for uniform distribution generators
     """
 
-    @model_validator(mode="after")
-    def ensure_min_max(self) -> UniformBase[T, N]:
+    @field_validator("max", mode="after")
+    @classmethod
+    def validate_max(cls, max: N | None) -> N:
         """Max interval must be defined"""
-        if self.max is None:
-            raise ValueError("min and max must be provided for UniformFloat")
-        return self
+        if max is None:
+            raise ValueError("max must be provided for Uniform generator")
+        return max
     
     @final
     def _apply_factor_inner(self, factor: int) -> None:

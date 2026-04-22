@@ -3,7 +3,7 @@ import math
 import random
 from abc import ABC
 from typing import Literal, final
-from pydantic import model_validator
+from pydantic import field_validator, model_validator
 from .base import ValueGeneratorBase, T, N
 
 class ExponentialBase(ValueGeneratorBase[T, N], ABC):
@@ -16,6 +16,15 @@ class ExponentialBase(ValueGeneratorBase[T, N], ABC):
 
     # Rate parameter
     rate: float | None = None
+    
+    @field_validator("max", mode="after")
+    @classmethod
+    def validate_max(cls, max: N | None) -> N | None:
+        if max is not None and max < 0:
+            raise ValueError(
+                "exponential distribution cannot generate negative values"
+            )
+        return max
 
     @model_validator(mode="after")
     def validate_parameters(self) -> ExponentialBase[T, N]:
@@ -24,23 +33,19 @@ class ExponentialBase(ValueGeneratorBase[T, N], ABC):
         """
         if self.mean is None and self.rate is None:
             raise ValueError(
-                "Either mean or rate must be specified"
+                "either mean or rate must be specified"
             )
         if self.mean is not None and self.rate is not None:
             raise ValueError(
-                "Specify either mean or rate, not both"
+                "specify either mean or rate, not both"
             )
         if self.mean is not None and self.mean <= 0:
             raise ValueError(
-                "Mean value for exponential distribution has to be positive"
+                "mean value for exponential distribution has to be positive"
             )
         if self.rate is not None and self.rate <= 0:
             raise ValueError(
-                "Mean value for exponential distribution has to be positive"
-            )
-        if self.max is not None and self.max < 0:
-            raise ValueError(
-                "Exponential distribution cannot generate negative values"
+                "mean value for exponential distribution has to be positive"
             )
         return self
     

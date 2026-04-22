@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import Literal
-from pydantic import PrivateAttr, model_validator
+from pydantic import PrivateAttr, field_validator
 from .base import ActionBase
 
 class SetState(ActionBase[Literal["SetState"]]):
@@ -16,12 +16,20 @@ class SetState(ActionBase[Literal["SetState"]]):
 
     # `StateNode` cpp_type assigned during generating
     _state_cpp_type: str | None = PrivateAttr(default=None)
-
-    @model_validator(mode="after")
-    def upper_state(self) -> SetState:
-        self.target = self.target.upper()
-        self.state = self.state.upper()
-        return self
+    
+    @field_validator("target", mode="after")
+    @classmethod
+    def upper_target(cls, target: str) -> str:
+        if target != target.upper():
+            raise ValueError("target in action node has to be upper case")
+        return target
+    
+    @field_validator("state", mode="after")
+    @classmethod
+    def upper_state(cls, state: str) -> str:
+        if state != state.upper():
+            raise ValueError("state in action node has to be upper case")
+        return state
 
     @property
     def cpp_type(self) -> str:
