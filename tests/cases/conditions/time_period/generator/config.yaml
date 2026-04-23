@@ -7,7 +7,7 @@ build:
       conditions:
         - type: TimePeriod
           t:
-            type: SeqCountInt
+            type: SeqCount
             min: 100
             step: 100
           f: 100

@@ -65,7 +65,7 @@ class ExponentialBase(ValueGeneratorBase[T, N], ABC):
             f"{self.N_to_str(self.rate)}"
         )
     
-class ExponentialFloat(ExponentialBase[Literal["ExponentialFloat"], float]):
+class ExponentialFloat(ExponentialBase[Literal["Exponential"], float]):
     """Exponential Float value generator"""
     
     @property
@@ -81,7 +81,7 @@ class ExponentialFloat(ExponentialBase[Literal["ExponentialFloat"], float]):
             x = -math.log(u) / self.rate
         return self.clamp(x)
 
-class ExponentialInt(ExponentialBase[Literal["ExponentialInt"], int]):
+class ExponentialInt(ExponentialBase[Literal["Exponential"], int]):
     """Exponential Int value generator"""
     
     @property

@@ -7,7 +7,7 @@ build:
       conditions: 
         - type: Size
           size:
-            type: UniformInt
+            type: Uniform
             min: 30
             max: 40
           op: gt

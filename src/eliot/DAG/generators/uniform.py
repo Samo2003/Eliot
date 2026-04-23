@@ -35,7 +35,7 @@ class UniformBase(ValueGeneratorBase[T, N], ABC):
     def cpp_type(self) -> str:
         return self.cpp_type_base
 
-class UniformFloat(UniformBase[Literal["UniformFloat"], float]):
+class UniformFloat(UniformBase[Literal["Uniform"], float]):
     """Uniform Float value generator"""
 
     @property
@@ -45,7 +45,7 @@ class UniformFloat(UniformBase[Literal["UniformFloat"], float]):
             return random.Random(self.seed).uniform(min_val, max_val)
         return random.uniform(min_val, max_val)
 
-class UniformInt(UniformBase[Literal["UniformInt"], int]):
+class UniformInt(UniformBase[Literal["Uniform"], int]):
     """Uniform int value generator"""
 
     @property

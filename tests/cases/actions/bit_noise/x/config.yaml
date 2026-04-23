@@ -8,7 +8,7 @@ build:
       actions:
         - type: BitNoise
           x: 
-            type: ExponentialFloat
+            type: Exponential
             max: 0.8
             mean: 0.2
             seed: 123456

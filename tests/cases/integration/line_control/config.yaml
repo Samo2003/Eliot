@@ -55,7 +55,7 @@ build:
               action:
                 type: Delay
                 n:
-                  type: NormalInt
+                  type: Normal
                   m: 200
                   s: 25
                   seed: 123456

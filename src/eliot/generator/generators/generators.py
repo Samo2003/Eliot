@@ -25,7 +25,7 @@ class ValueGeneratorGenerator(GeneratorBase):
         # If any normal-distribution generator is required,
         # generate Ziggurat lookup tables
         if any(
-            "Normal" in generator.type 
+            "Normal" == generator.type
             for generator in context.generators
         ):
             template_name = "generators/ZigguratTables.hpp.jinja"
@@ -44,7 +44,7 @@ class ValueGeneratorGenerator(GeneratorBase):
 
         # Generate individual generator implementations
         for generator in context.generators:
-            template_name = f"generators/{generator.type}Generator.hpp.jinja"
+            template_name = f"generators/{generator.__class__.__name__}Generator.hpp.jinja"
             output_name = f"{generator.cpp_type}.hpp"
             output_path = generators_dir / output_name
 

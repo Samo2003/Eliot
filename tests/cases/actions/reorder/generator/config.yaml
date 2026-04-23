@@ -8,7 +8,7 @@ build:
       actions:
         - type: Reorder
           n: 
-            type: SeqCountInt
+            type: SeqCount
             min: 2
             step: 1
           strategy: reverse

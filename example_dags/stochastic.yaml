@@ -3,14 +3,14 @@ root:
   condition:
     type: Prob
     x:
-      type: UniformFloat
+      type: Uniform
       min: 0
       max: 1
   if_true:
     condition:
       type: Prob
       x:
-        type: NormalFloat
+        type: Normal
         m: 0.5
         s: 0.2
     if_true:
@@ -24,7 +24,7 @@ root:
     condition:
       type: Prob
       x:
-        type: NormalFloat
+        type: Normal
         m: 0.3
         s: 0.1
     if_true:

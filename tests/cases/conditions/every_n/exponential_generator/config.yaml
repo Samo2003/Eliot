@@ -7,7 +7,7 @@ build:
       conditions: 
         - type: EveryN
           N: 
-            type: ExponentialInt
+            type: Exponential
             min: 2
             max: 6
             mean: 4

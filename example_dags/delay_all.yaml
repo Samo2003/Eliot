@@ -3,7 +3,7 @@ root:
   action:
     type: Delay
     n: 
-      type: SeqCountInt
+      type: SeqCount
       step: 17
       period: 3
       mode: reverse

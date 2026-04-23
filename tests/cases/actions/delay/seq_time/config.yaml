@@ -8,7 +8,7 @@ build:
       actions:
         - type: Delay
           n: 
-            type: SeqTimeInt
+            type: SeqTime
             min: 20
             max: 100
             step: 20

@@ -8,7 +8,7 @@ build:
       actions:
         - type: Delay
           n: 
-            type: ExponentialInt
+            type: Exponential
             mean: 100
             seed: 123456
 

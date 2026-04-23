@@ -8,7 +8,7 @@ build:
       actions:
         - type: Replicate
           n:
-            type: SeqCountInt
+            type: SeqCount
             min: 1
             step: 10
 

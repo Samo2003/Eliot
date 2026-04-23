@@ -3,7 +3,7 @@ root:
   action:
     type: Delay
     n: 
-      type: NormalInt
+      type: Normal
       m: 100
       s: 30
       min: 1
@@ -11,7 +11,7 @@ root:
     condition:
       type: Prob
       x:
-        type: NormalFloat
+        type: Normal
         m: 0.5
         s: 0.2
     if_true:

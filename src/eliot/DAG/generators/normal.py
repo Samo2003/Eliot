@@ -48,7 +48,7 @@ class NormalBase(ValueGeneratorBase[T, N], ABC):
             f"{self.N_to_str(self.s)}"
         )
 
-class NormalFloat(NormalBase[Literal["NormalFloat"], float]):
+class NormalFloat(NormalBase[Literal["Normal"], float]):
     """Normal Float value generator"""
     
     @property
@@ -59,7 +59,7 @@ class NormalFloat(NormalBase[Literal["NormalFloat"], float]):
             x = random.gauss(self.m, self.s)
         return self.clamp(x)
 
-class NormalInt(NormalBase[Literal["NormalInt"], int]):
+class NormalInt(NormalBase[Literal["Normal"], int]):
     """Normal Int value generator"""
     
     @property

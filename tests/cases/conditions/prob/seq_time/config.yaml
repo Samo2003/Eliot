@@ -8,7 +8,7 @@ build:
         - type: Prob
           seed: 123456
           x:
-            type: SeqTimeFloat
+            type: SeqTime
             min: 0.1
             max: 0.8
             step: 0.1

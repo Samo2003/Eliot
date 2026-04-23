@@ -7,7 +7,7 @@ build:
       conditions: 
         - type: EveryN
           N: 
-            type: NormalInt
+            type: Normal
             min: 2
             max: 6
             m: 3.5

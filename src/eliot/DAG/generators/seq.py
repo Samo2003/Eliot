@@ -66,7 +66,7 @@ class SeqBase(ValueGeneratorBase[T, N], ABC):
     def is_state(self) -> bool:
         return not self.once
     
-class SeqCountFloat(SeqBase[Literal["SeqCountFloat"], float]):
+class SeqCountFloat(SeqBase[Literal["SeqCount"], float]):
     """Sequential count float value generator"""
     
     @property
@@ -75,7 +75,7 @@ class SeqCountFloat(SeqBase[Literal["SeqCountFloat"], float]):
             return self.max if self.max is not None else 0
         return self.min
 
-class SeqCountInt(SeqBase[Literal["SeqCountInt"], int]):
+class SeqCountInt(SeqBase[Literal["SeqCount"], int]):
     """Sequential count int value generator"""
     
     @property
@@ -118,7 +118,7 @@ class SeqTimeBase(SeqBase[T, N], ABC):
             f"{self.instant}"
         )
 
-class SeqTimeFloat(SeqTimeBase[Literal["SeqTimeFloat"], float]):
+class SeqTimeFloat(SeqTimeBase[Literal["SeqTime"], float]):
     """Sequential time float value generator"""
      
     @property
@@ -127,7 +127,7 @@ class SeqTimeFloat(SeqTimeBase[Literal["SeqTimeFloat"], float]):
             return self.max if self.max is not None else 0
         return self.min
 
-class SeqTimeInt(SeqTimeBase[Literal["SeqTimeInt"], int]):
+class SeqTimeInt(SeqTimeBase[Literal["SeqTime"], int]):
     """Sequential time int value generator"""
      
     @property
