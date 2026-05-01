@@ -16,13 +16,13 @@ class PacketGenerator(GeneratorBase):
         template_name = "Packet.hpp.jinja"
 
         # Output file location
-        output_path = context.generated_dir / "Packet.hpp"
+        output_path = context.dag.generated_dir / "Packet.hpp"
 
         # Render template with traits binding
         self._generate_to_file(
             template_name,
             output_path,
             {
-                "traits": context.traits
+                "traits": context.dag.traits
             }
         )

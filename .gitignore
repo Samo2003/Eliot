@@ -5,6 +5,7 @@ __pycache__/
 
 # CMake build
 /build/
+/CMakeLists.txt
 
 # Default generator output
 /generated/

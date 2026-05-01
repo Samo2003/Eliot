@@ -6,6 +6,8 @@ from pathlib import Path
 from eliot.generator import Generator, GeneratorConfig
 from eliot.DAG import DAG
 
+BASE_DIR = Path(__file__).resolve().parents[2]
+
 COMMON_OPTIONS: list[Callable[[Callable[..., Any]], Callable[..., Any]]] = [
     click.option(
         "--dag",
@@ -127,8 +129,8 @@ def benchmark(dag: Path | None, test_case: Path | None, output: Path) -> None:
         dag=dag,
         test_case=test_case,
         output=output,
-        traits=Path("traits/BenchmarkTraits.hpp"),
-        backend=Path("mocks/benchmark"),
+        traits=(BASE_DIR / "traits/BenchmarkTraits.hpp"),
+        backend=(BASE_DIR / "mocks/benchmark"),
         profiling=False,
         testing=False,
     )
@@ -140,8 +142,8 @@ def test(dag: Path | None, test_case: Path | None, output: Path) -> None:
         dag=dag,
         test_case=test_case,
         output=output,
-        traits=Path("traits/EchoTraits.hpp"),
-        backend=Path("mocks/echo"),
+        traits=(BASE_DIR / "traits/EchoTraits.hpp"),
+        backend=(BASE_DIR / "mocks/echo"),
         profiling=False,
         testing=True,
     )
@@ -153,8 +155,8 @@ def profile(dag: Path | None, test_case: Path | None, output: Path) -> None:
         dag=dag,
         test_case=test_case,
         output=output,
-        traits=Path("traits/ProfilingTraits.hpp"),
-        backend=Path("mocks/profiling"),
+        traits=(BASE_DIR / "traits/ProfilingTraits.hpp"),
+        backend=(BASE_DIR / "mocks/profiling"),
         profiling=True,
         testing=False,
     )

@@ -1,6 +1,6 @@
 import shutil
 import subprocess
-from .config import ROOT_DIR, BINARY_NAME, GeneratorConfig
+from .config import BINARY_NAME, GeneratorConfig
 
 class Builder:
     """
@@ -49,21 +49,9 @@ class Builder:
         cmake_args = [
             "cmake",
             "-G", "Ninja",
-            "-S", str(ROOT_DIR),
-            "-B", str(self._build_dir),
-            f"-DGENERATED_DIR={self.generated_dir}",
-            f"-DTRAITS_DIR={self._cfg.traits_path.parent}",
-            f"-DBACKEND_DIR={self._cfg.backend_path.resolve()}",
-            f"-DELIOT_BINARY_NAME={BINARY_NAME}"
+            "-S", str(self._cfg.output_path),
+            "-B", str(self._build_dir)
         ]
-
-        # Enable profiling configuration
-        if self._cfg.profiling:
-            cmake_args.append("-DPROFILING=ON")
-
-        # Enable testing configuration
-        if self._cfg.testing:
-            cmake_args.append("-DTESTING=ON")
 
         # Avoid unnecessary reconfiguration in testing mode
         if not self._cfg.testing or not (self._build_dir / "CMakeCache.txt").exists():

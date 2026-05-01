@@ -2,6 +2,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 from pydantic import BaseModel, model_validator
+from importlib.resources import files
 from eliot.DAG import Condition, Action, StateNode, ValueGenerator
 from .dag_processing.types import Case
 
@@ -9,7 +10,8 @@ from .dag_processing.types import Case
 BINARY_NAME = "eliot-run"
 
 # Projects root directory
-ROOT_DIR = Path(__file__).resolve().parents[3]
+# ROOT_DIR = Path(__file__).resolve().parents[3]
+ROOT_DIR = files("eliot")
 
 # Directory containing C++ template files used during generation
 TEMPLATE_DIR = ROOT_DIR / "templates"
@@ -41,7 +43,7 @@ class GeneratorConfig(BaseModel):
         return self
 
 @dataclass
-class GeneratorContext:
+class DAGContext:
     """
     Intermediate representation used during code generation.
 
@@ -74,3 +76,17 @@ class GeneratorContext:
 
     # Processed execution cases
     cases: list[Case]
+    
+@dataclass
+class BuildConfig:
+    output_dir: Path
+    backend_path: Path
+    traits_dir: Path
+    binary_name: str
+    profiling: bool
+    testing: bool
+    
+@dataclass
+class GeneratorContext:
+    dag: DAGContext
+    build: BuildConfig

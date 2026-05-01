@@ -19,14 +19,14 @@ class PacketProcessorGenerator(GeneratorBase):
         template_name = "PacketProcessor.hpp.jinja"
 
         # Output file path
-        output_path = context.generated_dir / "PacketProcessor.hpp"
+        output_path = context.dag.generated_dir / "PacketProcessor.hpp"
 
         # Render template with feature flags derived from DAG analysis
         self._generate_to_file(
             template_name,
             output_path,
             {
-                "require_calendar": context.require_calendar,
-                "require_time": context.require_time
+                "require_calendar": context.dag.require_calendar,
+                "require_time": context.dag.require_time
             }
         )

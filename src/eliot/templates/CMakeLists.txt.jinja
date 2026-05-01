@@ -14,17 +14,13 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 # Name of resulting executable
-set(ELIOT_BINARY_NAME "eliot-run" CACHE STRING "Name of the generated executable")
-
-# Optional build modes
-option(PROFILING "Enable profiling mode" OFF)
-option(TESTING "Enable testing mode" OFF)
+set(ELIOT_BINARY_NAME "{{ binary }}")
 
 # Directory containing generated sources
-set(GENERATED_DIR "generated" CACHE STRING "Generated sources directory")
+set(GENERATED_DIR "generated")
 
 # Path to selected backend implementation
-set(BACKEND_DIR "" CACHE PATH "Path to backend directory")
+set(BACKEND_DIR "{{ backend_dir }}")
 
 # Validate backend directory
 if(NOT EXISTS "${BACKEND_DIR}" OR NOT EXISTS "${BACKEND_DIR}/CMakeLists.txt")
@@ -32,7 +28,7 @@ if(NOT EXISTS "${BACKEND_DIR}" OR NOT EXISTS "${BACKEND_DIR}/CMakeLists.txt")
 endif()
 
 # Directory containing backend-specific traits
-set(TRAITS_DIR "" CACHE STRING "Directory containing backend traits")
+set(TRAITS_DIR "{{ traits_dir }}")
 
 # Validate traits directory
 if(NOT EXISTS "${TRAITS_DIR}")
@@ -52,16 +48,16 @@ if(CCACHE_PROGRAM)
 endif()
 
 # Build configuration flags
-if(TESTING)
-    # Disable optimizations for faster build
-    add_compile_options(-O0)
-elseif(PROFILING)
-    # Minimal optimization + debug symbols for profiling tools
-    add_compile_options(-O1 -g -fno-inline -fno-omit-frame-pointer)
-else()
-    # Maximum optimization for production build
-    add_compile_options(-O3)
-endif()
+{% if testing %}
+# Disable optimizations for faster build
+add_compile_options(-O0)
+{% elif profiling %}
+# Minimal optimization + debug symbols for profiling tools
+add_compile_options(-O1 -g -fno-inline -fno-omit-frame-pointer)
+{% else %}
+# Maximum optimization for production build
+add_compile_options(-O3)
+{% endif %}
 
 # Add backend as separate subproject
 add_subdirectory(${BACKEND_DIR} backend_build)

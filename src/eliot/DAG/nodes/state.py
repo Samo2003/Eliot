@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import Any
 from pydantic import PrivateAttr, field_validator, model_validator
 from eliot.DAG.dag_base_model import DAGBaseModel

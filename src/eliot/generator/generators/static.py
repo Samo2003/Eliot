@@ -22,13 +22,13 @@ class StaticGenerator(GeneratorBase):
 
         # Copy main entry source file
         shutil.copy2(
-            Path(TEMPLATE_DIR) / "eliot.cpp",
-            context.generated_dir / "eliot.cpp"
+            Path(str(TEMPLATE_DIR)) / "eliot.cpp",
+            context.dag.generated_dir / "eliot.cpp"
         )
 
         # Static support directory
-        static_dir = Path(TEMPLATE_DIR) / "static"
-        dst_dir = context.generated_dir / "static"
+        static_dir = Path(str(TEMPLATE_DIR)) / "static"
+        dst_dir = context.dag.generated_dir / "static"
 
         dst_dir.mkdir(parents=True, exist_ok=True)
 
@@ -36,7 +36,7 @@ class StaticGenerator(GeneratorBase):
         for src in static_dir.iterdir():
 
             # Conditionally include calendar only if required
-            if src.name == "calendar" and not context.require_calendar:
+            if src.name == "calendar" and not context.dag.require_calendar:
                 continue
 
             dst = dst_dir / src.name

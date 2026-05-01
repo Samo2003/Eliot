@@ -17,9 +17,9 @@ class ConditionGenerator(GeneratorBase):
         """
 
         # Directory where generated condition headers are stored
-        conditions_dir = context.generated_dir / "conditions"
+        conditions_dir = context.dag.generated_dir / "conditions"
         
-        for condition in context.conditions:
+        for condition in context.dag.conditions:
             # Template selected based on condition type
             template_name = f"conditions/{condition.type}Condition.hpp.jinja"
 

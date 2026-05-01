@@ -4,7 +4,7 @@ import subprocess
 import time
 from pathlib import Path
 from typing import Any, Callable, cast
-from eliot.generator.config import BINARY_NAME, ROOT_DIR
+from eliot.generator.config import BINARY_NAME
 from eliot.test_case.test_case import TestCase
 from .comm import ReceivedPacket, SentPacket, receive_packets, send_packets
 from .loader import Case, load_case
@@ -83,15 +83,14 @@ class CaseRunner:
         """
 
         build_args = self._write_test_case(case)
-        workspace_rel = self.workspace.relative_to(ROOT_DIR)
 
         generator_args = [
             "eliot", "test",
             *build_args,
-            "-o", str(workspace_rel)
+            "-o", "."
         ]
 
-        generator = subprocess.run(generator_args, cwd=ROOT_DIR, text=True, capture_output=True)
+        generator = subprocess.run(generator_args, cwd=self.workspace, text=True, capture_output=True)
 
         assert generator.returncode == 0, (
             f"stdout:\n{generator.stdout}\n"

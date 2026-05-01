@@ -19,9 +19,9 @@ class StateGenerator(GeneratorBase):
         """
 
         # Directory where state header files are placed
-        state_dir = context.generated_dir / "states"
+        state_dir = context.dag.generated_dir / "states"
 
-        for state in context.state_nodes:
+        for state in context.dag.state_nodes:
             # Shared template used for all state nodes
             template_name = "states/StateNode.hpp.jinja"
 

@@ -17,9 +17,9 @@ class ActionGenerator(GeneratorBase):
         """
 
         # Directory where generated action headers are stored
-        actions_dir = context.generated_dir / "actions"
+        actions_dir = context.dag.generated_dir / "actions"
 
-        for action in context.actions:
+        for action in context.dag.actions:
             # Template selected based on action type
             template_name = f"actions/{action.type}Action.hpp.jinja"
 

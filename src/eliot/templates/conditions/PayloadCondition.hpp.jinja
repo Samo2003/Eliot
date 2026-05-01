@@ -118,9 +118,12 @@ public:
         {% else %}
         // Multi-byte pattern search
     #if defined(__GLIBC__)
-        return std::memmem(window, window_length, _PATTERN, _PATTERN_LEN) != nullptr;
+        return memmem(window, window_length, _PATTERN, _PATTERN_LEN) != nullptr;
     #else
-        return std::search(window, window + window_length, _PATTERN, _PATTERN + _PATTERN_LEN) != window + window_length;
+        return std::search(
+            window, window + window_length, 
+            _PATTERN, _PATTERN + _PATTERN_LEN
+        ) != window + window_length;
     #endif            
         {% endif %}
         {% endif %}

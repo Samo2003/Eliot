@@ -19,7 +19,7 @@ class GeneratorBase(ABC):
 
     # Shared Jinja2 environment used for template rendering
     env: ClassVar[Environment] = Environment(
-        loader=FileSystemLoader(TEMPLATE_DIR),      # Initialize template loader
+        loader=FileSystemLoader(str(TEMPLATE_DIR)), # Initialize template loader
         trim_blocks=True,                           # Strip new lines after generated line
         lstrip_blocks=True                          # Strip white spaces from the beginning of the line
     )

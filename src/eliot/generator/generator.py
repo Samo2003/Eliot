@@ -2,7 +2,7 @@ import yaml
 from eliot.DAG import DAG
 from eliot.test_case import translate_to_DAG, load_test_case
 from .builder import Builder
-from .config import GeneratorConfig
+from .config import BINARY_NAME, BuildConfig, GeneratorConfig, GeneratorContext
 from .dag_processing.processor import DAGProcessor
 from .generators import GeneratorBase
 
@@ -70,6 +70,16 @@ class Generator:
             # Wrap all errors into a controlled RuntimeError
             raise RuntimeError(f"ERROR: loading input file: {e}")
 
+    def _get_build_config(self) -> BuildConfig:
+        return BuildConfig(
+            output_dir=self._cfg.output_path,
+            backend_path=self._cfg.backend_path.resolve(),
+            traits_dir=self._cfg.traits_path.parent.resolve(),
+            binary_name=BINARY_NAME,
+            profiling=self._cfg.profiling,
+            testing=self._cfg.testing
+        )
+
     def _generate(self, dag: DAG) -> None:
         """
         Core generation phase.
@@ -79,7 +89,14 @@ class Generator:
         """
 
         # Transform DAG into internal representation
-        context = self._processor.process(dag)
+        dag_context = self._processor.process(dag)
+        
+        build_config = self._get_build_config()
+        
+        context = GeneratorContext(
+            dag=dag_context,
+            build=build_config
+        )
 
         # Execute all registered code generators
         for generator_cls in GeneratorBase.registry:

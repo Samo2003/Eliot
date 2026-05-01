@@ -22,16 +22,16 @@ class FaultModelGenerator(GeneratorBase):
         """
         
         template_name = "FaultModel.hpp.jinja"
-        output_path = context.generated_dir / "FaultModel.hpp"
+        output_path = context.dag.generated_dir / "FaultModel.hpp"
 
         self._generate_to_file(
             template_name,
             output_path,
             {
-                "conditions": context.conditions, 
-                "actions": context.actions,
-                "states": context.state_nodes,
-                "require_calendar": context.require_calendar
+                "conditions": context.dag.conditions, 
+                "actions": context.dag.actions,
+                "states": context.dag.state_nodes,
+                "require_calendar": context.dag.require_calendar
             }
         )
 
@@ -41,12 +41,12 @@ class FaultModelGenerator(GeneratorBase):
         """
 
         template_name = "FaultModel.cpp.jinja"
-        output_path = context.generated_dir / "FaultModel.cpp"
+        output_path = context.dag.generated_dir / "FaultModel.cpp"
 
         self._generate_to_file(
             template_name,
             output_path,
             {
-                "cases": context.cases
+                "cases": context.dag.cases
             }
         )

@@ -1,3 +1,4 @@
+from __future__ import annotations
 from pydantic import model_validator
 from eliot.DAG.actions import Action
 from .node import DAGNode

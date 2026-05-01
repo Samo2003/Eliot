@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from pathlib import Path
 from eliot.DAG.actions.set_state import SetState
-from eliot.generator.config import GeneratorContext
+from eliot.generator.config import DAGContext
 from eliot.DAG import DAG
 from .nodes import collect_nodes
 from .cases import get_cases
@@ -11,16 +11,16 @@ from .states import process_state_nodes
 class DAGProcessor:
     """
     Responsible for transforming a validated DAG model into an
-    intermediate representation (GeneratorContext) used for
+    intermediate representation (DAGContext) used for
     code generation.
     """
 
     generated_dir: Path
     traits_name: str
 
-    def process(self, dag: DAG) -> GeneratorContext:
+    def process(self, dag: DAG) -> DAGContext:
         """
-        Convert DAG into GeneratorContext.
+        Convert DAG into DAGContext.
 
         This method performs semantic analysis and prepares all
         information required by the generation phase.
@@ -29,7 +29,7 @@ class DAGProcessor:
             dag: Parsed and validated DAG specification
 
         Returns:
-            Prepared GeneratorContext
+            Prepared DAGContext
         """
 
         # Collect all unique nodes required for generation
@@ -62,7 +62,7 @@ class DAGProcessor:
         )
 
         # Perform semantic validation and state linking
-        return GeneratorContext(
+        return DAGContext(
             generated_dir=self.generated_dir,
             conditions=collected_conditions,
             actions=collected_actions,

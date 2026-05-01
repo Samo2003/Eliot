@@ -40,6 +40,8 @@ The following commands assume that the virtual environment is activated.
 | `test` | Generate code using the testing backend |
 | `schema` | Print the JSON schema for DAG specifications |
 
+**Note:** The `benchmark`, `profile`, and `test` commands only work with editable installation (`pip install -e ".[dev]"`), as they rely on example backends and traits included in the repository.
+
 ### DAG specification
 To define the network target behavior you need to create a `DAG` specification file in `YAML` or `JSON` format. Example files can be found in `example_dags/`. The exact arguments and structures of each node can be found in classes defined in `src/eliot/DAG/`.
 
