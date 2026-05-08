@@ -12,6 +12,8 @@ build:
             mean: 100
             seed: 123456
 
+timeout: 1
+
 send:
   - count: 1000
   

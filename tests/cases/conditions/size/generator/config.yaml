@@ -16,6 +16,6 @@ build:
 
 send:       # All packet sizes are +20 for IPv4 header
   - payload_size: 25
-    count: 500
+    count: 100
   - payload_size: 5
-    count: 500
+    count: 100

@@ -4,6 +4,7 @@ import subprocess
 import time
 from pathlib import Path
 from typing import Any, Callable, cast
+import threading
 from eliot.generator.config import BINARY_NAME
 from eliot.test_case.test_case import TestCase
 from .comm import ReceivedPacket, SentPacket, receive_packets, send_packets
@@ -138,9 +139,26 @@ class CaseRunner:
             sock.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, BUFFER_SIZE)
             sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, BUFFER_SIZE)
             sock.connect(("127.0.0.1", port))
+            
+            received: list[ReceivedPacket] = []
+            stop = False
+
+            def recv():
+                sock.settimeout(0.1)
+                while not stop:
+                    try:
+                        packets = receive_packets(sock, 0.1)
+                        received.extend(packets)
+                    except:
+                        pass
+
+            t = threading.Thread(target=recv)
+            t.start()
 
             sent = send_packets(case.send, sock)
-            received = receive_packets(sock, case.timeout)
+            time.sleep(case.timeout)
+            stop = True
+            t.join()
             
         return sent, received
  

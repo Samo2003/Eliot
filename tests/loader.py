@@ -74,7 +74,7 @@ class Case(BaseModel):
     """
 
     name: str
-    timeout: float = 1
+    timeout: float = 0.1
     send: list[Step]
     build: TestCase | DAG
 

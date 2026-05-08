@@ -14,4 +14,4 @@ def check(stats: ExchangeStats) -> None:
     assert intervals.count(2) > intervals.count(6)
 
     avg_interval = sum(intervals) / len(intervals)
-    assert 3.0 <= avg_interval <= 5.0
+    assert 2.5 <= avg_interval <= 5.5

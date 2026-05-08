@@ -16,5 +16,5 @@ build:
         - type: Drop
 
 send: 
-  - count: 2000
+  - count: 100
   

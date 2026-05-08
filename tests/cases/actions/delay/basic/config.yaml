@@ -9,6 +9,8 @@ build:
         - type: Delay
           n: 100
 
+timeout: 1
+
 send:
   - count: 10
   

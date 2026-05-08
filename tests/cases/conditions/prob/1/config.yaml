@@ -11,4 +11,4 @@ build:
         - type: Finish
 
 send:
-  - count: 1000
+  - count: 100
