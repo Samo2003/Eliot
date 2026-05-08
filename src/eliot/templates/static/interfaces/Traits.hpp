@@ -24,8 +24,8 @@ concept BaseTraitsConcept =
         int argc,
         char** argv
     ) {
-        typename T::PacketType;
         typename T::QueueType;
+        typename T::PacketType;
 
         // Packet must be storable in wrappers/optionals
         requires std::move_constructible<typename T::PacketType>;
@@ -82,7 +82,7 @@ concept ImmutablePayloadTraitsConcept =
     ) {
         requires (T::modifiable_payload == false);
 
-        requires std::assignable_from<typename T::PacketType&, typename T::PacketType>;
+        requires std::movable<typename T::PacketType>;
 
         { T::change_payload(std::move(p), std::move(payload)) } -> std::same_as<typename T::PacketType>;
     };
@@ -94,7 +94,10 @@ concept ImmutablePayloadTraitsConcept =
  * payload handling strategy.
  */
 template<typename T>
-concept BackendTraitsConcept = BaseTraitsConcept<T> && (ModifiablePayloadTraitsConcept<T> != ImmutablePayloadTraitsConcept<T>);
+concept BackendTraitsConcept = 
+    BaseTraitsConcept<T> && (
+        ModifiablePayloadTraitsConcept<T> != ImmutablePayloadTraitsConcept<T>
+    );
 
 }   // namespace eliot::core
 

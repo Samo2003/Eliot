@@ -1,4 +1,4 @@
-name: Size generator  test
+name: Size generator test
 
 build:
   defaultAction: Drop

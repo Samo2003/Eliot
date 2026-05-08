@@ -8,6 +8,8 @@
 #include <queue>
 #include <iostream>
 #include <cerrno>
+#include <cstdint>
+#include <array>
 
 #include "socket.hpp"
 #include "nf_packet.hpp"

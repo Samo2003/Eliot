@@ -48,7 +48,7 @@ public:
         } while (u <= 0.0f);
 
         // Inverse transform sampling
-        float x = -_INV_LAMBDA * std::logf(u);
+        float x = -_INV_LAMBDA * std::log(u);
 
         // Check minimum bound
         if (x < _MIN) return _MIN;
