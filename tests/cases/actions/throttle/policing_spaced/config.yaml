@@ -15,4 +15,4 @@ timeout: 3.0
 send:
   - count: 10
     payload_size: 100
-    interval: 130
+    interval: 170
