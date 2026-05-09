@@ -143,7 +143,7 @@ class CaseRunner:
             received: list[ReceivedPacket] = []
             stop = False
 
-            def recv():
+            def recv() -> None:
                 sock.settimeout(0.1)
                 while not stop:
                     try:

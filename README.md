@@ -6,10 +6,10 @@ It transforms a declarative behavioral network specification defined as a `DAG`,
 ---
 
 ## Installation
-**Requirements:** Python >= 3.12, Ninja build system, C++20 compiler, CMake.
+**Requirements:** Python >= 3.10, Ninja build system, C++20 compiler, CMake.
 ```bash
 # Clone the repository
-git clone https://github.com/Samo2003/BP.git Eliot
+git clone https://github.com/Samo2003/Eliot.git
 cd Eliot
 
 # Create virtual environment
