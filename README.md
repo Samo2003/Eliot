@@ -20,9 +20,15 @@ source venv/bin/activate
 pip install .
 ```
 
-For development purposes install with development dependencies:
+For development install with development dependencies:
 ```bash
 pip install -e ".[dev]"
+```
+
+You can install the required system dependencies on Ubuntu using:
+```bash
+sudo apt update
+sudo apt install python3 python3-venv g++ cmake ninja-build
 ```
 
 ---
@@ -75,6 +81,13 @@ pytest -n auto
 ```
 
 The tests are located in the `tests/` directory. They consist of end-to-end tests to verify the complete generation and execution pipeline. Each test consists of generating code from DAG specification, building a binary file, sending defined packet sequences and validating the provided constraints.
+
+If you execute the tests without required system dependencies installed, first install them and then rerun the tests using the `--clean` flag to ensure that all generated code is removed and regenerated with the new dependencies:
+```bash
+pytest --clean -n auto
+```
+
+**Note:** For normal test execution, use the first mentioned command as it results in a faster test execution by reusing `CMake` build files.
 
 ---
 

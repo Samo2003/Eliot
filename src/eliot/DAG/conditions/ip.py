@@ -44,6 +44,9 @@ class IP(ConditionBase[Literal["IP"]]):
     @property
     def cpp_type(self) -> str:
         parts = [self.cpp_type_base]
+        
+        if self.ip is not None:
+            parts.append(f"any_{self.ip.replace('.', '_').replace(':', '_')}")
 
         if self.src is not None:
             parts.append(f"src_{self.src.replace('.', '_').replace(':', '_')}")
