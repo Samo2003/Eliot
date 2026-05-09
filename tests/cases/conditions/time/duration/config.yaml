@@ -17,5 +17,5 @@ send:
   - count: 1
   - delay: 50
   - count: 1
-  - delay: 200
+  - delay: 250
   - count: 50
