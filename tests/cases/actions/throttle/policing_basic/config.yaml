@@ -8,9 +8,9 @@ build:
       actions:
         - type: Throttle
           mode: policing
-          rate: 1000
+          rate: 400
 
 send:
   - count: 20
     payload_size: 100
-    interval: 60
+    interval: 170
