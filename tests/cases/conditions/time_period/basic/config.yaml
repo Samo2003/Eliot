@@ -14,7 +14,7 @@ send:
   - count: 1
   - delay: 150
   - count: 1
-  - delay: 50
+  - delay: 100
   - count: 1
-  - delay: 350
+  - delay: 300
   - count: 1

@@ -18,11 +18,11 @@ send:
   - count: 1
   - delay: 150
   - count: 1
-  - delay: 50
+  - delay: 100
   - count: 1
-  - delay: 250
+  - delay: 200
   - count: 1
   - delay: 100
   - count: 1
-  - delay: 250
+  - delay: 300
   - count: 1
