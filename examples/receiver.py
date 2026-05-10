@@ -3,6 +3,7 @@ import time
 import click
 from scapy.layers.inet import IP, TCP, UDP
 from scapy.packet import Raw
+from config import load_config
 
 PROTO_NAMES = {
     1: "icmp",
@@ -42,16 +43,15 @@ def describe_packet(data: bytes) -> str | None:
     context_settings={"help_option_names": ["-h", "--help"]},
     help="Receive packets forwarded by mocks/mock."
 )
-@click.option("--bind-ip", default="127.0.0.1", show_default=True)
-@click.option("--bind-port", default=9002, show_default=True, type=int)
-@click.option("--timeout", default=10.0, show_default=True, type=float)
-def main(bind_ip: str, bind_port: int, timeout: float) -> None:
+@click.option("--timeout", default=30.0, show_default=True, type=float)
+def main(timeout: float) -> None:
+    config = load_config()
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        sock.bind((bind_ip, bind_port))
+        sock.bind((config.server_ip, config.server_port))
         sock.settimeout(0.1)
 
-        click.echo(f"receiver listening on {bind_ip}:{bind_port}")
+        click.echo(f"receiver listening on {config.server_ip}:{config.server_port}")
         deadline = time.time() + timeout
         received = 0
 

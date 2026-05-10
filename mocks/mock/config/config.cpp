@@ -14,8 +14,8 @@ Config::Config(const std::string& config_path) {
     buffer << ifs.rdbuf();
     std::string config_file = buffer.str();
 
-    listen_ip = _get_value(config_file, "listen_ip");
-    listen_port = static_cast<uint16_t>(std::stoi(_get_value(config_file, "listen_port")));
+    eliot_ip = _get_value(config_file, "eliot_ip");
+    eliot_port = static_cast<uint16_t>(std::stoi(_get_value(config_file, "eliot_port")));
     client_ip = _get_value(config_file, "client_ip");
     client_port = static_cast<uint16_t>(std::stoi(_get_value(config_file, "client_port")));
     server_ip = _get_value(config_file, "server_ip");

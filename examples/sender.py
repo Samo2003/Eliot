@@ -2,6 +2,7 @@ import socket
 import click
 from scapy.layers.inet import ICMP, IP, TCP, UDP
 from scapy.packet import Raw
+from config import load_config
 
 def build_packet(
     protocol: str,
@@ -32,10 +33,6 @@ def build_packet(
     context_settings={"help_option_names": ["-h", "--help"]},
     help="Send simple IPv4 packets through mocks/mock."
 )
-@click.option("--eliot-ip", default="127.0.0.1", show_default=True)
-@click.option("--eliot-port", default=9000, show_default=True, type=int)
-@click.option("--client-ip", default="127.0.0.1", show_default=True)
-@click.option("--client-port", default=9001, show_default=True, type=int)
 @click.option("--src-ip", default="10.200.0.1", show_default=True)
 @click.option("--dst-ip", default="10.200.0.2", show_default=True)
 @click.option("--protocol", default="icmp", show_default=True, type=click.Choice(["icmp", "raw", "tcp", "udp"]))
@@ -43,10 +40,6 @@ def build_packet(
 @click.option("--dport", default=12345, show_default=True, type=int)
 @click.option("--count", default=1, show_default=True, type=int)
 def main(
-    eliot_ip: str,
-    eliot_port: int,
-    client_ip: str,
-    client_port: int,
     src_ip: str,
     dst_ip: str,
     protocol: str,
@@ -54,15 +47,20 @@ def main(
     dport: int,
     count: int,
 ) -> None:
+    config = load_config()
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        sock.bind((client_ip, client_port))
-        sock.connect((eliot_ip, eliot_port))
+        sock.bind((config.client_ip, config.client_port))
+        sock.connect((config.eliot_ip, config.eliot_port))
 
         for i in range(count):
             payload = f"packet-{i}".encode("ascii")
             packet = build_packet(protocol, src_ip, dst_ip, sport, dport, payload)
-            sock.send(packet)
+            try:
+                sock.send(packet)
+            except Exception as e:
+                click.echo(f"failed to send packet: {e}", err=True)
+                continue
             click.echo(f"sent #{i + 1}: {src_ip}->{dst_ip} proto={protocol} bytes={len(packet)}")
 
 if __name__ == "__main__":

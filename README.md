@@ -48,11 +48,20 @@ The following commands assume that the virtual environment is activated.
 
 **Note:** The `benchmark`, `profile`, and `test` commands only work with editable installation (`pip install -e ".[dev]"`), as they rely on example backends and traits included in the repository.
 
+### Options for the `generate` Command
+| Option | Default | Description |
+|--------|---------|-------------|
+| `-d \| --dag` | None | Path to the DAG specification file (YAML or JSON) |
+| `-t \| --traits` | None | Path to the traits file (C++ header) |
+| `-b \| --backend` | None | Path to the backend directory containing CMakeLists.txt |
+| `-o \| --output` | `.` | Path to the output directory for generated code and binary file |
+| `-h \| --help` | None | Show help message and exit |
+
 ### DAG specification
-To define the network target behavior you need to create a `DAG` specification file in `YAML` or `JSON` format. Example files can be found in `example_dags/`. The exact arguments and structures of each node can be found in classes defined in `src/eliot/DAG/`.
+To define the target network behavior you need to create a `DAG` specification file in `YAML` or `JSON` format. Example files can be found in `examples/dags/`. The exact arguments and structures of each node can be found in classes defined in `src/eliot/DAG/`.
 
 ### Traits Setup
-You need to specify a traits file defining a linking layer between your backend and the generated code. The file `traits/TraitsTemplate.hpp` contains required methods together with their explanations. Other files in the `traits/` directory serve as examples.
+You need to specify a traits file defining an adapter layer between your backend and the generated code. The file `traits/TraitsTemplate.hpp` contains required methods together with their explanations. Other files in the `traits/` directory serve as examples.
 
 ### Code generation
 To generate the code and binary file, run:
@@ -62,15 +71,38 @@ eliot generate \
     --traits <path_to_traits_file> \
     --backend <path_to_backend_directory>
 ```
-The generated code will be placed by default in the current directory in the `generated/` folder. You can change the output directory by adding the `--output <path_to_output_directory>` argument to the command above. The result is a generated `C++` code and a compiled binary file `eliot-run`.
+The generated code will be placed by default in the current directory under `generated/`, and the compiled binary will be copied to `./eliot-run`. You can change the output directory by adding the `--output <path_to_output_directory>` argument to the command above.
 
-Example of the command:
+### Examples
+Example of the `generate` command:
 ```bash
 eliot generate \
-    --dag example_dags/line_control.yaml \
+    --dag examples/dags/drop_every_second.yaml \
     --traits traits/MockTraits.hpp \
     --backend mocks/mock
 ```
+
+This command generates code for a DAG specification that drops every second packet, using a mock backend and traits file. The target behavior can be tested using the following commands:
+
+In **terminal 1** execute `eliot-run` to start the generated binary:
+```bash
+./eliot-run examples/backend_config.json
+```
+**Note:** The `examples/backend_config.json` file contains the configuration for ports and `IP` addresses of the mock backend, which is used in this example.
+
+In **terminal 2** execute the receiver script to accept packets:
+```bash
+python examples/receiver.py
+```
+
+In **terminal 3** execute the sender script to send packets:
+```bash
+python examples/sender.py --count 10
+```
+
+This will send 10 `ICMP` packets from the sender to the receiver. The generated code will drop every second packet, so only 5 packets will be received by the receiver. You can modify the DAG specification to change the behavior or test different scenarios.
+
+For more details about the example scripts and available scenario DAGs, see [examples/README.md](examples/README.md).
 
 ---
 

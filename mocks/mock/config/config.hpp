@@ -25,10 +25,10 @@ public:
     explicit Config(const std::string& config_path);
 
     ///> IP address to bind listening socket
-    std::string listen_ip;
+    std::string eliot_ip;
 
     ///> Port to bind listening socket
-    uint16_t listen_port;
+    uint16_t eliot_port;
 
     ///> Client endpoint IP
     std::string client_ip;

@@ -23,7 +23,7 @@ public:
      * @brief Construct NFCore using configuration.
      */
     explicit NFCore(const Config& config) 
-        : _receive_socket(_make_recv_socket(config.listen_ip, config.listen_port)),
+        : _receive_socket(_make_recv_socket(config.eliot_ip, config.eliot_port)),
         _send_socket(_make_send_socket()) {
             _translate_address(config.client_ip, config.client_port, _client_addr);
             _translate_address(config.server_ip, config.server_port, _server_addr);  
