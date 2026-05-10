@@ -35,6 +35,6 @@ addopts = "--ignore=tests/output"
 [tool.mypy]
 python_version = "3.10"
 strict = true
-files = ["src", "tests"]
+files = ["src", "tests", "examples"]
 exclude = "tests/cases/"
 install_types = true
