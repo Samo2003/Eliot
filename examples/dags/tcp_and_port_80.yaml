@@ -2,17 +2,14 @@
 root:
   condition:
     type: Protocol
-    id: 6     # TCP protocol number
+    id: 6     # TCP
   if_true:
     condition:
       type: Port
       port: 80
     if_true:
-      action:
-        type: Drop
+      action: { type: Drop }
     if_false:
-      action:
-        type: Finish
+      action: { type: Finish }
   if_false:
-    action:
-      type: Finish
+    action: { type: Finish }

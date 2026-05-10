@@ -1,0 +1,8 @@
+{
+    "listen_ip": "127.0.0.1",
+    "listen_port": 9000,
+    "client_ip": "127.0.0.1",
+    "client_port": 9001,
+    "server_ip": "127.0.0.1",
+    "server_port": 9002
+}

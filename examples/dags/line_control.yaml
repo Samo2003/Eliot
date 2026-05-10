@@ -24,8 +24,7 @@ root:
       target: CONTROL                       # State node reference
       state: DELAY
     next:
-      action:
-        type: Drop
+      action: { type: Drop }
   if_false:
     condition:
       type: Payload
@@ -38,8 +37,7 @@ root:
         target: CONTROL                     # State node reference
         state: ACTIVE
       next:
-        action:
-          type: Drop
+        action: { type: Drop }
     if_false:
       condition:
         type: Payload
@@ -52,15 +50,13 @@ root:
           target: CONTROL                   # State node reference
           state: DROP
         next:
-          action:
-            type: Drop
+          action: { type: Drop }
       if_false:
         id: CONTROL                         # State node identifier
         initial: ACTIVE
         transitions:
           ACTIVE:
-            action:
-              type: Finish
+            action: { type: Finish }
           
           DELAY:
             action:
@@ -70,9 +66,7 @@ root:
                 m: 200
                 s: 25
             next:
-              action:
-                type: Finish
+              action: { type: Finish }
           
           DROP:
-            action:
-              type: Drop
+            action: { type: Drop }

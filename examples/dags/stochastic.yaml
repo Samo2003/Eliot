@@ -14,11 +14,9 @@ root:
         m: 0.5
         s: 0.2
     if_true:
-      action:
-        type: Finish
+      action: { type: Finish }
     if_false:
-      action:
-        type: Drop
+      action: { type: Drop }
   
   if_false:
     condition:
@@ -28,8 +26,6 @@ root:
         m: 0.3
         s: 0.1
     if_true:
-      action:
-        type: Finish
+      action: { type: Finish }
     if_false:
-      action:
-        type: Drop
+      action: { type: Drop }

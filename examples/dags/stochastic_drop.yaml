@@ -5,8 +5,6 @@ root:
     type: Prob
     x: 0.3
   if_true:
-    action:
-      type: Drop
+    action: { type: Drop }
   if_false:
-    action:
-      type: Finish
+    action: { type: Finish }

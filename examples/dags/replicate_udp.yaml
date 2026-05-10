@@ -9,9 +9,7 @@ root:
       type: Replicate
       n: 1
     next:
-      action:
-        type: Finish
+      action: { type: Finish }
   if_false:
-    action:
-      type: Finish
+    action: { type: Finish }
   

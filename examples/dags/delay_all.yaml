@@ -10,5 +10,4 @@ root:
       min: 1
       max: 200
   next:
-    action:
-      type: Finish
+    action: { type: Finish }

@@ -1,0 +1,7 @@
+# Drops every second packet
+root:
+  condition: { type: EveryN, N: 2 }
+  if_true:
+    action: { type: Drop }
+  if_false:
+    action: { type: Finish }

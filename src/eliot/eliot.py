@@ -46,21 +46,26 @@ def execute_generator(
     """
     Generate pipeline code from DAG specification.
     """
-
-    # Create generator configuration
-    config = GeneratorConfig(
-        dag_path=dag,
-        test_case_path=test_case,
-        output_path=output,
-        traits_path=traits,
-        backend_path=backend,
-        profiling=profiling,
-        testing=testing
-    )
-
-    generator = Generator(config)
+    
+    # No specification file provided
+    if not dag and not test_case:
+        click.echo("No input file provided (use --dag or --test_case)", err=True)
+        sys.exit(1)
 
     try:
+        # Create generator configuration
+        config = GeneratorConfig(
+            dag_path=dag,
+            test_case_path=test_case,
+            output_path=output,
+            traits_path=traits,
+            backend_path=backend,
+            profiling=profiling,
+            testing=testing
+        )
+
+        generator = Generator(config)
+        
         # Execute generation process
         generator.run()
 

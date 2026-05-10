@@ -1,0 +1,15 @@
+# Reorders all UDP packets in groups of 5
+root:
+  condition:
+    type: Protocol
+    id: 17    # UDP
+  if_true:
+    action:
+      type: Reorder
+      n: 5
+      strategy: reverse
+    next:
+      action: { type: Finish }
+  if_false:
+    action: { type: Finish }
+  
