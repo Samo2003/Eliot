@@ -1,6 +1,6 @@
 # Examples
 
-[go-back](../README.md#examples)
+[Back to main README](../README.md#examples)
 
 This directory contains DAG examples and two helper scripts for trying them with the `mocks/mock` backend.
 

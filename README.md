@@ -63,6 +63,8 @@ To define the target network behavior you need to create a `DAG` specification f
 ### Traits Setup
 You need to specify a traits file defining an adapter layer between your backend and the generated code. The file `traits/TraitsTemplate.hpp` contains required methods together with their explanations. Other files in the `traits/` directory serve as examples.
 
+The repository also contains several lightweight backend implementations in `mocks/`. See [mocks/README.md](mocks/README.md) for a short overview.
+
 ### Code generation
 To generate the code and binary file, run:
 ```bash
