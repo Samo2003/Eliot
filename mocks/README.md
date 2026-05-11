@@ -1,11 +1,9 @@
 # Mock Backends
 [Back to main README](../README.md#traits-setup)
 
-This directory contains simple backend implementations used for testing,
-examples, benchmarking, and profiling generated fault models.
+This directory contains simple backend implementations used for testing, examples, benchmarking, and profiling generated fault models.
 
-Each backend exposes the queue-like interface expected by Eliot through a
-matching traits file in `traits/`.
+Each backend exposes the queue-like interface expected by Eliot through a&nbsp;matching traits file in `traits/`.
 
 | Backend | Traits file | Purpose |
 |---------|-------------|---------|

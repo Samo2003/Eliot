@@ -2,7 +2,7 @@
 
 [Back to main README](../README.md#examples)
 
-This directory contains DAG examples and two helper scripts for trying them with the `mocks/mock` backend.
+This directory contains `DAG` examples and two helper scripts for trying them with the `mocks/mock` backend.
 
 The demo topology is:
 
@@ -14,7 +14,7 @@ sender.py -> eliot-run -> receiver.py
 
 ## Basic workflow
 
-Generate an executable for one DAG:
+Generate an executable for one `DAG`:
 
 ```bash
 eliot generate \
@@ -61,9 +61,7 @@ python examples/sender.py --count 10 --protocol tcp --sport 12345 --dport 80
 python examples/sender.py --count 10 --dst-ip 10.200.0.99
 ```
 
-The sender puts a readable payload like `packet-0`, `packet-1`, ... into each
-packet. The receiver prints this payload, which is useful for observing reorder
-or replication behavior.
+The sender puts a readable payload like `packet-0` into each packet. The receiver prints this payload, which is useful for observing reorder or replication behavior.
 
 ## Receiver options
 

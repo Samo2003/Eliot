@@ -30,7 +30,7 @@ python3 -m venv venv
 source venv/bin/activate
 
 # Install dependencies
-pip install .
+pip install -e .
 ```
 
 For development install with development dependencies:
@@ -38,7 +38,7 @@ For development install with development dependencies:
 pip install -e ".[dev]"
 ```
 
-You can install the required system dependencies on Ubuntu using:
+You can install the required system dependencies on `Ubuntu` using:
 ```bash
 sudo apt update
 sudo apt install python3 python3-venv g++ cmake ninja-build
@@ -59,7 +59,7 @@ The following commands assume that the virtual environment is activated.
 | `test` | Generate code using the testing backend |
 | `schema` | Print the JSON schema for DAG specifications |
 
-**Note:** The `benchmark`, `profile`, and `test` commands only work with editable installation (`pip install -e ".[dev]"`), as they rely on example backends and traits included in the repository.
+**Note:** The `benchmark`, `profile`, and `test` commands only work with editable installation (`pip install -e .`), as they rely on example backends and traits included in the repository.
 
 ### Options for the `generate` Command
 | Option | Default | Description |
@@ -117,9 +117,9 @@ In **terminal 3** execute the sender script to send packets:
 python examples/sender.py --count 10
 ```
 
-This will send 10 `ICMP` packets from the sender to the receiver. The generated code will drop every second packet, so only 5 packets will be received by the receiver. You can modify the DAG specification to change the behavior or test different scenarios.
+This will send **10** `ICMP` packets from the sender to the receiver. The generated code will drop every second packet, so only **5** packets will be received by the receiver. You can modify the DAG specification to change the behavior or test different scenarios.
 
-For more details about the example scripts and available scenario DAGs, see [examples/README.md](examples/README.md).
+For more details about the examples see [examples/README.md](examples/README.md).
 
 ---
 
@@ -143,4 +143,4 @@ pytest --clean -n auto
 ---
 
 ## Notes
-Some source code comments were generated using [`ChatGPT`](https://chat.openai.com).
+Some source code comments were generated using [ChatGPT](https://chat.openai.com).

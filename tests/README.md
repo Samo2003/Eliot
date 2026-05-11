@@ -2,8 +2,7 @@
 
 [Back to main README](../README.md#tests)
 
-End-to-end tests are in `tests/cases/`. Each test case is stored in its own
-directory and must contain two files:
+End-to-end tests are in `tests/cases/`. Each test case is stored in its own directory and must contain two files:
 
 ```text
 tests/cases/<category>/<case_name>/
@@ -11,8 +10,7 @@ tests/cases/<category>/<case_name>/
   assert.py
 ```
 
-`config.yaml` describes the generated model and the packets to send. The `build` field can contain either a DAG (`root: ...`) or a test-case rule model
-(`defaultAction` and `rules`). The `send` field describes the sequence of packets to send to the generated binary. The `timeout` field specifies the maximum time to wait for the test to complete, in seconds after sending all packets. This is useful when testing actions such as `Delay`.
+`config.yaml` describes the generated model and the packets to send. The `build` field can contain either a DAG (`root: ...`) or a test-case rule model (`defaultAction` and `rules`). The `send` field describes the sequence of packets to send to the generated binary. The `timeout` field specifies the maximum time to wait for the test to complete, in seconds after sending all packets. This is useful when testing actions such as `Delay`.
 
 Minimal example:
 
@@ -48,8 +46,7 @@ Packet send steps support fields such as:
 | `delay` | `null` | Delay before this step, in milliseconds |
 | `interval` | `0` | Delay between packets, in milliseconds |
 
-`assert.py` must define a `check(stats: ExchangeStats) -> None` function. Use
-plain `assert` statements inside it.
+`assert.py` must define a `check(stats: ExchangeStats) -> None` function. Use plain `assert` statements inside it.
 
 Minimal example:
 
