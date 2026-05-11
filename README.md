@@ -3,6 +3,19 @@
 
 It transforms a declarative behavioral network specification defined as a `DAG`, into `C++` code that is compiled into a standalone tool. The generated code is compiled together with a provided backend implementation. A traits file provides the linking layer between the generated code and the backend, allowing the generated model to interact with the fault injector backend.
 
+## Contents
+
+- [Installation](#installation)
+- [Usage](#usage)
+  - [Available Commands](#available-commands)
+  - [Options for the `generate` Command](#options-for-the-generate-command)
+  - [DAG specification](#dag-specification)
+  - [Traits Setup](#traits-setup)
+  - [Code generation](#code-generation)
+  - [Examples](#examples)
+- [Tests](#tests)
+- [Notes](#notes)
+
 ---
 
 ## Installation
@@ -60,6 +73,8 @@ The following commands assume that the virtual environment is activated.
 ### DAG specification
 To define the target network behavior you need to create a `DAG` specification file in `YAML` or `JSON` format. Example files can be found in `examples/dags/`. The exact arguments and structures of each node can be found in classes defined in `src/eliot/DAG/`.
 
+The model is designed to be extensible: new actions, conditions, and value generators can be added by defining the corresponding DAG model class and code-generation template.
+
 ### Traits Setup
 You need to specify a traits file defining an adapter layer between your backend and the generated code. The file `traits/TraitsTemplate.hpp` contains required methods together with their explanations. Other files in the `traits/` directory serve as examples.
 
@@ -115,6 +130,8 @@ pytest -n auto
 ```
 
 The tests are located in the `tests/` directory. They consist of end-to-end tests to verify the complete generation and execution pipeline. Each test consists of generating code from DAG specification, building a binary file, sending defined packet sequences and validating the provided constraints.
+
+For details on adding new test cases, see [tests/README.md](tests/README.md).
 
 If you execute the tests without required system dependencies installed, first install them and then rerun the tests using the `--clean` flag to ensure that all generated code is removed and regenerated with the new dependencies:
 ```bash
