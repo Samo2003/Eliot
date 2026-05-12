@@ -57,23 +57,23 @@ The following commands assume that the virtual environment is activated.
 | `benchmark` | Generate code using the benchmark backend |
 | `profile` | Generate code configured for profiling |
 | `test` | Generate code using the testing backend |
-| `schema` | Print the JSON schema for DAG specifications |
+| `schema` | Print the `JSON` schema for `DAG` specifications |
 
 **Note:** The `benchmark`, `profile`, and `test` commands only work with editable installation (`pip install -e .`), as they rely on example backends and traits included in the repository.
 
 ### Options for the `generate` Command
 | Option | Default | Description |
 |--------|---------|-------------|
-| `-d \| --dag` | None | Path to the DAG specification file (YAML or JSON) |
-| `-t \| --traits` | None | Path to the traits file (C++ header) |
-| `-b \| --backend` | None | Path to the backend directory containing CMakeLists.txt |
+| `-d \| --dag` | None | Path to the `DAG` specification file (`YAML` or `JSON`) |
+| `-t \| --traits` | None | Path to the traits file (`C++` header) |
+| `-b \| --backend` | None | Path to the backend directory containing `CMakeLists.txt` |
 | `-o \| --output` | `.` | Path to the output directory for generated code and binary file |
 | `-h \| --help` | None | Show help message and exit |
 
 ### DAG specification
 To define the target network behavior you need to create a `DAG` specification file in `YAML` or `JSON` format. Example files can be found in `examples/dags/`. The exact arguments and structures of each node can be found in classes defined in `src/eliot/DAG/`.
 
-The model is designed to be extensible: new actions, conditions, and value generators can be added by defining the corresponding DAG model class and code-generation template.
+The model is designed to be extensible: new actions, conditions, and value generators can be added by defining the corresponding `DAG` model class and code-generation template.
 
 ### Traits Setup
 You need to specify a traits file defining an adapter layer between your backend and the generated code. The file `traits/TraitsTemplate.hpp` contains required methods together with their explanations. Other files in the `traits/` directory serve as examples.
@@ -99,13 +99,13 @@ eliot generate \
     --backend mocks/mock
 ```
 
-This command generates code for a DAG specification that drops every second packet, using a mock backend and traits file. The target behavior can be tested using the following commands:
+This command generates code for a `DAG` specification that drops every second packet, using a mock backend and traits file. The target behavior can be tested using the following commands:
 
 In **terminal 1** execute `eliot-run` to start the generated binary:
 ```bash
 ./eliot-run examples/backend_config.json
 ```
-**Note:** The `examples/backend_config.json` file contains the configuration for ports and `IP` addresses of the mock backend, which is used in this example.
+**Note:** The `examples/backend_config.json` file contains the configuration for ports and IP addresses of the mock backend, which is used in this example.
 
 In **terminal 2** execute the receiver script to accept packets:
 ```bash
@@ -117,7 +117,7 @@ In **terminal 3** execute the sender script to send packets:
 python examples/sender.py --count 10
 ```
 
-This will send **10** `ICMP` packets from the sender to the receiver. The generated code will drop every second packet, so only **5** packets will be received by the receiver. You can modify the DAG specification to change the behavior or test different scenarios.
+This will send **10** `ICMP` packets from the sender to the receiver. The generated code will drop every second packet, so only **5** packets will be received by the receiver. You can modify the `DAG` specification to change the behavior or test different scenarios.
 
 For more details about the examples see [examples/README.md](examples/README.md).
 
@@ -129,7 +129,7 @@ To execute the tests run:
 pytest -n auto
 ```
 
-The tests are located in the `tests/` directory. They consist of end-to-end tests to verify the complete generation and execution pipeline. Each test consists of generating code from DAG specification, building a binary file, sending defined packet sequences and validating the provided constraints.
+The tests are located in the `tests/` directory. They consist of end-to-end tests to verify the complete generation and execution pipeline. Each test consists of generating code from `DAG` specification, building a binary file, sending defined packet sequences and validating the provided constraints.
 
 For details on adding new test cases, see [tests/README.md](tests/README.md).
 
