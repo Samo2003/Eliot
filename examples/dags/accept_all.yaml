@@ -1,0 +1,3 @@
+# Forwards all incoming packets
+root:
+  action: { type: Finish }

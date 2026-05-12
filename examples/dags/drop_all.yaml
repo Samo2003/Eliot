@@ -1,0 +1,3 @@
+# Drops all incoming packets
+root:
+  action: { type: Drop }

@@ -1,0 +1,10 @@
+# Drops all UDP packets
+root:
+  condition:
+    type: Protocol
+    id: 17    # UDP
+  if_true:
+    action: { type: Drop }
+  if_false:
+    action: { type: Finish }
+  
