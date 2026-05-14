@@ -27,6 +27,9 @@ dev = [
 [project.scripts]
 eliot = "eliot.cli:main"
 
+[tool.setuptools.package-data]
+eliot = ["py.typed", "templates/**/*"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
