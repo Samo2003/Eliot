@@ -149,7 +149,7 @@ generated::Packet* Calendar::get_ready() noexcept {
 /**
  * @brief Clears all items from specified wheel level.
  */
-void Calendar::_clear_wheel(std::array<BucketT, _SLOTS>& wheel) noexcept {
+void Calendar::_clear_wheel(WheelT& wheel) noexcept {
     for (uint32_t i = 0; i < _SLOTS; i++) {
         CalendarItem *item;
         while ((item = wheel[i].pop())) {

@@ -50,9 +50,7 @@ concept BaseTraitsConcept =
         { T::payload(cp) } -> std::same_as<const std::vector<uint8_t>&>;
 
         // Compile-time payload mutability flag
-        requires requires { 
-            { T::modifiable_payload } -> std::convertible_to<bool>;
-        };
+        { T::modifiable_payload } -> std::convertible_to<bool>;
     };
 
 /**

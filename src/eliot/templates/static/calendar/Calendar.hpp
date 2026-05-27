@@ -116,14 +116,17 @@ private:
     ///> Bucket type used for each wheel slot.
     using BucketT = Bucket<CalendarItem>;
 
+    ///> Wheel type used for each wheel
+    using WheelT = std::array<BucketT, _SLOTS>;
+
     ///> First-level timer wheel.
-    std::array<BucketT, _SLOTS> _wheel0{};
+    WheelT _wheel0{};
 
     ///> Second-level timer wheel.
-    std::array<BucketT, _SLOTS> _wheel1{};
+    WheelT _wheel1{};
 
     ///> Third-level timer wheel.
-    std::array<BucketT, _SLOTS> _wheel2{};
+    WheelT _wheel2{};
 
     ///> Item pool for calendar items.
     ItemPool<CalendarItem, 4096> _item_pool;
@@ -141,7 +144,7 @@ private:
     /**
      * @brief Clears all items from specified wheel.
      */
-    void _clear_wheel(std::array<BucketT, _SLOTS>& wheel) noexcept;
+    void _clear_wheel(WheelT& wheel) noexcept;
     
     /**
      * @brief Returns current tick based on monotonic clock.
