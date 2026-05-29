@@ -1,5 +1,6 @@
 import socket
 import click
+import time
 from scapy.layers.inet import ICMP, IP, TCP, UDP
 from scapy.packet import Raw
 from config import load_config
@@ -39,6 +40,7 @@ def build_packet(
 @click.option("--sport", default=12345, show_default=True, type=int)
 @click.option("--dport", default=12345, show_default=True, type=int)
 @click.option("--count", default=1, show_default=True, type=int)
+@click.option("--interval", default=0.0, show_default=True, type=float)
 def main(
     src_ip: str,
     dst_ip: str,
@@ -46,6 +48,7 @@ def main(
     sport: int,
     dport: int,
     count: int,
+    interval: float,
 ) -> None:
     config = load_config()
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
@@ -62,6 +65,10 @@ def main(
                 click.echo(f"failed to send packet: {e}", err=True)
                 continue
             click.echo(f"sent #{i + 1}: {src_ip}->{dst_ip} proto={protocol} bytes={len(packet)}")
+
+            if interval and i != count - 1:
+                click.echo(f"sleeping for {interval} seconds")
+                time.sleep(interval)
 
 if __name__ == "__main__":
     main()

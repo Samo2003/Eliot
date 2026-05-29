@@ -51,6 +51,7 @@ python examples/sender.py --count 10
 | `--dst-ip` | `10.200.0.2` | Destination IP written into the generated packet |
 | `--sport` | `12345` | Source port for UDP/TCP packets |
 | `--dport` | `12345` | Destination port for UDP/TCP packets |
+| `--interval` | `0` | Interval between packets in seconds |
 
 Examples:
 
@@ -86,6 +87,7 @@ The bind address and port are read from `examples/backend_config.json`.
 | [accept_all.yaml](dags/accept_all.yaml) | Forwards all packets without modification. Useful as a baseline. |
 | [drop_all.yaml](dags/drop_all.yaml) | Drops all incoming packets. |
 | [drop_udp.yaml](dags/drop_udp.yaml) | Drops all UDP packets. Use `--protocol udp` to trigger it. |
+| [drop_cycles.yaml](dags/drop_cycles.yaml) | Drops all packets every other second. Use `--interval 1 --count 10` to trigger it. |
 | [drop_every_second.yaml](dags/drop_every_second.yaml) | Drops every second packet. |
 | [delay_all.yaml](dags/delay_all.yaml) | Delays every packet using a sequence-based delay generator. |
 | [reorder_udp.yaml](dags/reorder_udp.yaml) | Reorders UDP packets in groups of five using reverse order. Use `--protocol udp --count 10`. |

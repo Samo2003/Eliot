@@ -1,0 +1,11 @@
+# Drops packets every other second
+
+root:
+  condition:
+    type: TimePeriod
+    t: 1
+    unit: s
+  if_true:
+    action: { type: Finish }
+  if_false:
+    action: { type: Drop }
