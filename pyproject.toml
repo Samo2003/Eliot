@@ -21,7 +21,10 @@ dev = [
     "pytest",
     "pytest-xdist",
     "mypy",
-    "types-PyYAML"
+    "types-PyYAML",
+    "types-Pygments",
+    "types-colorama",
+    "types-pexpect"
 ]
 
 [project.scripts]
@@ -41,3 +44,4 @@ strict = true
 files = ["src", "tests", "examples"]
 exclude = "tests/cases/"
 install_types = true
+non_interactive = true
