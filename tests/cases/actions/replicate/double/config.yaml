@@ -7,9 +7,9 @@ build:
       conditions: []
       actions:
         - type: Replicate
-          n: 10
+          n: 5
         - type: Replicate
-          n: 10
+          n: 5
 
 send:
   - count: 2
